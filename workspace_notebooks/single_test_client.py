@@ -10,10 +10,10 @@ round_metrics_filename = f'../simulation_results/round_metrics{NUM_CLIENTS_SINGL
 
 all_epoch_metrics, all_round_metrics = sim.run_tests(
     num_clients_list=[NUM_CLIENTS_SINGLE_TEST],
-    batch_size_list=[32, 64, 128],
+    batch_size_list=[32],
     num_steps_until_rtc_check_list=[1],
-    theta_list=[0.05, 0.5, 1., 3., 5., 7., 10.],
-    num_epochs=10,
+    theta_list=[1., 3.],
+    num_epochs=50,
     sketch_width=500,
     sketch_depth=7
 )
