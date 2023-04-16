@@ -1199,9 +1199,8 @@ def run_simulations(train_dataset, test_dataset, num_clients_list, batch_size_li
                     all_round_metrics.extend(complete_round_metrics)
                     
     return all_epoch_metrics, all_round_metrics
-                    
-
-
+        
+    
 # ## Run tests
 
 # In[ ]:
