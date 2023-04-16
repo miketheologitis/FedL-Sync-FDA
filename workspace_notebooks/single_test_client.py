@@ -8,7 +8,7 @@ NUM_CLIENTS_SINGLE_TEST = int(sys.argv[1])
 epoch_metrics_filename = f'../simulation_results/epoch_metrics{NUM_CLIENTS_SINGLE_TEST}.parquet'
 round_metrics_filename = f'../simulation_results/round_metrics{NUM_CLIENTS_SINGLE_TEST}.parquet'
 
-all_epoch_metrics, all_round_metrics = sim.run_tests(
+all_epoch_metrics, all_round_metrics = sim.run_simulations(
     num_clients_list=[NUM_CLIENTS_SINGLE_TEST],
     batch_size_list=[32],
     num_steps_until_rtc_check_list=[1],
