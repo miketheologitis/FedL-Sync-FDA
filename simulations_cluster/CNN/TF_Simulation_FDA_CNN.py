@@ -1092,7 +1092,7 @@ def prepare_for_federated_simulation(num_clients, train_dataset, batch_size, num
     
     # 1. Helper variable to count Epochs
     if bench_test:
-        fda_steps_in_one_epoch = 5
+        fda_steps_in_one_epoch = 10
     else:
         fda_steps_in_one_epoch = ((n_train / batch_size) / num_clients) / num_steps_until_rtc_check
     
@@ -1124,41 +1124,66 @@ def print_current_test_info(num_clients, batch_size, num_epochs, num_steps_until
     print()
 
 
-# ### Basic Test FDA
-# 
-# Test *naive*, *linear* and *sketch* methods for fixed parameters.
+# ### Single FDA method simulation
 
 # In[36]:
 
 
+from math import sqrt
+
+def single_simulation(fda_name, num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
+                     theta, num_epochs, sketch_width=-1, sketch_depth=-1, bench_test=False):
+    
+     # 1. Preparation
+    server_cnn, client_cnns, federated_dataset, fda_steps_in_one_epoch = prepare_for_federated_simulation(
+        num_clients, train_dataset, batch_size, num_steps_until_rtc_check, bench_test=bench_test
+    )
+
+    # 2. Simulation
+    epoch_metrics_list, round_metrics_list = federated_simulation(
+        test_dataset, federated_dataset, fda_name, server_cnn, client_cnns, num_epochs, theta, fda_steps_in_one_epoch,
+        ams_sketch = AmsSketch(width=sketch_width, depth=sketch_depth) if fda_name == "sketch" else None,
+        epsilon = 1. / sqrt(sketch_width) if fda_name == "sketch" else None
+    )
+
+    # 3. Create Test ID
+    test_id = TestId(
+        "EMNIST", fda_name, num_clients, batch_size, num_steps_until_rtc_check, theta, 
+        count_weights(server_cnn), sketch_width, sketch_depth
+    )
+
+    # 4. Store ID'd Metrics
+    epoch_metrics_with_test_id_list, round_metrics_with_test_id_list = process_metrics_with_test_id(
+        epoch_metrics_list, round_metrics_list, test_id
+    )
+    
+    # Not needed, but we are proactive because `Dask` uses this
+    del server_cnn, client_cnns, federated_dataset
+    
+    return epoch_metrics_with_test_id_list, round_metrics_with_test_id_list
+
+
+# ### Basic Test FDA
+# 
+# Test *naive*, *linear* and *sketch* methods for fixed parameters.
+
+# In[37]:
+
+
 def basic_simulation(num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
-                     theta, num_epochs, ams_sketch, epsilon, bench_test=False):
+                     theta, num_epochs, sketch_width, sketch_depth, bench_test=False):
     
     complete_epoch_metrics = []
     complete_round_metrics = []
     
     for fda_name in ["naive", "linear", "sketch"]:
         
-        # 1. Preparation
-        server_cnn, client_cnns, federated_dataset, fda_steps_in_one_epoch = prepare_for_federated_simulation(
-            num_clients, train_dataset, batch_size, num_steps_until_rtc_check, bench_test=bench_test
-        )
-
-        # 2. Simulation
-        epoch_metrics_list, round_metrics_list = federated_simulation(
-            test_dataset, federated_dataset, fda_name, server_cnn, client_cnns, num_epochs, theta, fda_steps_in_one_epoch,
-            ams_sketch if fda_name == "sketch" else None, epsilon if fda_name == "sketch" else None
-        )
-
-        # 3. Create Test ID
-        test_id = TestId(
-            "EMNIST", fda_name, num_clients, batch_size, num_steps_until_rtc_check, theta, count_weights(server_cnn),
-            ams_sketch.width if fda_name == "sketch" else -1, ams_sketch.depth if fda_name == "sketch" else -1
-        )
-        
         # 4. Store ID'd Metrics
-        epoch_metrics_with_test_id_list, round_metrics_with_test_id_list = process_metrics_with_test_id(
-            epoch_metrics_list, round_metrics_list, test_id
+        epoch_metrics_with_test_id_list, round_metrics_with_test_id_list = single_simulation(
+            fda_name, num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check, theta, num_epochs,
+            sketch_width = sketch_width if fda_name == "sketch" else -1, 
+            sketch_depth = sketch_depth if fda_name == "sketch" else -1, 
+            bench_test=bench_test
         )
 
         complete_epoch_metrics.extend(epoch_metrics_with_test_id_list)
@@ -1170,16 +1195,11 @@ def basic_simulation(num_clients, train_dataset, test_dataset, batch_size, num_s
 
 # ## All combinations Test function
 
-# In[37]:
+# In[38]:
 
-
-from math import sqrt
 
 def run_simulations(train_dataset, test_dataset, num_clients_list, batch_size_list, num_steps_until_rtc_check_list,
                     theta_list, num_epochs, sketch_width, sketch_depth, bench_test=False):
-    
-    ams_sketch = AmsSketch(width=sketch_width, depth=sketch_depth)
-    epsilon = 1. / sqrt(sketch_width)
     
     all_epoch_metrics = []
     all_round_metrics = []
@@ -1192,18 +1212,19 @@ def run_simulations(train_dataset, test_dataset, num_clients_list, batch_size_li
                     
                     complete_epoch_metrics, complete_round_metrics = basic_simulation(
                         num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
-                        theta, num_epochs, ams_sketch, epsilon, bench_test=bench_test
+                        theta, num_epochs, sketch_width, sketch_depth, bench_test=bench_test
                     )
                     
                     all_epoch_metrics.extend(complete_epoch_metrics)
                     all_round_metrics.extend(complete_round_metrics)
                     
     return all_epoch_metrics, all_round_metrics
-        
-    
+                    
+
+
 # ## Run tests
 
-# In[ ]:
+# In[42]:
 
 
 if __name__ == '__main__' and '__file__' not in globals():
@@ -1216,18 +1237,19 @@ if __name__ == '__main__' and '__file__' not in globals():
     all_epoch_metrics, all_round_metrics = run_simulations(
         train_dataset=train_dataset,
         test_dataset=test_dataset,
-        num_clients_list=[10],
+        num_clients_list=[5, 20, 4, 11, 15, 7],
         batch_size_list=[32],
         num_steps_until_rtc_check_list=[1],
         theta_list=[1.],
-        num_epochs=25,
+        num_epochs=1,
         sketch_width=500,
-        sketch_depth=7
+        sketch_depth=7,
+        bench_test=True
     )
     
     epoch_metrics_df = pd.DataFrame(all_epoch_metrics)
     round_metrics_df = pd.DataFrame(all_round_metrics)
     
-    epoch_metrics_df.to_parquet(epoch_metrics_filename)
-    round_metrics_df.to_parquet(round_metrics_filename)
+    #epoch_metrics_df.to_parquet(epoch_metrics_filename)
+    #round_metrics_df.to_parquet(round_metrics_filename)
 
