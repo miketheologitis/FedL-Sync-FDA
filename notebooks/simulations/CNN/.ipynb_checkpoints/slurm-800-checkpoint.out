@@ -1,0 +1,5 @@
+Usage: python -m distributed.cli.dask_worker [OPTIONS] [SCHEDULER]
+                                             [PRELOAD_ARGV]...
+Try 'python -m distributed.cli.dask_worker --help' for help.
+
+Error: No such option: --timeout

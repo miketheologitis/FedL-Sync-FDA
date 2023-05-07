@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 import tensorflow as tf
 
 from tensorflow import keras
@@ -998,6 +995,7 @@ def federated_simulation(test_dataset, federated_dataset, fda_name, server_cnn, 
                 acc = current_accuracy_advanced_cnn(client_cnns, test_dataset)
                 epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc)
                 epoch_metrics_list.append(epoch_metrics)
+                print(epoch_metrics) # remove
                 # -------------------------------
                 
                 epoch_count += 1
@@ -1015,6 +1013,7 @@ def federated_simulation(test_dataset, federated_dataset, fda_name, server_cnn, 
         actual_var = variance(server_cnn, client_cnns).numpy()
         round_metrics = RoundMetrics(epoch_count, total_rounds, total_fda_steps, est_var, actual_var)
         round_metrics_list.append(round_metrics)
+        print(round_metrics) # remove
         # ------------------------------------------------------------------
 
         if fda_name == "linear": w_tminus1 = w_t0

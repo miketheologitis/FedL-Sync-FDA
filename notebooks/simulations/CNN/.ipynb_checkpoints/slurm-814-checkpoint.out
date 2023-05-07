@@ -1,0 +1,22 @@
+2023-05-07 14:38:26,050 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.0.0.104:42995'
+2023-05-07 14:38:30,224 - distributed.worker - INFO -       Start worker at:     tcp://10.0.0.104:36679
+2023-05-07 14:38:30,225 - distributed.worker - INFO -          Listening to:     tcp://10.0.0.104:36679
+2023-05-07 14:38:30,225 - distributed.worker - INFO -           Worker name:             SLURMCluster-7
+2023-05-07 14:38:30,225 - distributed.worker - INFO -          dashboard at:           10.0.0.104:34857
+2023-05-07 14:38:30,226 - distributed.worker - INFO - Waiting to connect to:     tcp://10.0.0.100:39817
+2023-05-07 14:38:30,226 - distributed.worker - INFO - -------------------------------------------------
+2023-05-07 14:38:30,226 - distributed.worker - INFO -               Threads:                          4
+2023-05-07 14:38:30,226 - distributed.worker - INFO -                Memory:                   2.79 GiB
+2023-05-07 14:38:30,226 - distributed.worker - INFO -       Local Directory: /storage/tuclocal/mtheologitis/dask-worker-space/worker-n6dhx39n
+2023-05-07 14:38:30,226 - distributed.worker - INFO - -------------------------------------------------
+2023-05-07 14:38:32,204 - distributed.worker - INFO -         Registered to:     tcp://10.0.0.100:39817
+2023-05-07 14:38:32,206 - distributed.worker - INFO - -------------------------------------------------
+2023-05-07 14:38:32,208 - distributed.core - INFO - Starting established connection to tcp://10.0.0.100:39817
+2023-05-07 14:38:34,005 - distributed.worker - INFO - Starting Worker plugin TF_Simulation_FDA_CNN.py7ccdbff6-42fe-41f9-8598-b4968335b8b9
+2023-05-07 14:38:34,114 - distributed.utils - INFO - Reload module TF_Simulation_FDA_CNN from .py file
+2023-05-07 14:38:58,465 - distributed.core - INFO - Event loop was unresponsive in Worker for 24.36s.  This is often caused by long-running GIL-holding functions or moving large chunks of data. This can cause timeouts and instability.
+2023-05-07 14:39:09.221569: W tensorflow/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 376320000 exceeds 10% of free system memory.
+2023-05-07 14:39:28.319619: W tensorflow/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 250085376 exceeds 10% of free system memory.
+2023-05-07 14:39:29.699201: W tensorflow/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 376320000 exceeds 10% of free system memory.
+2023-05-07 14:39:45.168156: W tensorflow/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 376320000 exceeds 10% of free system memory.
+2023-05-07 14:39:57.019044: W tensorflow/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 376320000 exceeds 10% of free system memory.

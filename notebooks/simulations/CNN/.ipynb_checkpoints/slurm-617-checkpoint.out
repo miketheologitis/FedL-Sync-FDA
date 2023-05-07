@@ -1,0 +1,90 @@
+2023-04-28 21:10:45,348 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.0.0.103:40203'
+2023-04-28 21:10:46,987 - distributed.diskutils - INFO - Found stale lock file and directory '/tmp/dask-worker-space-15070/worker-npl0ac4a', purging
+2023-04-28 21:10:48,773 - distributed.worker - INFO -       Start worker at:     tcp://10.0.0.103:39227
+2023-04-28 21:10:48,774 - distributed.worker - INFO -          Listening to:     tcp://10.0.0.103:39227
+2023-04-28 21:10:48,774 - distributed.worker - INFO -           Worker name:             SLURMCluster-1
+2023-04-28 21:10:48,774 - distributed.worker - INFO -          dashboard at:           10.0.0.103:41121
+2023-04-28 21:10:48,774 - distributed.worker - INFO - Waiting to connect to:     tcp://10.0.0.100:45443
+2023-04-28 21:10:48,774 - distributed.worker - INFO - -------------------------------------------------
+2023-04-28 21:10:48,774 - distributed.worker - INFO -               Threads:                          4
+2023-04-28 21:10:48,774 - distributed.worker - INFO -                Memory:                   2.79 GiB
+2023-04-28 21:10:48,774 - distributed.worker - INFO -       Local Directory: /tmp/dask-worker-space-15070/worker-ljzcsf4p
+2023-04-28 21:10:48,774 - distributed.worker - INFO - -------------------------------------------------
+2023-04-28 21:10:50,316 - distributed.worker - INFO -         Registered to:     tcp://10.0.0.100:45443
+2023-04-28 21:10:50,318 - distributed.worker - INFO - -------------------------------------------------
+2023-04-28 21:10:50,321 - distributed.core - INFO - Starting established connection to tcp://10.0.0.100:45443
+2023-04-28 21:11:32,408 - distributed.worker - INFO - Starting Worker plugin TF_Simulation_FDA_CNN.py380ae10d-fd5d-4d6b-ad1e-9ba8712bf0ce
+2023-04-28 21:11:32,475 - distributed.utils - INFO - Reload module TF_Simulation_FDA_CNN from .py file
+2023-04-28 21:11:36,518 - distributed.nanny - INFO - Worker process 4169130 was killed by signal 4
+2023-04-28 21:11:36,526 - distributed.nanny - WARNING - Restarting worker
+2023-04-28 21:11:40,140 - distributed.worker - INFO -       Start worker at:     tcp://10.0.0.103:42955
+2023-04-28 21:11:40,140 - distributed.worker - INFO -          Listening to:     tcp://10.0.0.103:42955
+2023-04-28 21:11:40,140 - distributed.worker - INFO -           Worker name:             SLURMCluster-1
+2023-04-28 21:11:40,140 - distributed.worker - INFO -          dashboard at:           10.0.0.103:39767
+2023-04-28 21:11:40,140 - distributed.worker - INFO - Waiting to connect to:     tcp://10.0.0.100:45443
+2023-04-28 21:11:40,141 - distributed.worker - INFO - -------------------------------------------------
+2023-04-28 21:11:40,141 - distributed.worker - INFO -               Threads:                          4
+2023-04-28 21:11:40,141 - distributed.worker - INFO -                Memory:                   2.79 GiB
+2023-04-28 21:11:40,141 - distributed.worker - INFO -       Local Directory: /tmp/dask-worker-space-15070/worker-m820vhre
+2023-04-28 21:11:40,141 - distributed.worker - INFO - -------------------------------------------------
+2023-04-28 21:11:41,342 - distributed.worker - INFO - Starting Worker plugin TF_Simulation_FDA_CNN.py380ae10d-fd5d-4d6b-ad1e-9ba8712bf0ce
+2023-04-28 21:11:41,400 - distributed.utils - INFO - Reload module TF_Simulation_FDA_CNN from .py file
+2023-04-28 21:11:42,975 - distributed.nanny - INFO - Worker process 4169149 was killed by signal 4
+2023-04-28 21:11:42,991 - distributed.nanny - WARNING - Restarting worker
+2023-04-28 21:11:44,254 - distributed.diskutils - INFO - Found stale lock file and directory '/tmp/dask-worker-space-15070/worker-m820vhre', purging
+2023-04-28 21:11:45,385 - distributed.worker - INFO -       Start worker at:     tcp://10.0.0.103:39689
+2023-04-28 21:11:45,385 - distributed.worker - INFO -          Listening to:     tcp://10.0.0.103:39689
+2023-04-28 21:11:45,385 - distributed.worker - INFO -           Worker name:             SLURMCluster-1
+2023-04-28 21:11:45,385 - distributed.worker - INFO -          dashboard at:           10.0.0.103:44999
+2023-04-28 21:11:45,385 - distributed.worker - INFO - Waiting to connect to:     tcp://10.0.0.100:45443
+2023-04-28 21:11:45,386 - distributed.worker - INFO - -------------------------------------------------
+2023-04-28 21:11:45,386 - distributed.worker - INFO -               Threads:                          4
+2023-04-28 21:11:45,386 - distributed.worker - INFO -                Memory:                   2.79 GiB
+2023-04-28 21:11:45,386 - distributed.worker - INFO -       Local Directory: /tmp/dask-worker-space-15070/worker-e4_5ytpb
+2023-04-28 21:11:45,386 - distributed.worker - INFO - -------------------------------------------------
+2023-04-28 21:11:46,119 - distributed.worker - INFO - Starting Worker plugin TF_Simulation_FDA_CNN.py380ae10d-fd5d-4d6b-ad1e-9ba8712bf0ce
+2023-04-28 21:11:46,180 - distributed.utils - INFO - Reload module TF_Simulation_FDA_CNN from .py file
+2023-04-28 21:11:47,423 - distributed.nanny - INFO - Worker process 4169157 was killed by signal 4
+2023-04-28 21:11:47,429 - distributed.nanny - WARNING - Restarting worker
+2023-04-28 21:11:48,795 - distributed.diskutils - INFO - Found stale lock file and directory '/tmp/dask-worker-space-15070/worker-e4_5ytpb', purging
+2023-04-28 21:11:50,067 - distributed.worker - INFO -       Start worker at:     tcp://10.0.0.103:43241
+2023-04-28 21:11:50,067 - distributed.worker - INFO -          Listening to:     tcp://10.0.0.103:43241
+2023-04-28 21:11:50,067 - distributed.worker - INFO -           Worker name:             SLURMCluster-1
+2023-04-28 21:11:50,067 - distributed.worker - INFO -          dashboard at:           10.0.0.103:32995
+2023-04-28 21:11:50,067 - distributed.worker - INFO - Waiting to connect to:     tcp://10.0.0.100:45443
+2023-04-28 21:11:50,067 - distributed.worker - INFO - -------------------------------------------------
+2023-04-28 21:11:50,067 - distributed.worker - INFO -               Threads:                          4
+2023-04-28 21:11:50,068 - distributed.worker - INFO -                Memory:                   2.79 GiB
+2023-04-28 21:11:50,068 - distributed.worker - INFO -       Local Directory: /tmp/dask-worker-space-15070/worker-h4p7_e71
+2023-04-28 21:11:50,068 - distributed.worker - INFO - -------------------------------------------------
+2023-04-28 21:11:50,731 - distributed.worker - INFO - Starting Worker plugin TF_Simulation_FDA_CNN.py380ae10d-fd5d-4d6b-ad1e-9ba8712bf0ce
+2023-04-28 21:11:50,783 - distributed.utils - INFO - Reload module TF_Simulation_FDA_CNN from .py file
+2023-04-28 21:11:52,038 - distributed.nanny - INFO - Worker process 4169165 was killed by signal 4
+2023-04-28 21:11:52,044 - distributed.nanny - WARNING - Restarting worker
+2023-04-28 21:11:53,430 - distributed.diskutils - INFO - Found stale lock file and directory '/tmp/dask-worker-space-15070/worker-h4p7_e71', purging
+2023-04-28 21:11:54,600 - distributed.worker - INFO -       Start worker at:     tcp://10.0.0.103:41321
+2023-04-28 21:11:54,600 - distributed.worker - INFO -          Listening to:     tcp://10.0.0.103:41321
+2023-04-28 21:11:54,600 - distributed.worker - INFO -           Worker name:             SLURMCluster-1
+2023-04-28 21:11:54,600 - distributed.worker - INFO -          dashboard at:           10.0.0.103:46177
+2023-04-28 21:11:54,601 - distributed.worker - INFO - Waiting to connect to:     tcp://10.0.0.100:45443
+2023-04-28 21:11:54,601 - distributed.worker - INFO - -------------------------------------------------
+2023-04-28 21:11:54,601 - distributed.worker - INFO -               Threads:                          4
+2023-04-28 21:11:54,601 - distributed.worker - INFO -                Memory:                   2.79 GiB
+2023-04-28 21:11:54,601 - distributed.worker - INFO -       Local Directory: /tmp/dask-worker-space-15070/worker-b1mimbco
+2023-04-28 21:11:54,601 - distributed.worker - INFO - -------------------------------------------------
+2023-04-28 21:11:55,188 - distributed.worker - INFO - Starting Worker plugin TF_Simulation_FDA_CNN.py380ae10d-fd5d-4d6b-ad1e-9ba8712bf0ce
+2023-04-28 21:11:55,243 - distributed.utils - INFO - Reload module TF_Simulation_FDA_CNN from .py file
+2023-04-28 21:11:56,442 - distributed.nanny - INFO - Worker process 4169174 was killed by signal 4
+2023-04-28 21:11:56,448 - distributed.nanny - WARNING - Restarting worker
+2023-04-28 21:11:57,894 - distributed.diskutils - INFO - Found stale lock file and directory '/tmp/dask-worker-space-15070/worker-b1mimbco', purging
+slurmstepd-wn003: error: *** JOB 617 ON wn003 CANCELLED AT 2023-04-28T21:11:58 ***
+2023-04-28 21:11:59,180 - distributed.worker - INFO -       Start worker at:     tcp://10.0.0.103:35219
+2023-04-28 21:11:59,180 - distributed.worker - INFO -          Listening to:     tcp://10.0.0.103:35219
+2023-04-28 21:11:59,180 - distributed.worker - INFO -           Worker name:             SLURMCluster-1
+2023-04-28 21:11:59,180 - distributed.worker - INFO -          dashboard at:           10.0.0.103:43391
+2023-04-28 21:11:59,180 - distributed.worker - INFO - Waiting to connect to:     tcp://10.0.0.100:45443
+2023-04-28 21:11:59,180 - distributed.worker - INFO - -------------------------------------------------
+2023-04-28 21:11:59,180 - distributed.worker - INFO -               Threads:                          4
+2023-04-28 21:11:59,181 - distributed.worker - INFO -                Memory:                   2.79 GiB
+2023-04-28 21:11:59,181 - distributed.worker - INFO -       Local Directory: /tmp/dask-worker-space-15070/worker-71ugubpq
+2023-04-28 21:11:59,181 - distributed.worker - INFO - -------------------------------------------------

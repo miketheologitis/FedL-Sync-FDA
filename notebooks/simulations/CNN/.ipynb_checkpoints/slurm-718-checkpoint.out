@@ -1,0 +1,19 @@
+2023-05-07 11:17:21,273 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.0.0.106:39149'
+2023-05-07 11:17:25,454 - distributed.worker - INFO -       Start worker at:     tcp://10.0.0.106:37477
+2023-05-07 11:17:25,455 - distributed.worker - INFO -          Listening to:     tcp://10.0.0.106:37477
+2023-05-07 11:17:25,455 - distributed.worker - INFO -           Worker name:             SLURMCluster-3
+2023-05-07 11:17:25,455 - distributed.worker - INFO -          dashboard at:           10.0.0.106:40439
+2023-05-07 11:17:25,455 - distributed.worker - INFO - Waiting to connect to:     tcp://10.0.0.100:46559
+2023-05-07 11:17:25,455 - distributed.worker - INFO - -------------------------------------------------
+2023-05-07 11:17:25,455 - distributed.worker - INFO -               Threads:                          4
+2023-05-07 11:17:25,455 - distributed.worker - INFO -                Memory:                   2.79 GiB
+2023-05-07 11:17:25,456 - distributed.worker - INFO -       Local Directory: /storage/tuclocal/mtheologitis/dask-worker-space/worker-43qd262y
+2023-05-07 11:17:25,456 - distributed.worker - INFO - -------------------------------------------------
+2023-05-07 11:17:27,338 - distributed.worker - INFO -         Registered to:     tcp://10.0.0.100:46559
+2023-05-07 11:17:27,340 - distributed.worker - INFO - -------------------------------------------------
+2023-05-07 11:17:27,342 - distributed.core - INFO - Starting established connection to tcp://10.0.0.100:46559
+2023-05-07 11:17:52,486 - distributed.worker - INFO - Starting Worker plugin TF_Simulation_FDA_CNN.pyb3244740-9ce7-4d2a-8d1a-9fed036b873a
+2023-05-07 11:17:52,634 - distributed.utils - INFO - Reload module TF_Simulation_FDA_CNN from .py file
+2023-05-07 11:18:03.413504: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-05-07 11:18:16,987 - distributed.core - INFO - Event loop was unresponsive in Worker for 24.37s.  This is often caused by long-running GIL-holding functions or moving large chunks of data. This can cause timeouts and instability.
