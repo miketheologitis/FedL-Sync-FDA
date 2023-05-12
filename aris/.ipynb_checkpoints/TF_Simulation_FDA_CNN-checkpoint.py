@@ -1247,8 +1247,8 @@ if __name__ == '__main__':
     epoch_metrics_filename = f'epoch_metrics/{args.test_id}.csv'
     round_metrics_filename = f'round_metrics/{args.test_id}.csv'
     
-    
     start_time = time.time()
+    
     all_epoch_metrics, all_round_metrics = run_simulations(
         train_dataset=train_dataset,
         test_dataset=test_dataset,
@@ -1262,9 +1262,7 @@ if __name__ == '__main__':
         bench_test=args.bench_test
     )
     
-    
-    total_time = time.time()-start_time
-    print("Total simulation time = ",total_time,"sec")
+    print(f"Total simulation time = {time.time()-start_time} sec")
 
     epoch_metrics_df = pd.DataFrame(all_epoch_metrics)
     round_metrics_df = pd.DataFrame(all_round_metrics)

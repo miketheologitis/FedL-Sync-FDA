@@ -45,5 +45,5 @@ echo "Running program"
 echo Environment
 export CUDA_VISIBLE_DEVICES=0,1
 export TF_XLA_FLAGS="--tf_xla_enable_xla_devices"
-srun python TF_Simulation_FDA_CNN.py --test_id 1 --num_clients 5 --batch_size 32 --theta 2. --epochs 25 --rtc_steps 1 --bench_test
+srun python TF_Simulation_FDA_CNN.py
 echo "Finished program"
