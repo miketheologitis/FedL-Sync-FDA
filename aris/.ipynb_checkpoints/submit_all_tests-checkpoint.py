@@ -77,14 +77,5 @@ for test_id, values in enumerate(combinations):
     os.remove(script_filename)
 
 
-# In[13]:
-
-
-params["test_id"]
-
-
-# In[ ]:
-
-
 
 
