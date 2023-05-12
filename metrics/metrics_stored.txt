@@ -3,3 +3,11 @@ BATCH_SIZE = [32]
 NUM_STEPS_UNTIL_RTC_CHECK = [1]
 THETA = [1]
 EPOCHS = 25
+
+
+
+---- Running Currently In-Testing ------
+NUM_CLIENTS = [5, 10, 15, 20, 25, 30]
+BATCH_SIZE = [32]
+NUM_STEPS_UNTIL_RTC_CHECK = [1]
+THETA = [3, 5]
