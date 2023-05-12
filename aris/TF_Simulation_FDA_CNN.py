@@ -1234,9 +1234,10 @@ if __name__ == '__main__':
     train_dataset, test_dataset = convert_to_tf_dataset(*load_data())
 
     import os, time
-    print("Environment")
-    for k,v in os.environ.items(): 
-        print (k,'=',v)
+    if 0:
+        print("Environment")
+        for k,v in os.environ.items(): 
+            print (k,'=',v)
 
 
     print("Hardware configuration")
