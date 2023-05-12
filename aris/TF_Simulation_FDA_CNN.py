@@ -1233,13 +1233,24 @@ if __name__ == '__main__':
     
     train_dataset, test_dataset = convert_to_tf_dataset(*load_data())
 
+    import os, time
+    print("Environment")
+    for k,v in os.environ.items(): 
+        print (k,'=',v)
+
+
+    print("Hardware configuration")
+    print(tf.config.list_physical_devices('GPU'))
+
+
     epoch_metrics_filename = 'epoch_metrics.csv'
     round_metrics_filename = 'round_metrics.csv'
     
+    start_time = time.time()
     all_epoch_metrics, all_round_metrics = run_simulations(
         train_dataset=train_dataset,
         test_dataset=test_dataset,
-        num_clients_list=[5],
+        num_clients_list=[30],
         batch_size_list=[32],
         num_steps_until_rtc_check_list=[1],
         theta_list=[1.],
@@ -1249,6 +1260,10 @@ if __name__ == '__main__':
         bench_test=True
     )
     
+    
+    total_time = time.time()-start_time
+    print("Total simulation time = ",total_time,"sec")
+
     epoch_metrics_df = pd.DataFrame(all_epoch_metrics)
     round_metrics_df = pd.DataFrame(all_round_metrics)
     
