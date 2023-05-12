@@ -1,7 +1,15 @@
-#!/usr/bin/env python
 # coding: utf-8
-
 # In[1]:
+
+import ssl
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    # Legacy Python that doesn't verify HTTPS certificates by default
+    pass
+else:
+    # Handle target environment that doesn't support HTTPS verification
+    ssl._create_default_https_context = _create_unverified_https_context
 
 
 import tensorflow as tf
@@ -33,7 +41,6 @@ n_train = 60_000
 
 
 # ## Prepare data for Federated Learning
-
 # In[4]:
 
 
@@ -711,13 +718,9 @@ def F_linear(euc_norm_squared_clients, ksi_delta_clients):
 # In[24]:
 
 
-from tensorflow.experimental import ExtensionType
+#from tensorflow.experimental import ExtensionType
 
-class AmsSketch(ExtensionType):
-    depth: int
-    width: int
-    F: tf.Tensor
-        
+class AmsSketch():
         
     def __init__(self, depth=7, width=1500):
         self.depth = depth
