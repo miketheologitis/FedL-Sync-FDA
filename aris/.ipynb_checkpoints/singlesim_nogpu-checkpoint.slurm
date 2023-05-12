@@ -14,11 +14,11 @@
 #SBATCH --nodes=1     # Number of nodes requested
 #SBATCH --ntasks-per-node=1     # Tasks per node
 #SBATCH --cpus-per-task=20     # Threads per task
-#SBATCH --time=10:00   # walltime
+#SBATCH --time=2:00:00   # walltime
 ##SBATCH --mem=16G   # memory per NODE
-##SBATCH --partition=compute    # Partition
-#SBATCH --partition=gpu    # Partition
-#SBATCH --gres=gpu:2
+#SBATCH --partition=compute    # Partition
+##SBATCH --partition=gpu    # Partition
+##SBATCH --gres=gpu:2
 #SBATCH --account=pa230401    # Replace with your system project
 
 
@@ -41,9 +41,9 @@ module load intelmpi/2018
 module load tensorflow/2.4.1
 
 
-echo "Running program"
+echo "Running program on Compute Island"
 echo Environment
-export CUDA_VISIBLE_DEVICES=0,1
-export TF_XLA_FLAGS="--tf_xla_enable_xla_devices"
-srun python TF_Simulation_FDA_CNN.py --test_id 1 --num_clients 5 --batch_size 32 --theta 2. --epochs 25 --rtc_steps 1 --bench_test
+# export CUDA_VISIBLE_DEVICES=0,1
+# export TF_XLA_FLAGS="--tf_xla_enable_xla_devices"
+srun python  TF_Simulation_FDA_CNN.py
 echo "Finished program"
