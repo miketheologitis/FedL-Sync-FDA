@@ -1230,6 +1230,7 @@ def run_simulations(train_dataset, test_dataset, num_clients_list, batch_size_li
 if __name__ == '__main__':
     
     import pandas as pd
+    import argparse
     
     parser = argparse.ArgumentParser(description='Script for running simulations.')
     parser.add_argument('--test_id', type=int, help='Unique Test Id')
