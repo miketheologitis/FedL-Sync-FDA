@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[30]:
+# In[36]:
 
 
 from string import Template
@@ -50,12 +50,12 @@ srun python TF_Simulation_FDA_CNN.py --test_id ${test_id} --num_clients ${num_cl
 echo "Finished program"
 """)
 
+epochs = 1
 # Define the parameter values
 params = {
-    "num_clients": [5, 10, 15],
-    "batch_size": [32],
+    "num_clients": [5, 10],
+    "batch_size": [32, 64],
     "theta": [3., 4.],
-    "epochs": [25],
     "rtc_steps": [1],
     "bench_test": [False]
 }
@@ -69,8 +69,9 @@ for test_id, values in enumerate(combinations):
     params_combination["bench_test_flag"] = "--bench_test" if params_combination["bench_test"] else ""
     params_combination["test_id"] = test_id+starting_test_id
     
+    params_combination['epochs'] = epochs
+    
     slurm_script = slurm_template.substitute(params_combination)
-
 
     # Save the script to a file
     script_filename = f"slurm_script_{params_combination['test_id']}.slurm"
