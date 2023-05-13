@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[26]:
+# In[30]:
 
 
 from string import Template
@@ -19,8 +19,15 @@ for directory in directories:
         
 
 # Define the template
-slurm_template = Template("""
-#!/bin/bash -l
+slurm_template = Template("""#!/bin/bash -l
+
+####################################
+#     ARIS slurm script template   #
+#                                  #
+# Submit script: sbatch filename   #
+#                                  #
+####################################
+
 #SBATCH --job-name=singlesim_${test_id}
 #SBATCH --output=slurm_out/ss.${test_id}.out
 #SBATCH --error=slurm_out/ss.${test_id}.err
@@ -66,7 +73,7 @@ for test_id, values in enumerate(combinations):
 
 
     # Save the script to a file
-    script_filename = f"slurm_script_{combination['test_id']}.slurm"
+    script_filename = f"slurm_script_{params_combination['test_id']}.slurm"
     with open(script_filename, 'w') as f:
         f.write(slurm_script)
 
@@ -75,6 +82,9 @@ for test_id, values in enumerate(combinations):
     
     # Delete the script file
     os.remove(script_filename)
+
+
+# In[ ]:
 
 
 

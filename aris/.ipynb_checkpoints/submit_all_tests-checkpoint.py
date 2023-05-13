@@ -66,7 +66,7 @@ for test_id, values in enumerate(combinations):
 
 
     # Save the script to a file
-    script_filename = f"slurm_script_{combination['test_id']}.slurm"
+    script_filename = f"slurm_script_{param_combination['test_id']}.slurm"
     with open(script_filename, 'w') as f:
         f.write(slurm_script)
 
