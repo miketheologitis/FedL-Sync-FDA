@@ -1269,8 +1269,8 @@ if __name__ == '__main__':
     epoch_metrics_df = pd.DataFrame(all_epoch_metrics)
     round_metrics_df = pd.DataFrame(all_round_metrics)
     
-    epoch_metrics_df.to_csv(epoch_metrics_filename)
-    round_metrics_df.to_csv(round_metrics_filename)
+    epoch_metrics_df.to_csv(epoch_metrics_filename, index=False)
+    round_metrics_df.to_csv(round_metrics_filename, index=False)
 
 
 # In[ ]:
