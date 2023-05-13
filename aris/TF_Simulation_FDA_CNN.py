@@ -1231,6 +1231,7 @@ if __name__ == '__main__':
     
     import pandas as pd
     import argparse
+    import time
     
     parser = argparse.ArgumentParser(description='Script for running simulations.')
     parser.add_argument('--test_id', type=int, help='Unique Test Id')
