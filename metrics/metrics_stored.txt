@@ -5,8 +5,7 @@ THETA = [1]
 EPOCHS = 25
 
 
-
----- Running Currently In-Testing (Grid) ------
+(Grid) 
 NUM_CLIENTS = [5, 10, 15, 20, 25, 30]
 BATCH_SIZE = [32]
 NUM_STEPS_UNTIL_RTC_CHECK = [1]
@@ -14,6 +13,7 @@ THETA = [3, 5]
 
 
 
+???????????
 ---- Running Currently In-Testing (Aris) ------
 NUM_CLIENTS = [35, 40, 45, 50, 60]
 BATCH_SIZE = [32]
