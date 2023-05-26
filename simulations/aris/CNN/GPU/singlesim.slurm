@@ -10,8 +10,8 @@
 #SBATCH --job-name=singlesim_gpu    # Job name
 #SBATCH --output=slurm_out/ss.%j.out # Stdout (%j expands to jobId)
 #SBATCH --error=slurm_out/ss.%j.err # Stderr (%j expands to jobId)
-#SBATCH --ntasks=2     # Number of tasks(processes)
-#SBATCH --nodes=1     # Number of nodes requested
+#SBATCH --ntasks=12     # Number of tasks(processes)
+#SBATCH --nodes=6     # Number of nodes requested
 #SBATCH --ntasks-per-node=2     # Tasks per node
 #SBATCH --cpus-per-task=10     # Threads per task
 #SBATCH --time=10:00   # walltime

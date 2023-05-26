@@ -15,11 +15,12 @@ for directory in directories:
 
 epochs = 25
 bench_test = False
+synchronous = False
 # Define the parameter values
 params = {
     "num_clients": [5, 10],
-    "batch_size": [32, 64],
-    "theta": [3., 4.],
+    "batch_size": [32],
+    "theta": [0.],
     "rtc_steps": [1]
 }
 
@@ -32,6 +33,7 @@ for i, combination in enumerate(combinations):
     combination["test_id"] = i + start_test_id
     combination["bench_test"] = bench_test
     combination["epochs"] = epochs
+    combination["synchronous"] = synchronous
     
 with open(f'combinations.json', 'w') as f:
     json.dump(combinations, f)

@@ -914,6 +914,11 @@ def F_sketch(euc_norm_squared_clients, sketch_clients, epsilon):
     return S_1 - (1. / (1. + epsilon)) * AmsSketch.estimate_euc_norm_squared(S_2)
 
 
+def clients_train_synchronous(client_cnns, federated_dataset): # NEW
+    for client_cnn, client_dataset in zip(client_cnns, federated_dataset):
+        client_cnn.train(client_dataset)
+
+
 # ### Metrics (early)
 
 # Due to memory concerns our Metrics will consist of `namedtuple` containers which are very memory efficient.
@@ -994,6 +999,13 @@ def federated_simulation(test_dataset, federated_dataset, fda_name, server_cnn, 
                 
                 # Sketch estimation of variance
                 est_var = F_sketch(euc_norm_squared_clients, sketch_clients, epsilon).numpy()
+    
+            if fda_name == "synchronous":  # NEW
+                # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
+                clients_train_synchronous(client_cnns, federated_dataset)
+                
+                # Force synchronization in every round, `synchronous` method
+                est_var = theta + 1
             
             tmp_fda_steps += 1
             total_fda_steps += 1
@@ -1020,6 +1032,12 @@ def federated_simulation(test_dataset, federated_dataset, fda_name, server_cnn, 
 
         # server average
         server_cnn.set_trainable_variables(average_client_weights(client_cnns))
+    
+        if fda_name == "synchronous":  # NEW
+            synchronize_clients(server_cnn, client_cnns)
+            est_var = 0
+            total_rounds += 1
+            continue
 
         # ------------------------- Metrics --------------------------------
         actual_var = variance(server_cnn, client_cnns).numpy()
@@ -1177,10 +1195,16 @@ def single_simulation(fda_name, num_clients, train_dataset, test_dataset, batch_
 
 
 def basic_simulation(num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
-                     theta, num_epochs, sketch_width, sketch_depth, bench_test=False):
+                     theta, num_epochs, sketch_width, sketch_depth, bench_test=False, synchronous=False):
     
     complete_epoch_metrics = []
     complete_round_metrics = []
+    
+    if synchronous: # NEW
+        return single_simulation(
+            'synchronous', num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check, theta, num_epochs,
+             sketch_width=-1, sketch_depth=-1, bench_test=bench_test
+        )
     
     for fda_name in ["naive", "linear", "sketch"]:
         
@@ -1205,7 +1229,7 @@ def basic_simulation(num_clients, train_dataset, test_dataset, batch_size, num_s
 
 
 def run_simulations(train_dataset, test_dataset, num_clients_list, batch_size_list, num_steps_until_rtc_check_list,
-                    theta_list, num_epochs, sketch_width, sketch_depth, bench_test=False):
+                    theta_list, num_epochs, sketch_width, sketch_depth, bench_test=False, synchronous=False):
     import pandas as pd
     
     all_epoch_metrics = []
@@ -1219,7 +1243,7 @@ def run_simulations(train_dataset, test_dataset, num_clients_list, batch_size_li
                     
                     complete_epoch_metrics, complete_round_metrics = basic_simulation(
                         num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
-                        theta, num_epochs, sketch_width, sketch_depth, bench_test=bench_test
+                        theta, num_epochs, sketch_width, sketch_depth, bench_test=bench_test, synchronous=synchronous
                     )
                     
                     all_epoch_metrics.extend(complete_epoch_metrics)
@@ -1271,7 +1295,8 @@ if __name__ == '__main__':
         num_epochs=my_comb['epochs'],
         sketch_width=500,
         sketch_depth=7,
-        bench_test=my_comb['bench_test']
+        bench_test=my_comb['bench_test'],
+        synchronous=my_comb['synchronous'] # NEW
     )
     
     print(f"Total simulation time = {time.time()-start_time} sec")
