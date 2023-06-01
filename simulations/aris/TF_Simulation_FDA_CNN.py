@@ -1,5 +1,14 @@
+#!/usr/bin/env python
 # coding: utf-8
+
 # In[1]:
+
+import os
+
+slurm_localid = int(os.environ.get('SLURM_LOCALID'))
+    
+os.environ['CUDA_VISIBLE_DEVICES'] = str(slurm_localid)
+
 
 import ssl
 try:
@@ -10,7 +19,6 @@ except AttributeError:
 else:
     # Handle target environment that doesn't support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
-
 
 import tensorflow as tf
 
@@ -41,6 +49,7 @@ n_train = 60_000
 
 
 # ## Prepare data for Federated Learning
+
 # In[4]:
 
 
@@ -117,42 +126,101 @@ def count_weights(model):
     return int(total_params)
 
 
+# ## Find accuracy based on some arbitrary `compile_and_build_model_func`
+
+# In[9]:
+
+
+def current_accuracy(client_models, test_dataset, compile_and_build_model_func):
+    
+    tmp_model = compile_and_build_model_func()
+    tmp_model.set_trainable_variables(average_client_weights(client_models))
+    _, acc = tmp_model.evaluate(test_dataset, verbose=0)
+    
+    return acc
+
+
+# ### Average NN weights
+
+# In[10]:
+
+
+def average_client_weights(client_models):
+    # client_weights[0] the trainable variables of Client 0 (a list of tf.Variable)
+    client_weights = [model.trainable_variables for model in client_models]
+
+    # concise solution. per layer. `layer_weight_tensors` corresponds to a list of tensors of a layer
+    avg_weights = [
+        tf.reduce_mean(layer_weight_tensors, axis=0)
+        for layer_weight_tensors in zip(*client_weights)
+    ]
+
+    return avg_weights
+
+
+# ## Server - Clients synchronization
+# 
+# The assumption here is that the models have `set_trainable_variables` function implemented.
+
+# In[11]:
+
+
+def synchronize_clients(server_model, client_models):
+
+    for client_model in client_models:
+        client_model.set_trainable_variables(server_model.trainable_variables)
+
+
 # ### Prepare (and restart) Client Dataset - shuffling, batching, prefetching
 # 
 # Proper use of `.prefetch` [explained](https://stackoverflow.com/questions/63796936/what-is-the-proper-use-of-tensorflow-dataset-prefetch-and-cache-options).
 # 
 # Proper ordering `.shuffle` and `.batch` and `.repeat` [explained](https://stackoverflow.com/questions/50437234/tensorflow-dataset-shuffle-then-batch-or-batch-then-shuffle)
 
-# # Simple Convolutional Neural Net (CNN) - Medium Size
+# # LeNet-5 - Small Size (61,706 params)
 
-# A simple Convolutional Neural Network with a single convolutional layer, followed by a max-pooling layer, and two dense layers for classification. Designed for 28x28 grayscale images. It has 692,352 weights.
+# The `LeNet-5` [LeCun et al. paper from 1998](http://vision.stanford.edu/cs598_spring07/papers/Lecun98.pdf)
 
-# In[9]:
+# In[12]:
 
 
-class SimpleCNN(tf.keras.Model):
+class LeNet5(tf.keras.Model):
+    
     def __init__(self, num_classes=10):
-        super(CNN, self).__init__()
-        self.reshape = layers.Reshape(CNN_INPUT_RESHAPE)
-        self.conv1 = layers.Conv2D(32, 3, activation='relu')
-        self.max_pool = layers.MaxPooling2D(pool_size=(2, 2))
-        self.flatten = layers.Flatten()
-        self.dense1 = layers.Dense(128, activation='relu')
-        self.dense2 = layers.Dense(num_classes, activation='softmax')
-
+        super(LeNet5, self).__init__()
         
-    # Defines the computation from inputs to outputs
+        self.reshape = layers.Reshape(CNN_INPUT_RESHAPE)
+        
+        # Layer 1 Conv2D
+        self.conv1 = layers.Conv2D(filters=6, kernel_size=(5, 5), strides=(1, 1), activation='tanh', padding='same')
+        # Layer 2 Pooling Layer
+        self.avgpool1 = layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid')
+        # Layer 3 Conv2D
+        self.conv2 = layers.Conv2D(filters=16, kernel_size=(5, 5), strides=(1, 1), activation='tanh', padding='valid')
+        # Layer 4 Pooling Layer
+        self.avgpool2 = layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid')
+        self.flatten = layers.Flatten()
+        self.dense1 = layers.Dense(units=120, activation='tanh')
+        self.dense2 = layers.Dense(units=84, activation='tanh')
+        self.dense3 = layers.Dense(units=num_classes, activation='softmax')
+
     def call(self, inputs, training=None):
-        x = self.reshape(inputs)  # Add a channel dimension
+        x = self.reshape(inputs)
         x = self.conv1(x)
-        x = self.max_pool(x)
+        x = self.avgpool1(x)
+        x = self.conv2(x)
+        x = self.avgpool2(x)
         x = self.flatten(x)
         x = self.dense1(x)
         x = self.dense2(x)
+        x = self.dense3(x)
+        
         return x
     
-    
+    @tf.function
     def step(self, batch):
+        
+        print("Retrace LeNet5.step()")
         
         x_batch, y_batch = batch
 
@@ -198,11 +266,11 @@ class SimpleCNN(tf.keras.Model):
 
 # **Important** function that returns a compiled and built `SimpleCNN`.
 
-# In[10]:
+# In[13]:
 
 
-def get_compiled_and_built_simple_cnn():
-    cnn = SimpleCNN()
+def get_compiled_and_built_lenet():
+    cnn = LeNet5()
     
     cnn.compile(
         optimizer=keras.optimizers.Adam(),
@@ -215,20 +283,6 @@ def get_compiled_and_built_simple_cnn():
     return cnn
 
 
-# Helper function that creates a new `AdvancedCNN` just to compute and return accuracy. Will be used in-between epochs so we keep correct metrics without synchronizing and messing up the federated training.
-
-# In[11]:
-
-
-def current_accuracy_simple_cnn(client_cnns, test_dataset):
-    
-    tmp_cnn = get_compiled_and_built_simple_cnn()
-    tmp_cnn.set_trainable_variables(average_client_weights(client_cnns))
-    _, acc = tmp_cnn.evaluate(test_dataset, verbose=0)
-    
-    return acc
-
-
 # # Advanced Convolutional Neural Net (CNN) - Large Size
 
 # A more complex Convolutional Neural Network with three sets of two convolutional layers, each followed by a max-pooling layer, and two dense layers with dropout for classification. Designed for 28x28 grayscale images. It has 2,592,202 weights.
@@ -239,7 +293,7 @@ def current_accuracy_simple_cnn(client_cnns, test_dataset):
 # 
 # 2. After testing it is not worth it to wrap `.train`. Only consider `.step`.
 
-# In[12]:
+# In[14]:
 
 
 class AdvancedCNN(tf.keras.Model):
@@ -290,8 +344,10 @@ class AdvancedCNN(tf.keras.Model):
         x = self.dense3(x)
         return x
     
-    
+    @tf.function
     def step(self, batch):
+        
+        print("Retrace AdvancedCNN.step()")
         
         x_batch, y_batch = batch
 
@@ -338,7 +394,7 @@ class AdvancedCNN(tf.keras.Model):
 
 # **Important** function that returns a compiled and built `AdvancedCNN`.
 
-# In[13]:
+# In[15]:
 
 
 def get_compiled_and_built_advanced_cnn():
@@ -353,49 +409,6 @@ def get_compiled_and_built_advanced_cnn():
     advanced_cnn.build(CNN_BATCH_INPUT)  # EMNIST dataset (None is used for batch size, as it varies)
     
     return advanced_cnn
-
-
-# Helper function that creates a new `AdvancedCNN` just to compute and return accuracy. Will be used in-between epochs so we keep correct metrics without synchronizing and messing up the federated training.
-
-# In[14]:
-
-
-def current_accuracy_advanced_cnn(client_cnns, test_dataset):
-    
-    tmp_cnn = get_compiled_and_built_advanced_cnn()
-    tmp_cnn.set_trainable_variables(average_client_weights(client_cnns))
-    _, acc = tmp_cnn.evaluate(test_dataset, verbose=0)
-    
-    return acc
-
-
-# ### Average NN weights
-
-# In[15]:
-
-
-def average_client_weights(client_models):
-    # client_weights[0] the trainable variables of Client 0 (a list of tf.Variable)
-    client_weights = [model.trainable_variables for model in client_models]
-
-    # concise solution. per layer. `layer_weight_tensors` corresponds to a list of tensors of a layer
-    avg_weights = [
-        tf.reduce_mean(layer_weight_tensors, axis=0)
-        for layer_weight_tensors in zip(*client_weights)
-    ]
-
-    return avg_weights
-
-
-# ### Server - Clients synchronization
-
-# In[16]:
-
-
-def synchronize_clients(server_cnn, client_cnns):
-
-    for client_cnn in client_cnns:
-        client_cnn.set_trainable_variables(server_cnn.trainable_variables)
 
 
 # # Functional Dynamic Averaging
@@ -458,7 +471,7 @@ def synchronize_clients(server_cnn, client_cnns):
 # 
 # The number of steps depends on the dataset, i.e., `.take(num)` call on `tf.data.Dataset` creation!
 
-# In[17]:
+# In[16]:
 
 
 def client_train_naive(w_t0, client_cnn, client_dataset):
@@ -488,7 +501,7 @@ def client_train_naive(w_t0, client_cnn, client_dataset):
 # 
 # 3. Even if we had endless RAM the usage of `tf.function` is still arguable. For instance, on testing for 16 clients the difference between the two is only 20-30ms with total execution time in the order of 200-250ms. Only if we had a huge amount of CPUs or GPU we could consider it, but still... there must be a better approach (`Dask` or a different implementation).
 
-# In[18]:
+# In[17]:
 
 
 def clients_train_naive(w_t0, client_cnns, federated_dataset):
@@ -508,7 +521,7 @@ def clients_train_naive(w_t0, client_cnns, federated_dataset):
 
 # ### Identity F Function
 
-# In[19]:
+# In[18]:
 
 
 def F_naive(S_i_clients):
@@ -542,7 +555,7 @@ def F_naive(S_i_clients):
 # 
 # $$ \xi = \frac{\overline{w_{t_0}} - \overline{w_{t_{-1}}}}{\lVert \overline{w_{t_0}} - \overline{w_{t_{-1}}} \rVert_2} $$
 
-# In[20]:
+# In[19]:
 
 
 def ksi_unit(w_t0, w_tminus1):
@@ -565,7 +578,7 @@ def ksi_unit(w_t0, w_tminus1):
 # 
 # The number of steps depends on the dataset, i.e., `.take(num)` call on `tf.data.Dataset` creation!
 
-# In[21]:
+# In[20]:
 
 
 def client_train_linear(w_t0, w_tminus1, client_cnn, client_dataset):
@@ -602,7 +615,7 @@ def client_train_linear(w_t0, w_tminus1, client_cnn, client_dataset):
 # 
 # 3. Even if we had endless RAM the usage of `tf.function` is still arguable. For instance, on testing for 16 clients the difference between the two is only 20-30ms with total execution time in the order of 200-250ms. Only if we had a huge amount of CPUs or GPU we could consider it, but still... there must be a better approach (`Dask` or a different implementation).
 
-# In[22]:
+# In[21]:
 
 
 def clients_train_linear(w_t0, w_tminus1, client_cnns, federated_dataset):
@@ -629,7 +642,7 @@ def clients_train_linear(w_t0, w_tminus1, client_cnns, federated_dataset):
 
 # ### F Function
 
-# In[23]:
+# In[22]:
 
 
 def F_linear(euc_norm_squared_clients, ksi_delta_clients):
@@ -715,12 +728,10 @@ def F_linear(euc_norm_squared_clients, ksi_delta_clients):
 
 # We use `ExtensionType` which is the way to go in order to avoid unecessary graph retracing when passing around `AmsSketch` type 'objects'.
 
-# In[24]:
+# In[23]:
 
 
-#from tensorflow.experimental import ExtensionType
-
-class AmsSketch():
+class AmsSketch: 
         
     def __init__(self, depth=7, width=1500):
         self.depth = depth
@@ -839,7 +850,7 @@ class AmsSketch():
 # 
 # The number of steps depends on the dataset, i.e., `.take(num)` call on `tf.data.Dataset` creation!
 
-# In[25]:
+# In[24]:
 
 
 def client_train_sketch(w_t0, client_cnn, client_dataset, ams_sketch):
@@ -867,7 +878,7 @@ def client_train_sketch(w_t0, client_cnn, client_dataset, ams_sketch):
 # 
 # 3. Even if we had endless RAM the usage of `tf.function` is still arguable. For instance, on testing for 16 clients the difference between the two is only 20-30ms with total execution time in the order of 200-250ms. Only if we had a huge amount of CPUs or GPU we could consider it, but still... there must be a better approach (`Dask` or a different implementation).
 
-# In[26]:
+# In[25]:
 
 
 def clients_train_sketch(w_t0, client_cnns, federated_dataset, ams_sketch):
@@ -895,7 +906,7 @@ def clients_train_sketch(w_t0, client_cnns, federated_dataset, ams_sketch):
 
 # ### F Function
 
-# In[27]:
+# In[26]:
 
 
 def F_sketch(euc_norm_squared_clients, sketch_clients, epsilon):
@@ -905,6 +916,16 @@ def F_sketch(euc_norm_squared_clients, sketch_clients, epsilon):
     
     # See theoretical analysis above
     return S_1 - (1. / (1. + epsilon)) * AmsSketch.estimate_euc_norm_squared(S_2)
+
+
+# # 4️⃣. Synchronous (synchronize in every step!)
+
+# In[27]:
+
+
+def clients_train_synchronous(client_cnns, federated_dataset): # NEW
+    for client_cnn, client_dataset in zip(client_cnns, federated_dataset):
+        client_cnn.train(client_dataset)
 
 
 # ### Metrics (early)
@@ -942,7 +963,7 @@ EpochMetrics = namedtuple("EpochMetrics", ["epoch", "total_rounds", "total_fda_s
 
 
 def federated_simulation(test_dataset, federated_dataset, fda_name, server_cnn, client_cnns, num_epochs, theta, 
-                         fda_steps_in_one_epoch, ams_sketch=None, epsilon=None):
+                         fda_steps_in_one_epoch, compile_and_build_model_func, ams_sketch=None, epsilon=None):
     """ Run a federated learning simulation of one of the FDA methods. We keep general and time-series-like metrics. """
     
     # ---- Inits -----
@@ -988,6 +1009,13 @@ def federated_simulation(test_dataset, federated_dataset, fda_name, server_cnn, 
                 # Sketch estimation of variance
                 est_var = F_sketch(euc_norm_squared_clients, sketch_clients, epsilon).numpy()
             
+            if fda_name == "synchronous":  # NEW
+                # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
+                clients_train_synchronous(client_cnns, federated_dataset)
+                
+                # Force synchronization in every round, `synchronous` method
+                est_var = theta + 1
+            
             tmp_fda_steps += 1
             total_fda_steps += 1
             
@@ -999,7 +1027,7 @@ def federated_simulation(test_dataset, federated_dataset, fda_name, server_cnn, 
                 tmp_fda_steps -= fda_steps_in_one_epoch
                 
                 # ---------- Metrics ------------
-                acc = current_accuracy_advanced_cnn(client_cnns, test_dataset)
+                acc = current_accuracy(client_cnns, test_dataset, compile_and_build_model_func)
                 epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc)
                 epoch_metrics_list.append(epoch_metrics)
                 print(epoch_metrics) # remove
@@ -1013,12 +1041,18 @@ def federated_simulation(test_dataset, federated_dataset, fda_name, server_cnn, 
 
         # server average
         server_cnn.set_trainable_variables(average_client_weights(client_cnns))
+        
+        if fda_name == "synchronous":  # NEW
+            synchronize_clients(server_cnn, client_cnns)
+            est_var = 0
+            total_rounds += 1
+            continue
 
         # ------------------------- Metrics --------------------------------
         actual_var = variance(server_cnn, client_cnns).numpy()
         round_metrics = RoundMetrics(epoch_count, total_rounds, total_fda_steps, est_var, actual_var)
         round_metrics_list.append(round_metrics)
-        print(round_metrics) # remove
+        print(round_metrics)
         # ------------------------------------------------------------------
 
         if fda_name == "linear": w_tminus1 = w_t0
@@ -1087,7 +1121,7 @@ def process_metrics_with_test_id(epoch_metrics_list, round_metrics_list, test_id
 # In[34]:
 
 
-def prepare_for_federated_simulation(num_clients, train_dataset, batch_size, num_steps_until_rtc_check, seed=None, bench_test=False):
+def prepare_for_federated_simulation(num_clients, train_dataset, batch_size, num_steps_until_rtc_check, compile_and_build_model_func, seed=None, bench_test=False):
     
     # 1. Helper variable to count Epochs
     if bench_test:
@@ -1100,48 +1134,31 @@ def prepare_for_federated_simulation(num_clients, train_dataset, batch_size, num
     federated_dataset = prepare_federated_data_for_test(clients_federated_data, batch_size, num_steps_until_rtc_check, seed)
     
     # 3. Models creation
-    server_cnn = get_compiled_and_built_advanced_cnn()
-    client_cnns = [get_compiled_and_built_advanced_cnn() for _ in range(num_clients)]
+    server_cnn = compile_and_build_model_func()
+    client_cnns = [compile_and_build_model_func() for _ in range(num_clients)]
     
     return server_cnn, client_cnns, federated_dataset, fda_steps_in_one_epoch
 
 
-# ### Print Current test Info
-
-# In[35]:
-
-
-def print_current_test_info(num_clients, batch_size, num_epochs, num_steps_until_rtc_check, theta):
-    print()
-    print(f"------------ Current Test : ------------")
-    print(f"Num Clients : {num_clients}")
-    print(f"Batch size : {batch_size}")
-    print(f"Num Epochs : {num_epochs}")
-    print(f"Number of steps until we check RTC : {num_steps_until_rtc_check}")
-    print(f"Theta : {theta}")
-    print("-----------------------------------------")
-    print()
-
-
 # ### Single FDA method simulation
 
-# In[36]:
+# In[35]:
 
 
 from math import sqrt
 
 def single_simulation(fda_name, num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
-                     theta, num_epochs, sketch_width=-1, sketch_depth=-1, bench_test=False):
+                     theta, num_epochs, sketch_width, sketch_depth, compile_and_build_model_func, bench_test=False):
     
      # 1. Preparation
     server_cnn, client_cnns, federated_dataset, fda_steps_in_one_epoch = prepare_for_federated_simulation(
-        num_clients, train_dataset, batch_size, num_steps_until_rtc_check, bench_test=bench_test
+        num_clients, train_dataset, batch_size, num_steps_until_rtc_check, compile_and_build_model_func, bench_test=bench_test
     )
 
     # 2. Simulation
     epoch_metrics_list, round_metrics_list = federated_simulation(
         test_dataset, federated_dataset, fda_name, server_cnn, client_cnns, num_epochs, theta, fda_steps_in_one_epoch,
-        ams_sketch = AmsSketch(width=sketch_width, depth=sketch_depth) if fda_name == "sketch" else None,
+        compile_and_build_model_func, ams_sketch = AmsSketch(width=sketch_width, depth=sketch_depth) if fda_name == "sketch" else None,
         epsilon = 1. / sqrt(sketch_width) if fda_name == "sketch" else None
     )
 
@@ -1162,119 +1179,133 @@ def single_simulation(fda_name, num_clients, train_dataset, test_dataset, batch_
     return epoch_metrics_with_test_id_list, round_metrics_with_test_id_list
 
 
-# ### Basic Test FDA
-# 
-# Test *naive*, *linear* and *sketch* methods for fixed parameters.
+# ### Print Current test Info
+
+# In[36]:
+
+
+def print_current_test_info(fda_name, num_clients, batch_size, num_epochs, num_steps_until_rtc_check, theta):
+    print()
+    print(f"------------ Current Test : ------------")
+    print(f"FDA name : {fda_name}")
+    print(f"Num Clients : {num_clients}")
+    print(f"Batch size : {batch_size}")
+    print(f"Num Epochs : {num_epochs}")
+    print(f"Number of steps until we check RTC : {num_steps_until_rtc_check}")
+    print(f"Theta : {theta}")
+    print("-----------------------------------------")
+    print()
+
+
+# # FDA-methods simulation
 
 # In[37]:
 
 
-def basic_simulation(num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
-                     theta, num_epochs, sketch_width, sketch_depth, bench_test=False):
+def fda_simulation(num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
+                   theta, num_epochs, sketch_width, sketch_depth, compile_and_build_model_func, bench_test=False):
     
     complete_epoch_metrics = []
     complete_round_metrics = []
     
     for fda_name in ["naive", "linear", "sketch"]:
         
+        print_current_test_info(fda_name, num_clients, batch_size, num_epochs, num_steps_until_rtc_check, theta)
+
         # 4. Store ID'd Metrics
         epoch_metrics_with_test_id_list, round_metrics_with_test_id_list = single_simulation(
             fda_name, num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check, theta, num_epochs,
-            sketch_width = sketch_width if fda_name == "sketch" else -1, 
-            sketch_depth = sketch_depth if fda_name == "sketch" else -1, 
-            bench_test=bench_test
+            sketch_width if fda_name == "sketch" else -1, sketch_depth if fda_name == "sketch" else -1, 
+            compile_and_build_model_func, bench_test=bench_test
         )
 
         complete_epoch_metrics.extend(epoch_metrics_with_test_id_list)
         complete_round_metrics.extend(round_metrics_with_test_id_list)
     
     return complete_epoch_metrics, complete_round_metrics
-    
 
 
-# ## All combinations Test function
+# # Synchronous simulation
 
 # In[38]:
 
 
-def run_simulations(train_dataset, test_dataset, num_clients_list, batch_size_list, num_steps_until_rtc_check_list,
-                    theta_list, num_epochs, sketch_width, sketch_depth, bench_test=False):
-    import pandas as pd
+def synchronous_simulation(num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
+                           theta, num_epochs, compile_and_build_model_func, bench_test=False):
     
-    all_epoch_metrics = []
-    all_round_metrics = []
+    print_current_test_info('synchronous', num_clients, batch_size, num_epochs, num_steps_until_rtc_check, theta)
     
-    for num_clients in num_clients_list:
-        for batch_size in batch_size_list:
-            for num_steps_until_rtc_check in num_steps_until_rtc_check_list:
-                for theta in theta_list:
-                    print_current_test_info(num_clients, batch_size, num_epochs, num_steps_until_rtc_check, theta)
-                    
-                    complete_epoch_metrics, complete_round_metrics = basic_simulation(
-                        num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
-                        theta, num_epochs, sketch_width, sketch_depth, bench_test=bench_test
-                    )
-                    
-                    all_epoch_metrics.extend(complete_epoch_metrics)
-                    all_round_metrics.extend(complete_round_metrics)
-                    
-    return all_epoch_metrics, all_round_metrics
-                    
+    return single_simulation(
+            'synchronous', num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check, theta, num_epochs,
+             -1, -1, compile_and_build_model_func, bench_test=bench_test
+        )
 
 
-# ## Run tests
+# # Run tests
 
-# In[40]:
+# In[39]:
 
 
 if __name__ == '__main__':
     
     import pandas as pd
-    import argparse
     import time
     
-    parser = argparse.ArgumentParser(description='Script for running simulations.')
-    parser.add_argument('--test_id', type=int, help='Unique Test Id')
-    parser.add_argument('--num_clients', type=int, help='Number of clients')
-    parser.add_argument('--batch_size', type=int, help='Batch size')
-    parser.add_argument('--theta', type=float, help='Theta value')
-    parser.add_argument('--epochs', type=int, help='Number of Epochs')
-    parser.add_argument('--rtc_steps', type=int, help='Steps until we check RTC')
-    parser.add_argument('--bench_test', action='store_true', default=False, help='Enable benchmark test')
+    import json
     
-    args = parser.parse_args()
+    print("GPU Setup:")
+    print(tf.config.list_physical_devices('GPU'))
+    print()
+    
+    slurm_procid = int(os.environ.get('SLURM_PROCID'))
+   
+    print(f"Test procid: {slurm_procid}")
+    
+    with open('combinations.json', 'r') as f:
+        all_combinations = json.load(f)
+    
+    my_comb = all_combinations[slurm_procid]
     
     train_dataset, test_dataset = convert_to_tf_dataset(*load_data())
 
-    epoch_metrics_filename = f'epoch_metrics/{args.test_id}.csv'
-    round_metrics_filename = f'round_metrics/{args.test_id}.csv'
+    epoch_metrics_filename = f'epoch_metrics/{my_comb["test_id"]}.csv'
+    round_metrics_filename = f'round_metrics/{my_comb["test_id"]}.csv'
+    
+    train_dataset, test_dataset = convert_to_tf_dataset(*load_data())
     
     start_time = time.time()
     
-    all_epoch_metrics, all_round_metrics = run_simulations(
-        train_dataset=train_dataset,
-        test_dataset=test_dataset,
-        num_clients_list=[args.num_clients],
-        batch_size_list=[args.batch_size],
-        num_steps_until_rtc_check_list=[args.rtc_steps],
-        theta_list=[args.theta],
-        num_epochs=args.epochs,
-        sketch_width=500,
-        sketch_depth=7,
-        bench_test=args.bench_test
-    )
+    num_clients = my_comb['num_clients']
+    batch_size = my_comb['batch_size']
+    theta = my_comb['theta']
+    bench_test = my_comb['bench_test']
+    synchronous = my_comb['synchronous']
+    
+    num_epochs = my_comb['epochs']
+    num_steps_until_rtc_check = my_comb['rtc_steps']
+    sketch_width = 250
+    sketch_depth = 5
+    
+    compile_and_build_model_func = get_compiled_and_built_lenet
+    
+    if synchronous:
+        all_epoch_metrics, all_round_metrics = synchronous_simulation(
+            num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
+            theta, num_epochs, compile_and_build_model_func, bench_test=bench_test
+        )
+    else:
+        all_epoch_metrics, all_round_metrics = fda_simulation(
+            num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
+            theta, num_epochs, sketch_width, sketch_depth, compile_and_build_model_func, bench_test=bench_test
+        )
     
     print(f"Total simulation time = {time.time()-start_time} sec")
-
+    
     epoch_metrics_df = pd.DataFrame(all_epoch_metrics)
     round_metrics_df = pd.DataFrame(all_round_metrics)
     
     epoch_metrics_df.to_csv(epoch_metrics_filename, index=False)
     round_metrics_df.to_csv(round_metrics_filename, index=False)
-
-
-# In[ ]:
-
 
 
 
