@@ -42,5 +42,5 @@ module load tensorflow/2.4.1
 echo "Running program"
 echo Environment
 export TF_XLA_FLAGS="--tf_xla_enable_xla_devices"
-srun python gpu_test.py
+srun python tf_sim_fda_nn.py
 echo "Finished program"
