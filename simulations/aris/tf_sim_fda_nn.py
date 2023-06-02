@@ -6,7 +6,13 @@
 import os
 
 slurm_localid = int(os.environ.get('SLURM_LOCALID'))
-    
+
+print()
+print(f"slurm_localid : {slurm_localid}")
+
+slurm_nodeid = os.environ.get('SLURM_NODEID')
+print(f"Running on node : {slurm_nodeid}")
+
 os.environ['CUDA_VISIBLE_DEVICES'] = str(slurm_localid)
 
 
@@ -19,6 +25,9 @@ except AttributeError:
 else:
     # Handle target environment that doesn't support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
+
+
+
 
 import tensorflow as tf
 
@@ -1255,7 +1264,10 @@ if __name__ == '__main__':
     
     print("GPU Setup:")
     print(tf.config.list_physical_devices('GPU'))
+
+    print("CUDA_VISIBLE_DEVICES:", os.environ.get('CUDA_VISIBLE_DEVICES'))
     print()
+    
     
     slurm_procid = int(os.environ.get('SLURM_PROCID'))
    
@@ -1265,8 +1277,6 @@ if __name__ == '__main__':
         all_combinations = json.load(f)
     
     my_comb = all_combinations[slurm_procid]
-    
-    train_dataset, test_dataset = convert_to_tf_dataset(*load_data())
 
     epoch_metrics_filename = f'epoch_metrics/{my_comb["test_id"]}.csv'
     round_metrics_filename = f'round_metrics/{my_comb["test_id"]}.csv'

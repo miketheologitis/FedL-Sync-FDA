@@ -13,14 +13,14 @@ for directory in directories:
         os.makedirs(directory)
         
 
-epochs = 25
+epochs = 75
 bench_test = False
 synchronous = False
 # Define the parameter values
 params = {
-    "num_clients": [5, 10],
+    "num_clients": [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60],
     "batch_size": [32],
-    "theta": [0.],
+    "theta": [0.5],
     "rtc_steps": [1]
 }
 
