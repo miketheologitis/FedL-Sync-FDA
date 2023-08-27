@@ -226,7 +226,6 @@ class LeNet5(tf.keras.Model):
         
         return x
     
-    @tf.function
     def step(self, batch):
         
         print("Retrace LeNet5.step()")
@@ -353,7 +352,6 @@ class AdvancedCNN(tf.keras.Model):
         x = self.dense3(x)
         return x
     
-    @tf.function
     def step(self, batch):
         
         print("Retrace AdvancedCNN.step()")
