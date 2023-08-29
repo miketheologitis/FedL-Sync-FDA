@@ -1,0 +1,3 @@
+We run the AdvancedCNN for a loooot more epochs in the main tests so because it was trouble
+to find which of these metrics correspond to AdvancedCNN we made them deprecated. These include
+LeNet-5 tests.
