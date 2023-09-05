@@ -1,5 +1,8 @@
 import tensorflow as tf
 
+from metrics import EpochMetrics
+from models import average_client_weights, synchronize_clients, current_accuracy
+
 
 def clients_train_synchronous(client_cnns, federated_dataset):
     """
@@ -57,9 +60,6 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
             
         # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
         clients_train_synchronous(client_cnns, federated_dataset)
-
-        # Force synchronization in every round, `synchronous` method
-        est_var = theta + 1
 
         tmp_fda_steps += 1
         total_fda_steps += 1

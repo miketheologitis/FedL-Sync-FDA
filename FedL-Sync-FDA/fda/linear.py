@@ -1,17 +1,41 @@
 import tensorflow as tf
 
+from metrics import EpochMetrics, RoundMetrics
+from models import average_client_weights, synchronize_clients, variance, current_accuracy
 
-def client_train_naive(w_t0, client_cnn, client_dataset):
+def ksi_unit(w_t0, w_tminus1):
     """
-    Trains a single client model and returns the square of the Euclidean norm of the update vector.
+    Calculates the heuristic unit vector ksi.
 
     Args:
-    - w_t0 (tf.Tensor): Initial model parameters as a vector. Shape=(d,).
+    - w_t0 (tf.Tensor): Initial model parameters for the current round. Shape=(d,).
+    - w_tminus1 (tf.Tensor): Model parameters from the previous round. Shape=(d,).
+
+    Returns:
+    - tf.Tensor: The heuristic unit vector ksi.
+    """
+    if tf.reduce_all(tf.equal(w_t0, w_tminus1)):
+        # if equal then ksi becomes a random vector (will only happen in round 1)
+        ksi = tf.random.normal(shape=w_t0.shape)
+    else:
+        ksi = w_t0 - w_tminus1
+
+    # Normalize and return
+    return tf.divide(ksi, tf.norm(ksi))
+
+
+def client_train_linear(w_t0, w_tminus1, client_cnn, client_dataset):
+    """
+    Trains a client model and returns the square of the Euclidean norm of the update vector and the dot product with ksi.
+
+    Args:
+    - w_t0 (tf.Tensor): Initial model parameters for the current round. Shape=(d,).
+    - w_tminus1 (tf.Tensor): Model parameters from the previous round. Shape=(d,).
     - client_cnn (object): The client's CNN model.
     - client_dataset (tf.data.Dataset): The dataset on which the client model will be trained.
 
     Returns:
-    - tf.Tensor: The square of the Euclidean norm of the update vector. Shape=(), dtype=tf.float32.
+    - tuple: (Square of the Euclidean norm of the update vector, Dot product with ksi), both as tf.Tensor with shape=().
     """
     
     # number of steps depend on `.take()` from `dataset`
@@ -22,52 +46,67 @@ def client_train_naive(w_t0, client_cnn, client_dataset):
     #||D(t)_i||^2 , shape = () 
     Delta_i_euc_norm_squared = tf.reduce_sum(tf.square(Delta_i)) # ||D(t)_i||^2
     
-    return Delta_i_euc_norm_squared
+    # heuristic unit vector ksi
+    ksi = ksi_unit(w_t0, w_tminus1)
+    
+    # ksi * Delta_i (* is dot) , shape = ()
+    ksi_Delta_i = tf.reduce_sum(tf.multiply(ksi, Delta_i))
+    
+    return Delta_i_euc_norm_squared, ksi_Delta_i
 
 
-def clients_train_naive(w_t0, client_cnns, federated_dataset):
+def clients_train_linear(w_t0, w_tminus1, client_cnns, federated_dataset):
     """
-    Trains multiple client models and returns the squares of the Euclidean norms of their update vectors.
+    Trains multiple client models and returns two lists containing the square of the Euclidean norms and the dot products with ksi.
 
     Args:
-    - w_t0 (tf.Tensor): Initial model parameters as a vector. Shape=(d,).
+    - w_t0 (tf.Tensor): Initial model parameters for the current round. Shape=(d,).
+    - w_tminus1 (tf.Tensor): Model parameters from the previous round. Shape=(d,).
     - client_cnns (list): A list of client CNN models.
-    - federated_dataset (list of tf.data.Dataset): A list of datasets for the client models.
+    - federated_dataset (list of tf.data.Dataset): A list of datasets for each client model.
 
     Returns:
-    - list: A list of tensors, each representing the square of the Euclidean norm of the update vector for each client.
+    - tuple: Two lists containing the square of the Euclidean norms and the dot products with ksi for each client.
     """
     
-    S_i_clients = []
-
+    euc_norm_squared_clients = []
+    ksi_delta_clients = []
+    
     for client_cnn, client_dataset in zip(client_cnns, federated_dataset):
-        Delta_i_euc_norm_squared = client_train_naive(w_t0, client_cnn, client_dataset)
-        S_i_clients.append(Delta_i_euc_norm_squared)
+        Delta_i_euc_norm_squared, ksi_Delta_i = client_train_linear(
+            w_t0, w_tminus1, client_cnn, client_dataset
+        )
+
+        euc_norm_squared_clients.append(Delta_i_euc_norm_squared)
+        ksi_delta_clients.append(ksi_Delta_i)
     
-    return S_i_clients
+    return euc_norm_squared_clients, ksi_delta_clients
 
 
-def F_naive(S_i_clients):
+def F_linear(euc_norm_squared_clients, ksi_delta_clients):
     """
-    Calculates the naive approximation of the variance based on the squares of the Euclidean norms of the update vectors.
+    Calculates the linear approximation of the variance based on the given lists.
 
     Args:
-    - S_i_clients (list of tf.Tensor): A list of tensors, each representing the square of the Euclidean norm of the update vector for each client.
+    - euc_norm_squared_clients (list of tf.Tensor): List of squares of the Euclidean norms for each client.
+    - ksi_delta_clients (list of tf.Tensor): List of dot products with ksi for each client.
 
     Returns:
-    - tf.Tensor: Naive variance approximation. Shape=(), dtype=tf.float32.
+    - tf.Tensor: Linear variance approximation. Shape=(), dtype=tf.float32.
     """
     
-    S = tf.reduce_mean(S_i_clients)
+    S_1 = tf.reduce_mean(euc_norm_squared_clients)
+    S_2 = tf.reduce_mean(ksi_delta_clients)
     
-    return S
+    return S_1 - S_2**2
 
 
-def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, client_cnns, num_epochs, theta, 
-                               fda_steps_in_one_epoch, compile_and_build_model_func):
+def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, client_cnns, num_epochs, theta, 
+                                fda_steps_in_one_epoch, compile_and_build_model_func):
     """
-    Run a federated learning simulation using the Naive FDA method and collect general and time-series metrics.
-
+    Run a federated learning simulation using the Linear FDA method. 
+    Collects both general and time-series-like metrics.
+    
     Args:
     - test_dataset (tf.data.Dataset): The dataset for evaluating the model's performance.
     - federated_dataset (list of tf.data.Dataset): A list of datasets for the client models.
@@ -77,14 +116,14 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
     - theta (float): The threshold for the variance of the update vectors.
     - fda_steps_in_one_epoch (int): The number of FDA steps in one epoch.
     - compile_and_build_model_func (function): Function to compile and build the model.
-
+    
     Returns:
     - epoch_metrics_list (list): A list of EpochMetrics namedtuples, storing metrics per epoch.
     - round_metrics_list (list): A list of RoundMetrics namedtuples, storing metrics per round.
 
     Note:
-    - We consider an FDA step to be a single update from each client.
-    - The function also outputs the metrics at the end of each epoch and round for monitoring.
+    - An FDA step is considered as a single update from each client.
+    - The function also prints metrics at the end of each epoch and round for monitoring.
     """
     
     # Initialize counters and metrics lists
@@ -94,10 +133,11 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
     total_fda_steps = 0  # Total number of FDA steps taken
     est_var = 0  # Estimated variance
     
-    # Initialize models and weights
+    # Initialize models and weights for the first round
     server_cnn.set_trainable_variables(average_client_weights(client_cnns))
     synchronize_clients(server_cnn, client_cnns)
     w_t0 = server_cnn.trainable_vars_as_vector()
+    w_tminus1 = w_t0  # Initialize w_tminus1 to be the same as w_t0 for the first round
     
     # Initialize lists for storing metrics
     round_metrics_list = []
@@ -107,12 +147,12 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
         
         # Continue training until estimated variance crosses the threshold
         while est_var <= theta:
-            
+                
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
-            Delta_i_euc_norm_squared = clients_train_naive(w_t0, client_cnns, federated_dataset)
+            euc_norm_squared_clients, ksi_delta_clients = clients_train_linear(w_t0, w_tminus1, client_cnns, federated_dataset)
 
-            # Naive estimation of variance
-            est_var = F_naive(Delta_i_euc_norm_squared).numpy()
+            # Linear estimation of variance
+            est_var = F_linear(euc_norm_squared_clients, ksi_delta_clients).numpy()
             
             tmp_fda_steps += 1
             total_fda_steps += 1
@@ -147,6 +187,7 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
         print(round_metrics)
         # ------------------------------------------------------------------
 
+        w_tminus1 = w_t0
         w_t0 = server_cnn.trainable_vars_as_vector()
 
         # clients sync
