@@ -16,7 +16,6 @@ class LeNet5(tf.keras.Model):
     - set_trainable_variables: Set the trainable variables of the model.
     - trainable_vars_as_vector: Return the trainable variables as a 1D tensor.
     """
-    
     def __init__(self, cnn_input_reshape, num_classes):
         """
         Initialize the LeNet-5 model with given input shape and number of output classes.
@@ -65,7 +64,7 @@ class LeNet5(tf.keras.Model):
         x = self.dense3(x)
         
         return x
-    
+
     def step(self, batch):
         """
         Perform one training step on a given batch of data.
@@ -99,9 +98,8 @@ class LeNet5(tf.keras.Model):
         self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
         
         # Update metrics (includes the metric that tracks the loss)
-        #self.compiled_metrics.update_state(y_batch, y_batch_pred)
-    
-    
+        # self.compiled_metrics.update_state(y_batch, y_batch_pred)
+
     def train(self, dataset):
         """
         Train the model on an entire dataset.
@@ -111,8 +109,7 @@ class LeNet5(tf.keras.Model):
         """
         for batch in dataset:
             self.step(batch)
-            
-    
+
     def set_trainable_variables(self, trainable_vars):
         """
         Set the model's trainable variables.
@@ -125,7 +122,6 @@ class LeNet5(tf.keras.Model):
         for model_var, var in zip(self.trainable_variables, trainable_vars):
             model_var.assign(var)
 
-            
     def trainable_vars_as_vector(self):
         """
         Get the model's trainable variables as a single vector.
@@ -152,10 +148,47 @@ def get_compiled_and_built_lenet(cnn_batch_input, cnn_input_reshape, num_classes
     
     cnn.compile(
         optimizer=tf.keras.optimizers.Adam(),
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False), # we have softmax
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),  # we have softmax
         metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')]
     )
     
     cnn.build(cnn_batch_input)
     
     return cnn
+
+
+# Sequential API - for reference
+def sequential_lenet5(cnn_input_reshape, num_classes):
+    """
+    Args:
+    - cnn_input_reshape (tuple): The shape to which the input should be reshaped (e.g., (28, 28, 1)).
+    - num_classes (int): Number of output classes.
+
+    Returns:
+    - tf.keras.models.Sequential: A LeNet-5 model using the Sequential API.
+
+    Example for MNIST:
+        lenet5 = sequential_lenet5((28, 28, 1), 10)
+        lenet5.compile(...)
+        lenet5.fit(...)
+    """
+    return tf.keras.models.Sequential([
+        # Reshape layer
+        layers.Reshape(cnn_input_reshape, input_shape=(28, 28)),  # Example input shape, change as needed
+        # Layer 1 Conv2D
+        layers.Conv2D(filters=6, kernel_size=(5, 5), strides=(1, 1), activation='tanh', padding='same'),
+        # Layer 2 Pooling Layer
+        layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'),
+        # Layer 3 Conv2D
+        layers.Conv2D(filters=16, kernel_size=(5, 5), strides=(1, 1), activation='tanh', padding='valid'),
+        # Layer 4 Pooling Layer
+        layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'),
+        # Flatten
+        layers.Flatten(),
+        # Layer 5 Dense
+        layers.Dense(units=120, activation='tanh'),
+        # Layer 6 Dense
+        layers.Dense(units=84, activation='tanh'),
+        # Layer 7 Dense
+        layers.Dense(units=num_classes, activation='softmax')  # Example num_classes=10, change as needed
+    ])

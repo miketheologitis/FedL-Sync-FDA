@@ -113,7 +113,7 @@ class AdvancedCNN(tf.keras.Model):
         self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
         
         # Update metrics (includes the metric that tracks the loss)
-        #self.compiled_metrics.update_state(y_batch, y_batch_pred)
+        # self.compiled_metrics.update_state(y_batch, y_batch_pred)
        
     def train(self, dataset):
         """
@@ -163,10 +163,53 @@ def get_compiled_and_built_advanced_cnn(cnn_batch_input, cnn_input_reshape, num_
     
     advanced_cnn.compile(
         optimizer=tf.keras.optimizers.Adam(),
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False), # we have softmax
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),  # we have softmax
         metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')]
     )
     
     advanced_cnn.build(cnn_batch_input)
     
     return advanced_cnn
+
+
+# Sequential API - for reference
+
+def sequential_advanced_cnn(cnn_input_reshape, num_classes):
+    """
+    Create the AdvancedCNN using the Sequential API.
+
+    Args:
+    - cnn_input_reshape (tuple): The shape to which the input should be reshaped (e.g., (28, 28, 1)).
+    - num_classes (int): Number of output classes.
+
+    Returns:
+    - tf.keras.models.Sequential: An AdvancedCNN model using the Sequential API.
+
+    Example for MNIST:
+        advanced_cnn = sequential_advanced_cnn((28, 28, 1), 10)
+        advanced_cnn.compile(...)
+        advanced_cnn.fit(...)
+    """
+    return tf.keras.models.Sequential([
+        # Reshape layer
+        layers.Reshape(cnn_input_reshape, input_shape=(28, 28)),  # Example input shape, change as needed
+        # First Convolutional Block
+        layers.Conv2D(64, kernel_size=3, activation='relu', padding='same'),
+        layers.Conv2D(64, kernel_size=3, activation='relu', padding='same'),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        # Second Convolutional Block
+        layers.Conv2D(128, kernel_size=3, activation='relu', padding='same'),
+        layers.Conv2D(128, kernel_size=3, activation='relu', padding='same'),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        # Third Convolutional Block
+        layers.Conv2D(256, kernel_size=3, activation='relu', padding='same'),
+        layers.Conv2D(256, kernel_size=3, activation='relu', padding='same'),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        # Fully Connected Layers
+        layers.Flatten(),
+        layers.Dense(512, activation='relu'),
+        layers.Dropout(0.5),
+        layers.Dense(512, activation='relu'),
+        layers.Dropout(0.5),
+        layers.Dense(num_classes, activation='softmax')
+    ])
