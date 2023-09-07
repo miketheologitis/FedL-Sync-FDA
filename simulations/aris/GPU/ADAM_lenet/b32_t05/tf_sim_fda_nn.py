@@ -1211,19 +1211,19 @@ def fda_simulation(num_clients, train_dataset, test_dataset, batch_size, num_ste
     complete_epoch_metrics = []
     complete_round_metrics = []
     
-    fda_name = "sketch"
+    for fda_name in ["naive", "linear", "sketch"]:
         
-    print_current_test_info(fda_name, num_clients, batch_size, num_epochs, num_steps_until_rtc_check, theta)
+        print_current_test_info(fda_name, num_clients, batch_size, num_epochs, num_steps_until_rtc_check, theta)
 
-    # 4. Store ID'd Metrics
-    epoch_metrics_with_test_id_list, round_metrics_with_test_id_list = single_simulation(
-        fda_name, num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check, theta, num_epochs,
-        sketch_width if fda_name == "sketch" else -1, sketch_depth if fda_name == "sketch" else -1, 
-        compile_and_build_model_func, bench_test=bench_test
-    )
+        # 4. Store ID'd Metrics
+        epoch_metrics_with_test_id_list, round_metrics_with_test_id_list = single_simulation(
+            fda_name, num_clients, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check, theta, num_epochs,
+            sketch_width if fda_name == "sketch" else -1, sketch_depth if fda_name == "sketch" else -1, 
+            compile_and_build_model_func, bench_test=bench_test
+        )
 
-    complete_epoch_metrics.extend(epoch_metrics_with_test_id_list)
-    complete_round_metrics.extend(round_metrics_with_test_id_list)
+        complete_epoch_metrics.extend(epoch_metrics_with_test_id_list)
+        complete_round_metrics.extend(round_metrics_with_test_id_list)
     
     return complete_epoch_metrics, complete_round_metrics
 
