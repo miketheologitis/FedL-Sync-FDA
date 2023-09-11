@@ -631,7 +631,7 @@ def clients_train_linear(w_t0, w_tminus1, client_cnns, federated_dataset):
     euc_norm_squared_clients = []
     ksi_delta_clients = []
     
-    for client_cnn, client_dataset in zip(client_cnns, federated_dataset):
+    for client_cnn, client_dataset in zip(client_cnns, federated_dataset):_
         Delta_i_euc_norm_squared, ksi_Delta_i = client_train_linear(
             w_t0, w_tminus1, client_cnn, client_dataset
         )
@@ -977,7 +977,7 @@ def federated_simulation(test_dataset, federated_dataset, fda_name, server_cnn, 
     est_var = 0
     
     # ----- Sync ----- TODO: Count or not first sync?
-    server_cnn.set_trainable_variables(average_client_weights(client_cnns))
+    #server_cnn.set_trainable_variables(average_client_weights(client_cnns))
     synchronize_clients(server_cnn, client_cnns)
     w_t0 = server_cnn.trainable_vars_as_vector()
     if fda_name == "linear": w_tminus1 = w_t0
@@ -1052,10 +1052,10 @@ def federated_simulation(test_dataset, federated_dataset, fda_name, server_cnn, 
             continue
 
         # ------------------------- Metrics --------------------------------
-        actual_var = variance(server_cnn, client_cnns).numpy()
-        round_metrics = RoundMetrics(epoch_count, total_rounds, total_fda_steps, est_var, actual_var)
-        round_metrics_list.append(round_metrics)
-        print(round_metrics)
+        #actual_var = variance(server_cnn, client_cnns).numpy()
+        #round_metrics = RoundMetrics(epoch_count, total_rounds, total_fda_steps, est_var, actual_var)
+        #round_metrics_list.append(round_metrics)
+        #print(round_metrics)
         # ------------------------------------------------------------------
 
         if fda_name == "linear": w_tminus1 = w_t0

@@ -1,1 +1,0 @@
-[{"num_clients": 20, "batch_size": 128, "theta": 2.0, "rtc_steps": 1, "test_id": 0, "bench_test": false, "epochs": 250, "synchronous": false}, {"num_clients": 60, "batch_size": 128, "theta": 2.0, "rtc_steps": 1, "test_id": 1, "bench_test": false, "epochs": 250, "synchronous": false}]
