@@ -232,7 +232,7 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
     est_var = 0  # Estimated variance
     
     # Initialize models and synchronize client and server models
-    server_cnn.set_trainable_variables(average_client_weights(client_cnns))
+    #server_cnn.set_trainable_variables(average_client_weights(client_cnns))
     synchronize_clients(server_cnn, client_cnns)
     w_t0 = server_cnn.trainable_vars_as_vector()
     

@@ -50,7 +50,7 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
     total_fda_steps = 0  # Total FDA steps taken
     
     # Initialize models and synchronize client and server models
-    server_cnn.set_trainable_variables(average_client_weights(client_cnns))
+    #server_cnn.set_trainable_variables(average_client_weights(client_cnns))
     synchronize_clients(server_cnn, client_cnns)
     
     # Initialize list for storing epoch metrics

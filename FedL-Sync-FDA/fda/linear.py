@@ -134,7 +134,7 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
     est_var = 0  # Estimated variance
     
     # Initialize models and weights for the first round
-    server_cnn.set_trainable_variables(average_client_weights(client_cnns))
+    #server_cnn.set_trainable_variables(average_client_weights(client_cnns))
     synchronize_clients(server_cnn, client_cnns)
     w_t0 = server_cnn.trainable_vars_as_vector()
     w_tminus1 = w_t0  # Initialize w_tminus1 to be the same as w_t0 for the first round
