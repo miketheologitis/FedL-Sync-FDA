@@ -12,13 +12,11 @@ def print_current_test_info(fda_name, num_clients, batch_size, num_epochs, num_s
     print()
     
     
-def print_finish_testing_info(naive_test, linear_test, sketch_test, synchronous_test, num_clients, batch_size, num_epochs, 
+def print_finish_testing_info(fda_name, num_clients, batch_size, num_epochs,
                               num_steps_until_rtc_check, theta, start_time, end_time):
-    conditions = [("naive", naive_test), ("linear", linear_test), ("sketch", sketch_test), ("synchronous", synchronous_test)]
-    tests_performed = [name for name, condition in conditions if condition]
     print()
     print(f"------------ Finished Testing : ------------")
-    print(f"FDA methods : {tests_performed}")
+    print(f"FDA name : {fda_name}")
     print(f"Num Clients : {num_clients}")
     print(f"Batch size : {batch_size}")
     print(f"Num Epochs : {num_epochs}")

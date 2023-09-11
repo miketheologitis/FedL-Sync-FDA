@@ -1,5 +1,3 @@
-import tensorflow as tf
-
 from metrics import EpochMetrics
 from models import average_client_weights, synchronize_clients, current_accuracy
 
@@ -19,8 +17,8 @@ def clients_train_synchronous(client_cnns, federated_dataset):
         client_cnn.train(client_dataset)
 
 
-def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn, client_cnns, num_epochs, 
-                         fda_steps_in_one_epoch, compile_and_build_model_func):
+def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn, client_cnns, num_epochs,
+                                     fda_steps_in_one_epoch, compile_and_build_model_func):
     """
     Run a federated learning simulation with the synchronous method (FDA with theta equal to zero).
     This function collects epoch-wise metrics.
@@ -36,7 +34,6 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
     
     Returns:
     - epoch_metrics_list (list): A list of tuples containing epoch-wise metrics.
-    - [] (list): An empty list (as round-wise metrics are not applicable in this training)
     
     Note:
     - An FDA step and a round is the same thing in this method.
@@ -48,11 +45,9 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
     epoch_count = 1  # Epoch counter
     total_rounds = 1  # Round counter
     total_fda_steps = 0  # Total FDA steps taken
-    
-    # Initialize models and synchronize client and server models
-    #server_cnn.set_trainable_variables(average_client_weights(client_cnns))
-    synchronize_clients(server_cnn, client_cnns)
-    
+
+    synchronize_clients(server_cnn, client_cnns)  # Set clients to server model
+
     # Initialize list for storing epoch metrics
     epoch_metrics_list = []
     
@@ -68,14 +63,15 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
         if tmp_fda_steps >= fda_steps_in_one_epoch:
 
             # Minus here and not `tmp_fda_steps = 0` because `fda_steps_in_one_epoch` is not an integer necessarily
-            # and we need to keep track of potentially more data seen in this fda step (many clients, large batch sizes)
+            # and we need to keep track of potentially more data seen in this fda step
+            # (many clients, large batch sizes)
             tmp_fda_steps -= fda_steps_in_one_epoch
 
             # ---------- Metrics ------------
             acc = current_accuracy(client_cnns, test_dataset, compile_and_build_model_func)
             epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc)
             epoch_metrics_list.append(epoch_metrics)
-            print(epoch_metrics) # remove
+            print(epoch_metrics)  # remove
             # -------------------------------
 
             epoch_count += 1
@@ -88,5 +84,5 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
         synchronize_clients(server_cnn, client_cnns)
         total_rounds += 1
     
-    return epoch_metrics_list, []
+    return epoch_metrics_list
                 

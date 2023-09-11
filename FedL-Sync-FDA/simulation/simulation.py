@@ -2,7 +2,7 @@ from math import sqrt
 
 from data import prepare_federated_data
 from metrics import TestId, process_metrics_with_test_id
-from models import count_weights
+from models import count_weights, synchronize_clients
 from fda import naive_federated_simulation, linear_federated_simulation,\
     sketch_federated_simulation, synchronous_federated_simulation, AmsSketch
 
@@ -52,7 +52,7 @@ def prepare_for_federated_simulation(n_train, train_dataset, num_clients, batch_
 
 
 def single_simulation(fda_name, num_clients, n_train, train_dataset, test_dataset, batch_size, num_steps_until_rtc_check,
-                      num_epochs, compile_and_build_model_func, theta=0., sketch_width=-1, sketch_depth=-1,
+                      num_epochs, compile_and_build_model_func, nn_name, theta=0., sketch_width=-1, sketch_depth=-1,
                       bench_test=False):
     """
     Run a single federated learning simulation based on the given FDA method name.
@@ -67,6 +67,7 @@ def single_simulation(fda_name, num_clients, n_train, train_dataset, test_datase
         num_steps_until_rtc_check (int): Number of steps to perform before each RTC check.
         num_epochs (int): Number of epochs to run the simulation.
         compile_and_build_model_func (callable): Function to compile and build the model.
+        nn_name (str): Name of the neural network model.
         theta (float, optional): Variance threshold for FDA methods. Defaults to 0. for "synchronous".
         sketch_width (int, optional): Width parameter for the AMS sketch. Defaults to -1.
         sketch_depth (int, optional): Depth parameter for the AMS sketch. Defaults to -1.
@@ -75,7 +76,6 @@ def single_simulation(fda_name, num_clients, n_train, train_dataset, test_datase
     Returns:
         tuple: A tuple containing two lists:
             - epoch_metrics_with_test_id_list (list): List of epoch metrics with test ID.
-            - round_metrics_with_test_id_list (list): List of round metrics with test ID.
 
     Notes:
         - The function prepares the simulation environment and then runs the simulation based on the `fda_name`.
@@ -90,38 +90,38 @@ def single_simulation(fda_name, num_clients, n_train, train_dataset, test_datase
 
     # 2. Simulation
     if fda_name == "naive":
-        epoch_metrics_list, round_metrics_list = naive_federated_simulation(
+        epoch_metrics_list = naive_federated_simulation(
             test_dataset, federated_dataset, server_cnn, client_cnns, num_epochs, theta, 
             fda_steps_in_one_epoch, compile_and_build_model_func
         )
     
     if fda_name == "linear":  
-        epoch_metrics_list, round_metrics_list = linear_federated_simulation(
+        epoch_metrics_list = linear_federated_simulation(
             test_dataset, federated_dataset, server_cnn, client_cnns, num_epochs, theta, 
             fda_steps_in_one_epoch, compile_and_build_model_func
         )
     
     if fda_name == "sketch":
-        epoch_metrics_list, round_metrics_list = sketch_federated_simulation(
+        epoch_metrics_list = sketch_federated_simulation(
             test_dataset, federated_dataset, server_cnn, client_cnns, num_epochs, theta, fda_steps_in_one_epoch,
             compile_and_build_model_func, AmsSketch(width=sketch_width, depth=sketch_depth), 1. / sqrt(sketch_width)
         )
         
     if fda_name == "synchronous":
-        epoch_metrics_list, round_metrics_list = synchronous_federated_simulation(
+        epoch_metrics_list = synchronous_federated_simulation(
             test_dataset, federated_dataset, server_cnn, client_cnns, num_epochs, 
             fda_steps_in_one_epoch, compile_and_build_model_func
         )
 
     # 3. Create Test ID
     test_id = TestId(
-        "EMNIST", fda_name, num_clients, batch_size, num_steps_until_rtc_check, theta, 
+        "MNIST", fda_name, num_clients, batch_size, num_steps_until_rtc_check, theta, nn_name,
         count_weights(server_cnn), sketch_width, sketch_depth
     )
 
     # 4. Store ID'd Metrics
-    epoch_metrics_with_test_id_list, round_metrics_with_test_id_list = process_metrics_with_test_id(
-        epoch_metrics_list, round_metrics_list, test_id
+    epoch_metrics_with_test_id_list = process_metrics_with_test_id(
+        epoch_metrics_list, test_id
     )
     
-    return epoch_metrics_with_test_id_list, round_metrics_with_test_id_list
+    return epoch_metrics_with_test_id_list

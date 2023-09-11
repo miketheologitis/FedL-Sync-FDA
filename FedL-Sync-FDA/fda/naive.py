@@ -1,7 +1,8 @@
 import tensorflow as tf
 
-from metrics import EpochMetrics, RoundMetrics
-from models import average_client_weights, synchronize_clients, variance, current_accuracy
+from metrics import EpochMetrics
+from models import average_client_weights, current_accuracy, synchronize_clients
+
 
 def client_train_naive(w_t0, client_cnn, client_dataset):
     """
@@ -21,7 +22,7 @@ def client_train_naive(w_t0, client_cnn, client_dataset):
     
     Delta_i = client_cnn.trainable_vars_as_vector() - w_t0
     
-    #||D(t)_i||^2 , shape = () 
+    #  ||D(t)_i||^2 , shape = ()
     Delta_i_euc_norm_squared = tf.reduce_sum(tf.square(Delta_i)) # ||D(t)_i||^2
     
     return Delta_i_euc_norm_squared
@@ -82,7 +83,6 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
 
     Returns:
     - epoch_metrics_list (list): A list of EpochMetrics namedtuples, storing metrics per epoch.
-    - round_metrics_list (list): A list of RoundMetrics namedtuples, storing metrics per round.
 
     Note:
     - We consider an FDA step to be a single update from each client.
@@ -95,14 +95,13 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
     total_rounds = 1  # Total number of rounds completed
     total_fda_steps = 0  # Total number of FDA steps taken
     est_var = 0  # Estimated variance
+
+    synchronize_clients(server_cnn, client_cnns)
     
     # Initialize models and weights
-    #server_cnn.set_trainable_variables(average_client_weights(client_cnns))
-    synchronize_clients(server_cnn, client_cnns)
     w_t0 = server_cnn.trainable_vars_as_vector()
     
     # Initialize lists for storing metrics
-    round_metrics_list = []
     epoch_metrics_list = []
     
     while epoch_count <= num_epochs:
@@ -123,31 +122,26 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
             if tmp_fda_steps >= fda_steps_in_one_epoch:
                 
                 # Minus here and not `tmp_fda_steps = 0` because `fda_steps_in_one_epoch` is not an integer necessarily
-                # and we need to keep track of potentially more data seen in this fda step (many clients, large batch sizes)
+                # and we need to keep track of potentially more data seen in this fda step
+                # (many clients, large batch sizes)
                 tmp_fda_steps -= fda_steps_in_one_epoch
                 
                 # ---------- Metrics ------------
                 acc = current_accuracy(client_cnns, test_dataset, compile_and_build_model_func)
                 epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc)
                 epoch_metrics_list.append(epoch_metrics)
-                print(epoch_metrics) # remove
+                print(epoch_metrics)  # remove
                 # -------------------------------
                 
                 epoch_count += 1
                 
-                if epoch_count > num_epochs: break
+                if epoch_count > num_epochs:
+                    break
         
         # Round finished
 
         # server average
         server_cnn.set_trainable_variables(average_client_weights(client_cnns))
-
-        # ------------------------- Metrics --------------------------------
-        actual_var = variance(server_cnn, client_cnns).numpy()
-        round_metrics = RoundMetrics(epoch_count, total_rounds, total_fda_steps, est_var, actual_var)
-        round_metrics_list.append(round_metrics)
-        print(round_metrics)
-        # ------------------------------------------------------------------
 
         w_t0 = server_cnn.trainable_vars_as_vector()
 
@@ -157,5 +151,5 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
 
         total_rounds += 1
         
-    return epoch_metrics_list, round_metrics_list
+    return epoch_metrics_list
                 

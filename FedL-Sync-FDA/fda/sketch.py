@@ -1,7 +1,7 @@
 import tensorflow as tf
 
-from metrics import EpochMetrics, RoundMetrics
-from models import average_client_weights, synchronize_clients, variance, current_accuracy
+from metrics import EpochMetrics
+from models import average_client_weights, current_accuracy, synchronize_clients
 
 
 class AmsSketch:
@@ -14,15 +14,13 @@ class AmsSketch:
         self.width = width
         self.F = tf.random.uniform(shape=(6, depth), minval=0, maxval=(1 << 31) - 1, dtype=tf.int32)
 
-        
     def hash31(self, x, a, b):
 
         r = a * x + b
         fold = tf.bitwise.bitwise_xor(tf.bitwise.right_shift(r, 31), r)
         return tf.bitwise.bitwise_and(fold, 2147483647)
-    
-    
-    def tensor_hash31(self, x, a, b): # GOOD
+
+    def tensor_hash31(self, x, a, b):  # GOOD
         """ Assumed that x is tensor shaped (d,) , i.e., a vector (for example, indices, i.e., tf.range(d)) """
 
         # Reshape x to have an extra dimension, resulting in a shape of (k, 1)
@@ -34,8 +32,7 @@ class AmsSketch:
         fold = tf.bitwise.bitwise_xor(tf.bitwise.right_shift(r, 31), r)
         
         return tf.bitwise.bitwise_and(fold, 2147483647)
-    
-    
+
     def tensor_fourwise(self, x):
         """ Assumed that x is tensor shaped (d,) , i.e., a vector (for example, indices, i.e., tf.range(d)) """
         # 1st use the tensor hash31
@@ -50,13 +47,10 @@ class AmsSketch:
         in4 = tf.bitwise.bitwise_and(in3, 32768)  # shape = (`x_dim`,  `self.depth`)
         
         return 2 * (tf.bitwise.right_shift(in4, 15)) - 1  # shape = (`x_dim`,  `self.depth`)
-        
-        
-    def fourwise(self, x):
 
+    def fourwise(self, x):
         result = 2 * (tf.bitwise.right_shift(tf.bitwise.bitwise_and(self.hash31(self.hash31(self.hash31(x, self.F[2], self.F[3]), x, self.F[4]), x, self.F[5]), 32768), 15)) - 1
         return result
-    
 
     @tf.function
     def sketch_for_vector(self, v):
@@ -89,7 +83,6 @@ class AmsSketch:
         
         return sketch
     
-    
     def sketch_for_vector2(self, v):
         """ Bad implementation for tensorflow. """
 
@@ -102,8 +95,7 @@ class AmsSketch:
             sketch = tf.tensor_scatter_nd_add(sketch, indices_to_update, delta)
 
         return sketch
-        
-    
+
     @staticmethod
     def estimate_euc_norm_squared(sketch):
 
@@ -140,7 +132,7 @@ def client_train_sketch(w_t0, client_cnn, client_dataset, ams_sketch):
     
     Delta_i = client_cnn.trainable_vars_as_vector() - w_t0
     
-    #||D(t)_i||^2 , shape = () 
+    #  ||D(t)_i||^2 , shape = ()
     Delta_i_euc_norm_squared = tf.reduce_sum(tf.square(Delta_i)) # ||D(t)_i||^2 
     
     # sketch approx
@@ -217,7 +209,6 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
     
     Returns:
     - epoch_metrics_list (list): A list of tuples containing epoch-wise metrics.
-    - round_metrics_list (list): A list of tuples containing round-wise metrics.
     
     Note:
     - An FDA step is considered as a single update from each client.
@@ -230,14 +221,13 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
     total_rounds = 1  # Round counter
     total_fda_steps = 0  # Total FDA steps taken
     est_var = 0  # Estimated variance
+
+    synchronize_clients(server_cnn, client_cnns)
     
     # Initialize models and synchronize client and server models
-    #server_cnn.set_trainable_variables(average_client_weights(client_cnns))
-    synchronize_clients(server_cnn, client_cnns)
     w_t0 = server_cnn.trainable_vars_as_vector()
     
-    # Initialize lists for storing metrics
-    round_metrics_list = []
+    # Initialize list for storing metrics
     epoch_metrics_list = []
     
     while epoch_count <= num_epochs:
@@ -246,7 +236,9 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         while est_var <= theta:
 
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
-            euc_norm_squared_clients, sketch_clients = clients_train_sketch(w_t0, client_cnns, federated_dataset, ams_sketch)
+            euc_norm_squared_clients, sketch_clients = clients_train_sketch(
+                w_t0, client_cnns, federated_dataset, ams_sketch
+            )
 
             # Sketch estimation of variance
             est_var = F_sketch(euc_norm_squared_clients, sketch_clients, epsilon).numpy()
@@ -258,32 +250,26 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
             if tmp_fda_steps >= fda_steps_in_one_epoch:
                 
                 # Minus here and not `tmp_fda_steps = 0` because `fda_steps_in_one_epoch` is not an integer necessarily
-                # and we need to keep track of potentially more data seen in this fda step (many clients, large batch sizes)
+                # and we need to keep track of potentially more data seen in this fda step
+                # (many clients, large batch sizes)
                 tmp_fda_steps -= fda_steps_in_one_epoch
                 
                 # ---------- Metrics ------------
                 acc = current_accuracy(client_cnns, test_dataset, compile_and_build_model_func)
                 epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc)
                 epoch_metrics_list.append(epoch_metrics)
-                print(epoch_metrics) # remove
+                print(epoch_metrics)  # remove
                 # -------------------------------
                 
                 epoch_count += 1
                 
-                if epoch_count > num_epochs: break
+                if epoch_count > num_epochs:
+                    break
         
         # Round finished
 
         # server average
         server_cnn.set_trainable_variables(average_client_weights(client_cnns))
-
-        # ------------------------- Metrics --------------------------------
-        actual_var = variance(server_cnn, client_cnns).numpy()
-        round_metrics = RoundMetrics(epoch_count, total_rounds, total_fda_steps, est_var, actual_var)
-        round_metrics_list.append(round_metrics)
-        print(round_metrics)
-        # ------------------------------------------------------------------
-
         w_t0 = server_cnn.trainable_vars_as_vector()
 
         # clients sync
@@ -291,7 +277,6 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         est_var = 0
 
         total_rounds += 1
-        
-    
-    return epoch_metrics_list, round_metrics_list
+
+    return epoch_metrics_list
                 

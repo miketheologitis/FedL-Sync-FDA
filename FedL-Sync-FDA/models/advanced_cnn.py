@@ -111,9 +111,6 @@ class AdvancedCNN(tf.keras.Model):
         
         # Apply gradients to the model's trainable variables (update weights)
         self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
-        
-        # Update metrics (includes the metric that tracks the loss)
-        # self.compiled_metrics.update_state(y_batch, y_batch_pred)
        
     def train(self, dataset):
         """
@@ -163,7 +160,7 @@ def get_compiled_and_built_advanced_cnn(cnn_batch_input, cnn_input_reshape, num_
     
     advanced_cnn.compile(
         optimizer=tf.keras.optimizers.Adam(),
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),  # we have softmax
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(),  # we have softmax
         metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')]
     )
     

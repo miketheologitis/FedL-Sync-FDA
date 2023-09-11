@@ -1,7 +1,8 @@
 import tensorflow as tf
 
-from metrics import EpochMetrics, RoundMetrics
-from models import average_client_weights, synchronize_clients, variance, current_accuracy
+from metrics import EpochMetrics
+from models import average_client_weights, variance, current_accuracy, synchronize_clients
+
 
 def ksi_unit(w_t0, w_tminus1):
     """
@@ -119,7 +120,6 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
     
     Returns:
     - epoch_metrics_list (list): A list of EpochMetrics namedtuples, storing metrics per epoch.
-    - round_metrics_list (list): A list of RoundMetrics namedtuples, storing metrics per round.
 
     Note:
     - An FDA step is considered as a single update from each client.
@@ -132,15 +132,13 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
     total_rounds = 1  # Total number of rounds completed
     total_fda_steps = 0  # Total number of FDA steps taken
     est_var = 0  # Estimated variance
-    
-    # Initialize models and weights for the first round
-    #server_cnn.set_trainable_variables(average_client_weights(client_cnns))
-    synchronize_clients(server_cnn, client_cnns)
+
+    synchronize_clients(server_cnn, client_cnns)  # Set clients to server model
+
     w_t0 = server_cnn.trainable_vars_as_vector()
     w_tminus1 = w_t0  # Initialize w_tminus1 to be the same as w_t0 for the first round
     
     # Initialize lists for storing metrics
-    round_metrics_list = []
     epoch_metrics_list = []
     
     while epoch_count <= num_epochs:
@@ -149,7 +147,9 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         while est_var <= theta:
                 
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
-            euc_norm_squared_clients, ksi_delta_clients = clients_train_linear(w_t0, w_tminus1, client_cnns, federated_dataset)
+            euc_norm_squared_clients, ksi_delta_clients = clients_train_linear(
+                w_t0, w_tminus1, client_cnns, federated_dataset
+            )
 
             # Linear estimation of variance
             est_var = F_linear(euc_norm_squared_clients, ksi_delta_clients).numpy()
@@ -161,31 +161,26 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
             if tmp_fda_steps >= fda_steps_in_one_epoch:
                 
                 # Minus here and not `tmp_fda_steps = 0` because `fda_steps_in_one_epoch` is not an integer necessarily
-                # and we need to keep track of potentially more data seen in this fda step (many clients, large batch sizes)
+                # and we need to keep track of potentially more data seen in this fda step
+                # (many clients, large batch sizes)
                 tmp_fda_steps -= fda_steps_in_one_epoch
                 
                 # ---------- Metrics ------------
                 acc = current_accuracy(client_cnns, test_dataset, compile_and_build_model_func)
                 epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc)
                 epoch_metrics_list.append(epoch_metrics)
-                print(epoch_metrics) # remove
+                print(epoch_metrics)  # remove
                 # -------------------------------
                 
                 epoch_count += 1
                 
-                if epoch_count > num_epochs: break
+                if epoch_count > num_epochs:
+                    break
         
         # Round finished
 
         # server average
         server_cnn.set_trainable_variables(average_client_weights(client_cnns))
-
-        # ------------------------- Metrics --------------------------------
-        actual_var = variance(server_cnn, client_cnns).numpy()
-        round_metrics = RoundMetrics(epoch_count, total_rounds, total_fda_steps, est_var, actual_var)
-        round_metrics_list.append(round_metrics)
-        print(round_metrics)
-        # ------------------------------------------------------------------
 
         w_tminus1 = w_t0
         w_t0 = server_cnn.trainable_vars_as_vector()
@@ -196,5 +191,5 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
 
         total_rounds += 1
         
-    return epoch_metrics_list, round_metrics_list
+    return epoch_metrics_list
                 

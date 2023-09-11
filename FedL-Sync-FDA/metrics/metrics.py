@@ -42,7 +42,7 @@ Attributes:
 TestId = namedtuple(
         'TestId',
         ["dataset_name", "fda_name", "num_clients", "batch_size", "num_steps_until_rtc_check",
-         "theta", "nn_num_weights", "sketch_width", "sketch_depth"]
+         "theta", "nn_name", "nn_num_weights", "sketch_width", "sketch_depth"]
 )
 
 # Extend the EpochMetrics and RoundMetrics namedtuples to include TestId.
@@ -50,7 +50,7 @@ EpochMetricsWithId = namedtuple('EpochMetricsWithId', TestId._fields + EpochMetr
 RoundMetricsWithId = namedtuple('RoundMetricsWithId', TestId._fields + RoundMetrics._fields)
 
 
-def process_metrics_with_test_id(epoch_metrics_list, round_metrics_list, test_id):
+def process_metrics_with_test_id(epoch_metrics_list, test_id):
     """
     Process the given epoch and round metrics lists to append TestId.
     
@@ -67,9 +67,4 @@ def process_metrics_with_test_id(epoch_metrics_list, round_metrics_list, test_id
         for epoch_metrics in epoch_metrics_list
     ]
     
-    round_metrics_with_test_id = [
-        RoundMetricsWithId(*test_id, *round_metrics)
-        for round_metrics in round_metrics_list
-    ]
-    
-    return epoch_metrics_with_test_id, round_metrics_with_test_id
+    return epoch_metrics_with_test_id

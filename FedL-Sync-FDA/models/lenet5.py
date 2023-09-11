@@ -87,8 +87,8 @@ class LeNet5(tf.keras.Model):
             # (the loss function is configured in `compile()`)
             loss = self.compiled_loss(
                 y_true=y_batch,
-                y_pred=y_batch_pred,
-                regularization_losses=self.losses
+                y_pred=y_batch_pred
+                #regularization_losses=self.losses
             )
 
         # Compute gradients
@@ -96,9 +96,6 @@ class LeNet5(tf.keras.Model):
         
         # Apply gradients to the model's trainable variables (update weights)
         self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
-        
-        # Update metrics (includes the metric that tracks the loss)
-        # self.compiled_metrics.update_state(y_batch, y_batch_pred)
 
     def train(self, dataset):
         """
