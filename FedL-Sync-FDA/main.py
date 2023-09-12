@@ -29,7 +29,9 @@ if __name__ == '__main__':
     else:
         sys.exit("Usage: python -m main <GPU_ID> <COMB_FILENAME> <PROC_ID> or python -m main <COMB_FILENAME>")
 
-    # os.environ['CUDA_VISIBLE_DEVICES'] = str(local_id)
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(local_id)
+    import tensorflow as tf
+    print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
     from functools import partial
     import time
