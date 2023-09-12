@@ -62,7 +62,7 @@ def prepare_federated_data(train_dataset, num_clients, batch_size, num_steps_unt
     def process_client_dataset(client_dataset, batch_size, num_steps_until_rtc_check, seed):
         shuffle_size = client_dataset.cardinality()  # Uniform shuffling
         return client_dataset.shuffle(shuffle_size, seed=seed).repeat().batch(batch_size)\
-            .take(num_steps_until_rtc_check).prefetch(2)
+            .prefetch(2).take(num_steps_until_rtc_check)
     
     # Shard the data across clients CLIENT LEVEL
     clients_federated_data = [
