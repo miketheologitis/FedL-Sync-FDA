@@ -65,6 +65,7 @@ class LeNet5(tf.keras.Model):
         
         return x
 
+    @tf.function
     def step(self, batch):
         """
         Perform one training step on a given batch of data.
@@ -76,7 +77,8 @@ class LeNet5(tf.keras.Model):
 
         This method computes the gradients using backpropagation and updates the model's trainable parameters.
         """
-        
+        print("Retrace LeNet5.step")
+
         x_batch, y_batch = batch
 
         with tf.GradientTape() as tape:

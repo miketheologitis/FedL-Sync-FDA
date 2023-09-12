@@ -1,9 +1,7 @@
 from metrics import EpochMetrics
 from models import average_client_weights, synchronize_clients, current_accuracy
-import tensorflow as tf
 
 
-@tf.function
 def clients_train_synchronous(client_cnns, federated_dataset):
     """
     Train all client models with the synchronous method (FDA with theta equal to zero).
@@ -15,7 +13,6 @@ def clients_train_synchronous(client_cnns, federated_dataset):
     Returns:
     None
     """
-    print("Retrace: clients_train_synchronous")
     for client_cnn, client_dataset in zip(client_cnns, federated_dataset):
         client_cnn.train(client_dataset)
 

@@ -80,7 +80,8 @@ class AdvancedCNN(tf.keras.Model):
         x = self.dropout2(x, training=training)
         x = self.dense3(x)
         return x
-    
+
+    @tf.function
     def step(self, batch):
         """
         Perform one training step on a given batch of data.
@@ -92,6 +93,7 @@ class AdvancedCNN(tf.keras.Model):
 
         This method computes the gradients using backpropagation and updates the model's trainable parameters.
         """
+        print("Retrace AdvancedCNN.step")
         x_batch, y_batch = batch
 
         with tf.GradientTape() as tape:

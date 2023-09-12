@@ -3,6 +3,8 @@ import tensorflow as tf
 from metrics import EpochMetrics
 from models import average_client_weights, current_accuracy, synchronize_clients
 
+import time  # REMOVE
+
 
 def client_train_naive(w_t0, client_cnn, client_dataset):
     """
@@ -23,7 +25,7 @@ def client_train_naive(w_t0, client_cnn, client_dataset):
     Delta_i = client_cnn.trainable_vars_as_vector() - w_t0
     
     #  ||D(t)_i||^2 , shape = ()
-    Delta_i_euc_norm_squared = tf.reduce_sum(tf.square(Delta_i)) # ||D(t)_i||^2
+    Delta_i_euc_norm_squared = tf.reduce_sum(tf.square(Delta_i))  # ||D(t)_i||^2
     
     return Delta_i_euc_norm_squared
 
@@ -103,14 +105,24 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
     
     # Initialize lists for storing metrics
     epoch_metrics_list = []
+
+    t2 = time.time()  # REMOVE
     
     while epoch_count <= num_epochs:
         
         # Continue training until estimated variance crosses the threshold
         while est_var <= theta:
-            
+
+            t1 = time.time()  # REMOVE
+
+            print(f"Not in train: {t1 - t2} seconds")  # REMOVE
+
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
             Delta_i_euc_norm_squared = clients_train_naive(w_t0, client_cnns, federated_dataset)
+
+            t2 = time.time()  # REMOVE
+
+            print(f"In train: {t2 - t1} seconds")  # REMOVE
 
             # Naive estimation of variance
             est_var = F_naive(Delta_i_euc_norm_squared).numpy()

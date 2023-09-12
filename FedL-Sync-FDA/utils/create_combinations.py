@@ -16,8 +16,8 @@ bench_test = False
 # Define the parameter values
 params = {
     "nn_name": ["LeNet-5"],
-    "num_clients": [4],
-    "fda_name": ["synchronous"],
+    "num_clients": [5, 10, 30, 60],
+    "fda_name": ["naive"],
     "batch_size": [64],
     "theta": [0.],
     "rtc_steps": [1]
