@@ -15,7 +15,7 @@ epochs = 15
 bench_test = False
 # Define the parameter values
 params = {
-    "nn_name": ["AdvancedCNN"],
+    "nn_name": ["LeNet-5"],
     "num_clients": [4],
     "fda_name": ["synchronous"],
     "batch_size": [64],

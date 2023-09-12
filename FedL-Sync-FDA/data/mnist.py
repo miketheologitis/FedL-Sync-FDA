@@ -4,6 +4,7 @@ MNIST_CNN_BATCH_INPUT = (None, 28, 28) # EMNIST dataset (None is used for batch 
 MNIST_CNN_INPUT_RESHAPE = (28, 28, 1)
 MNIST_N_TRAIN = 60_000
 
+
 def load_data():
     """
     Load the MNIST dataset and normalize the pixel values.
