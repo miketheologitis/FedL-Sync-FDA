@@ -101,6 +101,8 @@ def average_client_weights(client_models):
     for each layer is computed separately and then returned as a list of average weights 
     for each layer.
 
+    https://stackoverflow.com/questions/48212110/average-weights-in-keras-models
+
     Args:
     - client_models (list of objects): A list of objects representing the client models. 
       Each object is expected to have an attribute `trainable_variables` that returns a 

@@ -2,6 +2,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 if __name__ == '__main__':
+
     import sys
 
     if len(sys.argv) == 2:  # SLURM ENVIRONMENT: One argument plus the script name
@@ -28,7 +29,7 @@ if __name__ == '__main__':
     else:
         sys.exit("Usage: python -m main <GPU_ID> <COMB_FILENAME> <PROC_ID> or python -m main <COMB_FILENAME>")
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(local_id)
+    # os.environ['CUDA_VISIBLE_DEVICES'] = str(local_id)
 
     from functools import partial
     import time
@@ -40,7 +41,7 @@ if __name__ == '__main__':
     from utils import print_finish_testing_info, print_current_test_info, get_test_hyper_parameters
 
     # 1. Hyper-Parameters
-    hyperparameters = get_test_hyper_parameters(comb_filename, proc_id)
+    hyperparameters = get_test_hyper_parameters(f'tmp/combinations/{comb_filename}', proc_id)
 
     if hyperparameters['nn_name'] == 'AdvancedCNN':
         compile_and_build_model_func = partial(
@@ -64,7 +65,8 @@ if __name__ == '__main__':
     print_current_test_info(
         hyperparameters['fda_name'], hyperparameters['num_clients'],
         hyperparameters['batch_size'], hyperparameters['epochs'],
-        hyperparameters['rtc_steps'], hyperparameters['theta']
+        hyperparameters['rtc_steps'], hyperparameters['nn_name'],
+        hyperparameters['theta']
     )
 
     # 1. Naive simulation
@@ -142,10 +144,10 @@ if __name__ == '__main__':
 
     # Simulation ended
     print_finish_testing_info(
-        hyperparameters['fda_name'], hyperparameters['num_clients'],
-        hyperparameters['batch_size'], hyperparameters['epochs'],
-        hyperparameters['rtc_steps'], hyperparameters['theta'],
-        start_time, time.time()
+        hyperparameters['nn_name'], hyperparameters['fda_name'],
+        hyperparameters['num_clients'], hyperparameters['batch_size'],
+        hyperparameters['epochs'], hyperparameters['rtc_steps'],
+        hyperparameters['theta'], start_time, time.time()
     )
 
     # Save Metrics

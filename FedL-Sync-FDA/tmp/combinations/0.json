@@ -1,0 +1,1 @@
+[{"nn_name": "AdvancedCNN", "num_clients": 4, "fda_name": "synchronous", "batch_size": 64, "theta": 0.0, "rtc_steps": 1, "test_id": "AdvancedCNN_synchronous_b64_c4_t00", "bench_test": false, "epochs": 15}]

@@ -99,12 +99,7 @@ class AdvancedCNN(tf.keras.Model):
             y_batch_pred = self(x_batch, training=True)
 
             # Compute the loss value
-            # (the loss function is configured in `compile()`)
-            loss = self.compiled_loss(
-                y_true=y_batch,
-                y_pred=y_batch_pred,
-                regularization_losses=self.losses
-            )
+            loss = self.loss(y_batch, y_batch_pred)
 
         # Compute gradients
         gradients = tape.gradient(loss, self.trainable_variables)
@@ -210,3 +205,12 @@ def sequential_advanced_cnn(cnn_input_reshape, num_classes):
         layers.Dropout(0.5),
         layers.Dense(num_classes, activation='softmax')
     ])
+
+
+"""
+loss = self.compiled_loss(
+    y_true=y_batch,
+    y_pred=y_batch_pred,
+    regularization_losses=self.losses
+)
+"""

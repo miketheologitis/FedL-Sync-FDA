@@ -84,12 +84,7 @@ class LeNet5(tf.keras.Model):
             y_batch_pred = self(x_batch, training=True)
 
             # Compute the loss value
-            # (the loss function is configured in `compile()`)
-            loss = self.compiled_loss(
-                y_true=y_batch,
-                y_pred=y_batch_pred
-                #regularization_losses=self.losses
-            )
+            loss = self.loss(y_batch, y_batch_pred)
 
         # Compute gradients
         gradients = tape.gradient(loss, self.trainable_variables)
