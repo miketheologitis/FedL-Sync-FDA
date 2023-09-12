@@ -92,6 +92,7 @@ def current_accuracy(client_models, test_dataset, compile_and_build_model_func):
     return acc
 
 
+@tf.function
 def average_client_weights(client_models):
     """
     Compute the average of the trainable parameters across multiple client models.
@@ -130,6 +131,7 @@ def average_client_weights(client_models):
     return avg_weights
 
 
+@tf.function
 def synchronize_clients(server_model, client_models):
     """
     Synchronize the trainable parameters of client models with those of a server model.

@@ -65,6 +65,7 @@ class LeNet5(tf.keras.Model):
         
         return x
 
+    @tf.function
     def step(self, batch):
         """
         Perform one training step on a given batch of data.
