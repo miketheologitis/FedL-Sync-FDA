@@ -38,7 +38,7 @@ if __name__ == '__main__':
     for proc_id in range(args.n_proc):
         # Construct the command
         cmd = [
-            'python', '-m', 'main_local', f'--comb_id={args.comb_id}',
+            'python', '-u', '-m', 'main_local', f'--comb_id={args.comb_id}',
             f'--proc_id={proc_id}', f'--gpu_id={next(gpu_id_generator)}'
         ]
 
