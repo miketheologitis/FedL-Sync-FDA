@@ -8,7 +8,7 @@ This project is a well-structured Python implementation of the Jupyter notebook 
 
 ### Create combinations
 ```bash
-python -m utils.create_combinations --comb_id 0 --fda naive --nn LeNet-5 --b 128 --e 50 --th 0.5
+python -m utils.create_combinations --comb_id 0 --fda naive --nn LeNet-5 --b 32 64 128 --e 50 --th 0.5 1.0
 ```
 
 ### Local simulation

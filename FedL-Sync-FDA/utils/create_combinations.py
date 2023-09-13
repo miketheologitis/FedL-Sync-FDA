@@ -22,12 +22,12 @@ for directory in directories:
 def create_combinations(args):
     # Define the parameter values
     params = {
-        "nn_name": [args.nn],
-        "num_clients": [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60],
-        "fda_name": [args.fda],
-        "batch_size": [args.b],
-        "theta": [args.th],
-        "rtc_steps": [1]
+        "nn_name": args.nn,
+        "fda_name": args.fda,
+        "batch_size": args.b,
+        "theta": args.th,
+        "rtc_steps": [1],
+        "num_clients": [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
     }
 
     combinations = [
@@ -44,19 +44,19 @@ def create_combinations(args):
         combination["epochs"] = args.e
 
     with open(f'{os.path.join(script_directory, "../tmp/combinations")}/{args.comb_id}.json', 'w') as f:
-        print("OK")
         json.dump(combinations, f)
+        print(f"OK! Created {len(combinations)} combinations.")
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--comb_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json")
-    parser.add_argument('--b', type=int, default=32, help="The batch size.")
-    parser.add_argument('--e', type=int, default=10, help="Number of epochs.")
-    parser.add_argument('--fda', type=str, default="synchronous", help="The FDA name.")
-    parser.add_argument('--nn', type=str, default="LeNet-5", help="The CNN name. Either 'LeNet-5' or 'AdvancedCNN'")
-    parser.add_argument('--th', type=float, default=1., help="Theta threshold.")
+    parser.add_argument('--comb_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json", required=True)
+    parser.add_argument('--b', nargs='+', type=int, help="The batch size(s).")
+    parser.add_argument('--e', type=int, help="Number of epochs.", required=True)
+    parser.add_argument('--fda', nargs='+', type=str, help="The FDA name(s).", required=True)
+    parser.add_argument('--nn', nargs='+', type=str, help="The CNN nam(e) ('LeNet-5' , 'AdvancedCNN')", required=True)
+    parser.add_argument('--th', nargs='+', type=float, help="Theta threshold(s).", required=True)
     parser.add_argument('--test', action='store_true', help="If given, then we bench test.")
 
     create_combinations(parser.parse_args())

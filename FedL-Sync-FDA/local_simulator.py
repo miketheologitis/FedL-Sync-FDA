@@ -20,9 +20,12 @@ def signal_handler(signum, frame):
     Signal handler to kill all child processes.
     """
     global processes  # Explicitly state that we're using the global variable
+
     for proc in processes:
-        proc.kill()
-    raise SystemExit("Killing child processes due to signal received.")
+        if not proc.poll():  # Check if the process is still running
+            proc.kill()
+    print("All processes terminated. Exiting.")
+    exit()
 
 
 if __name__ == '__main__':
@@ -36,6 +39,20 @@ if __name__ == '__main__':
     gpu_id_generator = gpu_id_gen(args.n_gpus)
 
     for proc_id in range(args.n_proc):
+        # Ask the user whether to start a new process or quit
+        user_response = input(
+            f"Press 'Enter' to start process {proc_id + 1}/{args.n_proc} or 'q' to terminate all and quit: "
+        ).strip().lower()
+
+        # If the user enters 'q', terminate all running processes and exit
+        if user_response == "q":
+            print("Terminating all processes based on user input.")
+            for p in processes:
+                if not p.poll():  # Check if the process is still running
+                    p.kill()
+            print("All processes terminated. Exiting.")
+            exit()
+
         # Construct the command
         cmd = [
             'python', '-u', '-m', 'main_local', f'--comb_id={args.comb_id}',
@@ -48,6 +65,9 @@ if __name__ == '__main__':
                 process = subprocess.Popen(cmd, stdout=stdout_file, stderr=stderr_file)
                 processes.append(process)
 
+        print()
+
+    print(f"The specified {args.n_proc} processes have all been started.")
     # Set up the signal handler
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -55,4 +75,6 @@ if __name__ == '__main__':
     # Wait for all child processes to complete
     for p in processes:
         p.wait()
+
+    print("All processes terminated. Exiting.")
 
