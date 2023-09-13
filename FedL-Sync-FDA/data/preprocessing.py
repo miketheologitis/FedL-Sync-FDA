@@ -37,6 +37,8 @@ def prepare_federated_data(train_dataset, num_clients, batch_size, num_steps_unt
     """
     Prepare federated data by sharding the original training dataset across multiple clients.
 
+    https://cs230.stanford.edu/blog/datapipeline/#best-practices
+
     Args:
         train_dataset (tf.data.Dataset): The original training dataset as a TensorFlow Dataset object.
             Each element is a tuple containing:
@@ -62,7 +64,7 @@ def prepare_federated_data(train_dataset, num_clients, batch_size, num_steps_unt
     def process_client_dataset(client_dataset, batch_size, num_steps_until_rtc_check, seed):
         shuffle_size = client_dataset.cardinality()  # Uniform shuffling
         return client_dataset.shuffle(shuffle_size, seed=seed).repeat().batch(batch_size)\
-            .take(num_steps_until_rtc_check).prefetch(tf.data.AUTOTUNE)
+            .take(num_steps_until_rtc_check)
     
     # Shard the data across clients CLIENT LEVEL
     clients_federated_data = [

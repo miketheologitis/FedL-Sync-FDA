@@ -93,7 +93,6 @@ class AdvancedCNN(tf.keras.Model):
 
         This method computes the gradients using backpropagation and updates the model's trainable parameters.
         """
-        print("Retrace AdvancedCNN.step")
         x_batch, y_batch = batch
 
         with tf.GradientTape() as tape:

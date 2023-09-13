@@ -77,7 +77,6 @@ class LeNet5(tf.keras.Model):
 
         This method computes the gradients using backpropagation and updates the model's trainable parameters.
         """
-        print("Retrace LeNet5.step")
 
         x_batch, y_batch = batch
 

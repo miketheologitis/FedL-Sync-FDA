@@ -45,6 +45,8 @@ if __name__ == '__main__':
     # 1. Hyper-Parameters
     hyperparameters = get_test_hyper_parameters(f'tmp/combinations/{comb_filename}', proc_id)
 
+    compile_and_build_model_func = None
+
     if hyperparameters['nn_name'] == 'AdvancedCNN':
         compile_and_build_model_func = partial(
             get_compiled_and_built_advanced_cnn, MNIST_CNN_BATCH_INPUT, MNIST_CNN_INPUT_RESHAPE, 10
