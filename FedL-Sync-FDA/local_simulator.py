@@ -34,6 +34,9 @@ if __name__ == '__main__':
                         help="The number of available GPUs in this machine. (We will only use one per simulation)")
     parser.add_argument('--n_proc', type=int, help="The number of processes to run in parallel. One in each GPU.")
     parser.add_argument('--comb_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json.")
+    # Add the gpu_mem argument
+    parser.add_argument('--gpu_mem', type=int, default=-1,
+                        help="The GPU memory to be used. If not provided we let TensorFlow dynamically allocate.")
     args = parser.parse_args()
 
     gpu_id_generator = gpu_id_gen(args.n_gpus)
@@ -56,7 +59,8 @@ if __name__ == '__main__':
         # Construct the command
         cmd = [
             'python', '-u', '-m', 'main_local', f'--comb_id={args.comb_id}',
-            f'--proc_id={proc_id}', f'--gpu_id={next(gpu_id_generator)}'
+            f'--proc_id={proc_id}', f'--gpu_id={next(gpu_id_generator)}',
+            f'--gpu_mem={args.gpu_mem}'
         ]
 
         with open(f'tmp/local_out/c{args.comb_id}_proc{proc_id}.out', 'w') as stdout_file:

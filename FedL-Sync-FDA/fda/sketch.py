@@ -56,8 +56,6 @@ class AmsSketch:
     def sketch_for_vector(self, v):
         """ Extremely efficient computation of sketch with only using tensors. """
         
-        print("retracing `sketch_for_vector`")
-        
         sketch = tf.zeros(shape=(self.depth, self.width), dtype=tf.float32)
         
         len_v = v.shape[0]

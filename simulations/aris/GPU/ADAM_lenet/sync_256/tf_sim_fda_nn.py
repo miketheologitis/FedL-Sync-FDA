@@ -631,7 +631,7 @@ def clients_train_linear(w_t0, w_tminus1, client_cnns, federated_dataset):
     euc_norm_squared_clients = []
     ksi_delta_clients = []
     
-    for client_cnn, client_dataset in zip(client_cnns, federated_dataset):_
+    for client_cnn, client_dataset in zip(client_cnns, federated_dataset):
         Delta_i_euc_norm_squared, ksi_Delta_i = client_train_linear(
             w_t0, w_tminus1, client_cnn, client_dataset
         )
