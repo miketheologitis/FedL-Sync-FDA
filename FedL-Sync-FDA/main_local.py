@@ -7,14 +7,23 @@ if __name__ == '__main__':
     parser.add_argument('--comb_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json")
     parser.add_argument('--proc_id', type=int, help="The Proc ID (0, 1, 2, ...)")
     parser.add_argument('--gpu_id', type=str, help="The GPU ID that the script will use.")
+    parser.add_argument('--gpu_mem', type=int,
+                        help="The maximum GPU memory. If not provided we let TensorFlow dynamically allocate.")
     args = parser.parse_args()
 
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
     import tensorflow as tf
     if tf.config.list_physical_devices('GPU'):
         print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-        for gpu in tf.config.experimental.list_physical_devices('GPU'):
-            tf.config.experimental.set_memory_growth(gpu, True)
+
+        if args.gpu_mem == -1:
+            for gpu in tf.config.experimental.list_physical_devices('GPU'):
+                tf.config.experimental.set_memory_growth(gpu, True)
+        else:
+            for gpu in tf.config.experimental.list_physical_devices('GPU'):
+                tf.config.set_logical_device_configuration(
+                    gpu, [tf.config.LogicalDeviceConfiguration(memory_limit=args.gpu_mem)]
+                )
 
     from functools import partial
     import time
