@@ -34,7 +34,7 @@ module load intelmpi/2018
 module load tensorflow/2.4.1
 
 export TF_XLA_FLAGS="--tf_xla_enable_xla_devices"
-srun python -m slurm_simulator --n_gpus={n_gpus} --comb_file_id={comb_file_id} --gpu_mem={gpu_mem} --sims_id={sims_id}
+srun python -m slurm_simulator --n_gpus={n_gpus} --comb_file_id={comb_file_id} --gpu_mem={gpu_mem} --sims_id={sims_id} --n_sims={n_sims}
 """
 
 if __name__ == '__main__':
@@ -73,7 +73,8 @@ if __name__ == '__main__':
             n_gpus=args.gpus_per_node,
             comb_file_id=args.comb_file_id,
             gpu_mem=args.gpu_mem,
-            sims_id=i
+            sims_id=i,
+            n_sims=args.sims_per_gpu * args.gpus_per_node
         )
 
         # Save the Slurm script content to a temporary file
