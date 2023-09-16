@@ -59,7 +59,7 @@ if __name__ == '__main__':
         raise ValueError("The number of simulations must be a multiple of "
                          "nodes_per_submit * sims_per_gpu * gpus_per_node.")
 
-    num_of_jobs = args.n_sims / (args.nodes_per_submit * args.sims_per_gpu * args.gpus_per_node)
+    num_of_jobs = args.n_sims // (args.nodes_per_submit * args.sims_per_gpu * args.gpus_per_node)
 
     for i in range(num_of_jobs):
         slurm_script = slurm_template.format(
