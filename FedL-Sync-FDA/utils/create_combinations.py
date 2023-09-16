@@ -43,7 +43,7 @@ def create_combinations(args):
         combination["bench_test"] = args.test
         combination["epochs"] = args.e
 
-    with open(f'{os.path.join(script_directory, "../tmp/combinations")}/{args.comb_id}.json', 'w') as f:
+    with open(f'{os.path.join(script_directory, "../tmp/combinations")}/{args.comb_file_id}.json', 'w') as f:
         json.dump(combinations, f)
         print(f"OK! Created {len(combinations)} combinations.")
 
@@ -51,7 +51,7 @@ def create_combinations(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--comb_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json", required=True)
+    parser.add_argument('--comb_file_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json", required=True)
     parser.add_argument('--b', nargs='+', type=int, help="The batch size(s).")
     parser.add_argument('--e', type=int, help="Number of epochs.", required=True)
     parser.add_argument('--fda', nargs='+', type=str, help="The FDA name(s).", required=True)

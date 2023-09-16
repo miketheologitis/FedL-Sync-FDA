@@ -1,11 +1,12 @@
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import logging
+logging.getLogger("tensorflow").setLevel(logging.WARNING)
 
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--comb_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json")
-    parser.add_argument('--proc_id', type=int, help="The Proc ID (0, 1, 2, ...)")
+    parser.add_argument('--comb_file_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json")
+    parser.add_argument('--sim_id', type=int, help="The Sim ID (0, 1, 2, ...)")
     parser.add_argument('--gpu_id', type=str, help="The GPU ID that the simulation will use.")
     parser.add_argument('--gpu_mem', type=int,
                         help="The maximum GPU memory. If not provided we let TensorFlow dynamically allocate.")
@@ -47,7 +48,7 @@ if __name__ == '__main__':
     from simulation import single_simulation
     from utils import print_finish_testing_info, print_current_test_info, get_test_hyper_parameters
 
-    hyperparameters = get_test_hyper_parameters(f'{args.comb_id}', args.proc_id)
+    hyperparameters = get_test_hyper_parameters(f'{args.comb_file_id}', args.sim_id)
 
     compile_and_build_model_func = None
 
