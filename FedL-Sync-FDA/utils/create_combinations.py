@@ -27,7 +27,7 @@ def create_combinations(args):
         "batch_size": args.b,
         "theta": args.th,
         "rtc_steps": [1],
-        "num_clients": [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
+        "num_clients": args.num_clients
     }
 
     combinations = [
@@ -57,6 +57,8 @@ if __name__ == '__main__':
     parser.add_argument('--fda', nargs='+', type=str, help="The FDA name(s).", required=True)
     parser.add_argument('--nn', nargs='+', type=str, help="The CNN nam(e) ('LeNet-5' , 'AdvancedCNN')", required=True)
     parser.add_argument('--th', nargs='+', type=float, help="Theta threshold(s).", required=True)
+    parser.add_argument('--num_clients', nargs='+', type=int, help="Number of clients.",
+                        default=[5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60])
     parser.add_argument('--test', action='store_true', help="If given, then we bench test.")
 
     create_combinations(parser.parse_args())

@@ -49,7 +49,13 @@ This project is a well-structured Python implementation of the Jupyter notebook 
 - **Type**: List of floats
 - **Description**: Specifies the Theta threshold(s) for the training.
 - **Required**: Yes
-- **Example**: `--th 0.1 0.2 0.3`
+- **Example**: `--th 0.1 0.2 0.3`'
+
+`--num_clients`
+
+- **Type**: List of Integers
+- **Description**: The list of client numbers for the simulations. If not provided, it defaults to the list `[5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]`.
+- **Example**: `--num_clients 5 10 25 50`
 
 `--test`
 
