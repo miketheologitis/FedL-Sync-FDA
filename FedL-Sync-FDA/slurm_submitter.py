@@ -84,7 +84,8 @@ if __name__ == '__main__':
         # Submit the Slurm script using sbatch
         result = subprocess.run(["sbatch", "tmp_slurm_script.slurm"], capture_output=True, text=True)
         print(result)
-        print(f"Submitted slurm job {i + 1}/{num_of_jobs}")
+        print(f"Submitted slurm job {i + 1}/{num_of_jobs} for combination file {args.comb_file_id}.json.")
+        print()
 
     # Remove the temporary file
     os.remove("tmp_slurm_script.slurm")
