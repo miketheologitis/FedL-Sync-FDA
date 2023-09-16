@@ -161,4 +161,8 @@ if __name__ == '__main__':
 
     # Save Metrics
     epoch_metrics_df = pd.DataFrame(all_epoch_metrics)
-    epoch_metrics_df.to_parquet(f"tmp/epoch_metrics/{hyperparameters['test_id']}.parquet")
+    
+    if args.slurm:
+        epoch_metrics_df.to_csv(f"tmp/epoch_metrics/{hyperparameters['test_id']}.csv", index=False)
+    else:
+        epoch_metrics_df.to_parquet(f"tmp/epoch_metrics/{hyperparameters['test_id']}.parquet")
