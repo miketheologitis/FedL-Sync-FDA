@@ -3,8 +3,7 @@ import argparse
 import os
 
 
-slurm_template = """
-#!/bin/bash -l
+slurm_template = """#!/bin/bash -l
 
 ####################################
 #     ARIS slurm script template   #
@@ -87,7 +86,7 @@ if __name__ == '__main__':
         print(f"Submitted slurm job {i + 1}/{num_of_jobs}")
 
     # Remove the temporary file
-    os.remove("tmp_slurm_script.sh")
+    os.remove("tmp_slurm_script.slurm")
 
 
 
