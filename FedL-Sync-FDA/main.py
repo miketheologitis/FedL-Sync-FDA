@@ -1,15 +1,19 @@
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import logging
+logging.getLogger("tensorflow").setLevel(logging.WARNING)
 
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--comb_file_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json")
+    parser.add_argument('--sim_id', type=int, help="The Sim ID (0, 1, 2, ...)")
+    parser.add_argument('--gpu_id', type=str, help="The GPU ID that the simulation will use.")
+    parser.add_argument('--gpu_mem', type=int,
+                        help="The maximum GPU memory. If not provided we let TensorFlow dynamically allocate.")
+    parser.add_argument('--slurm', action='store_true', help="Use if we are in SLURM HPC env.")
+    args = parser.parse_args()
 
-    import sys
-
-    if len(sys.argv) == 2:  # SLURM ENVIRONMENT: One argument plus the script name
-        local_id = int(os.environ.get('SLURM_LOCALID'))  # The GPU ID (0 or 1) that the script will use
-        comb_filename = sys.argv[1]
-        proc_id = int(os.environ.get('SLURM_PROCID'))  # The process ID (0, 1, 2, ...)
-
+    if args.slurm:
         # Fix for SSL error in Aris gr.net
         import ssl
         try:
@@ -21,17 +25,19 @@ if __name__ == '__main__':
             # Handle target environment that doesn't support HTTPS verification
             ssl._create_default_https_context = _create_unverified_https_context
 
-    elif len(sys.argv) == 4:  # LOCAL ENVIRONMENT: Two arguments plus the script name
-        local_id = int(sys.argv[1])  # The GPU ID (0 or 1) that the script will use
-        comb_filename = sys.argv[2]
-        proc_id = int(sys.argv[3])  # The process ID (0, 1, 2, ...)
-
-    else:
-        sys.exit("Usage: python -m main <GPU_ID> <COMB_FILENAME> <PROC_ID> or python -m main <COMB_FILENAME>")
-
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(local_id)
+    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
     import tensorflow as tf
-    print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+    if tf.config.list_physical_devices('GPU'):
+        print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+
+        if args.gpu_mem == -1:
+            for gpu in tf.config.experimental.list_physical_devices('GPU'):
+                tf.config.experimental.set_memory_growth(gpu, True)
+        else:
+            for gpu in tf.config.experimental.list_physical_devices('GPU'):
+                tf.config.set_logical_device_configuration(
+                    gpu, [tf.config.LogicalDeviceConfiguration(memory_limit=args.gpu_mem)]
+                )
 
     from functools import partial
     import time
@@ -42,8 +48,7 @@ if __name__ == '__main__':
     from simulation import single_simulation
     from utils import print_finish_testing_info, print_current_test_info, get_test_hyper_parameters
 
-    # 1. Hyper-Parameters
-    hyperparameters = get_test_hyper_parameters(f'tmp/combinations/{comb_filename}', proc_id)
+    hyperparameters = get_test_hyper_parameters(f'{args.comb_file_id}', args.sim_id)
 
     compile_and_build_model_func = None
 

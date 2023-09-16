@@ -32,7 +32,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--n_gpus', type=int,
                         help="The number of available GPUs in this machine. (We will only use one per simulation)")
-    parser.add_argument('--n_proc', type=int, help="The number of processes to run in parallel. One in each GPU.")
+    parser.add_argument('--n_sims', type=int, help="The number of simulations to run in parallel. One in each GPU.")
     parser.add_argument('--comb_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json.")
     # Add the gpu_mem argument
     parser.add_argument('--gpu_mem', type=int, default=-1,
@@ -41,10 +41,10 @@ if __name__ == '__main__':
 
     gpu_id_generator = gpu_id_gen(args.n_gpus)
 
-    for proc_id in range(args.n_proc):
+    for sim_id in range(args.n_sims):
         # Ask the user whether to start a new process or quit
         user_response = input(
-            f"Press 'Enter' to start process {proc_id + 1}/{args.n_proc} or 'q' to terminate all and quit: "
+            f"Press 'Enter' to start process {sim_id + 1}/{args.n_sims} or 'q' to terminate all and quit: "
         ).strip().lower()
 
         # If the user enters 'q', terminate all running processes and exit
@@ -58,20 +58,20 @@ if __name__ == '__main__':
 
         # Construct the command
         cmd = [
-            'python', '-u', '-m', 'main_local', f'--comb_id={args.comb_id}',
-            f'--proc_id={proc_id}', f'--gpu_id={next(gpu_id_generator)}',
+            'python', '-u', '-m', 'main', f'--comb_id={args.comb_id}',
+            f'--sim_id={sim_id}', f'--gpu_id={next(gpu_id_generator)}',
             f'--gpu_mem={args.gpu_mem}'
         ]
 
-        with open(f'tmp/local_out/c{args.comb_id}_proc{proc_id}.out', 'w') as stdout_file:
-            with open(f'tmp/local_out/c{args.comb_id}_proc{proc_id}.err', 'w') as stderr_file:
+        with open(f'tmp/local_out/c{args.comb_id}_sim{sim_id}.out', 'w') as stdout_file:
+            with open(f'tmp/local_out/c{args.comb_id}_sim{sim_id}.err', 'w') as stderr_file:
                 print(f"Running: {' '.join(cmd)}")
                 process = subprocess.Popen(cmd, stdout=stdout_file, stderr=stderr_file)
                 processes.append(process)
 
         print()
 
-    print(f"The specified {args.n_proc} processes have all been started.")
+    print(f"The specified {args.n_sims} processes have all been started.")
     # Set up the signal handler
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
