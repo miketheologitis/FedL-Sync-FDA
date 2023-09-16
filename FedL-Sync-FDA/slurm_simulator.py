@@ -44,12 +44,9 @@ if __name__ == '__main__':
             f'--sim_id={sim_id}', f'--gpu_id={next(gpu_id_generator)}',
             f'--gpu_mem={args.gpu_mem}', '--slurm'
         ]
-
-        with open(f'tmp/local_out/c{args.comb_file_id}_sim{sim_id}.out', 'w') as stdout_file:
-            with open(f'tmp/local_out/c{args.comb_file_id}_sim{sim_id}.err', 'w') as stderr_file:
-                print(f"Running: {' '.join(cmd)}")
-                process = subprocess.Popen(cmd, stdout=stdout_file, stderr=stderr_file)
-                processes.append(process)
+        
+        process = subprocess.Popen(cmd)
+        processes.append(process)
 
         print()
 
