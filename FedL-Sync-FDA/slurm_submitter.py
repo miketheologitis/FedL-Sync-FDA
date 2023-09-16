@@ -78,11 +78,11 @@ if __name__ == '__main__':
         )
 
         # Save the Slurm script content to a temporary file
-        with open("tmp_slurm_script.sh", "w") as f:
+        with open("tmp_slurm_script.slurm", "w") as f:
             f.write(slurm_script)
 
         # Submit the Slurm script using sbatch
-        result = subprocess.run(["sbatch", "temp_slurm_script.sh"], capture_output=True, text=True)
+        result = subprocess.run(["sbatch", "tmp_slurm_script.slurm"], capture_output=True, text=True)
         print(result)
         print(f"Submitted slurm job {i + 1}/{num_of_jobs}")
 
