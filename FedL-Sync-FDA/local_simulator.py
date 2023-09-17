@@ -33,7 +33,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_gpus', type=int,
                         help="The number of available GPUs in this machine. (We will only use one per simulation)")
     parser.add_argument('--n_sims', type=int, help="The number of simulations to run in parallel. One in each GPU.")
-    parser.add_argument('--comb_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json.")
+    parser.add_argument('--comb_file_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json.")
     # Add the gpu_mem argument
     parser.add_argument('--gpu_mem', type=int, default=-1,
                         help="The GPU memory to be used. If not provided we let TensorFlow dynamically allocate.")
@@ -58,13 +58,13 @@ if __name__ == '__main__':
 
         # Construct the command
         cmd = [
-            'python', '-u', '-m', 'main', f'--comb_id={args.comb_id}',
+            'python', '-u', '-m', 'main', f'--comb_file_id={args.comb_file_id}',
             f'--sim_id={sim_id}', f'--gpu_id={next(gpu_id_generator)}',
             f'--gpu_mem={args.gpu_mem}'
         ]
 
-        with open(f'tmp/local_out/c{args.comb_id}_sim{sim_id}.out', 'w') as stdout_file:
-            with open(f'tmp/local_out/c{args.comb_id}_sim{sim_id}.err', 'w') as stderr_file:
+        with open(f'tmp/local_out/c{args.comb_file_id}_sim{sim_id}.out', 'w') as stdout_file:
+            with open(f'tmp/local_out/c{args.comb_file_id}_sim{sim_id}.err', 'w') as stderr_file:
                 print(f"Running: {' '.join(cmd)}")
                 process = subprocess.Popen(cmd, stdout=stdout_file, stderr=stderr_file)
                 processes.append(process)

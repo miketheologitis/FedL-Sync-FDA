@@ -117,7 +117,7 @@ OK! Created 144 combinations.
 ```
 Continue with:
 ```shell
-~$ python -m local_simulator --n_gpus 2 --n_sims 144 --comb_file_id 0
+python -m local_simulator --n_gpus 2 --n_sims 144 --comb_file_id 0
 ```
 
 Be careful to use the same `--comb_file_id` for both scripts and use the same number of simulations (`--n_sims`) 
