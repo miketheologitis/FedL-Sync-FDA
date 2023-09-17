@@ -34,7 +34,7 @@ module load intelmpi/2018
 module load tensorflow/2.4.1
 
 export TF_XLA_FLAGS="--tf_xla_enable_xla_devices"
-srun python -m slurm_simulator --n_gpus={n_gpus} --comb_file_id={comb_file_id} --gpu_mem={gpu_mem} --sims_id={sims_id} --n_sims={n_sims}
+srun python -m slurm_simulator --n_gpus={n_gpus} --comb_file_id={comb_file_id} --gpu_mem={gpu_mem} --starting_sim_id_in_submit={starting_sim_id_in_submit} --n_sims={n_sims}
 """
 
 if __name__ == '__main__':
@@ -58,9 +58,10 @@ if __name__ == '__main__':
         raise ValueError("The number of simulations must be a multiple of "
                          "nodes_per_submit * sims_per_gpu * gpus_per_node.")
 
-    num_of_jobs = args.n_sims // (args.nodes_per_submit * args.sims_per_gpu * args.gpus_per_node)
+    sims_per_submit = args.nodes_per_submit * args.sims_per_gpu * args.gpus_per_node
+    num_of_submits = args.n_sims // sims_per_submit
 
-    for i in range(num_of_jobs):
+    for i in range(num_of_submits):
         slurm_script = slurm_template.format(
             job_name=f"c{args.comb_file_id}_s{i}",
             n_tasks=args.nodes_per_submit,
@@ -73,7 +74,7 @@ if __name__ == '__main__':
             n_gpus=args.gpus_per_node,
             comb_file_id=args.comb_file_id,
             gpu_mem=args.gpu_mem,
-            sims_id=i,
+            starting_sim_id_in_submit=i*sims_per_submit,
             n_sims=args.sims_per_gpu * args.gpus_per_node
         )
 
@@ -84,7 +85,7 @@ if __name__ == '__main__':
         # Submit the Slurm script using sbatch
         result = subprocess.run(["sbatch", "tmp_slurm_script.slurm"], capture_output=True, text=True)
         print(result)
-        print(f"Submitted slurm job {i + 1}/{num_of_jobs} for combination file {args.comb_file_id}.json.")
+        print(f"Submitted slurm job {i + 1}/{num_of_submits} for combination file {args.comb_file_id}.json.")
         print()
 
     # Remove the temporary file

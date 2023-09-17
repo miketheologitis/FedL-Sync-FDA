@@ -1,5 +1,6 @@
 import argparse
 import subprocess
+import os
 
 processes = []
 
@@ -26,14 +27,15 @@ if __name__ == '__main__':
     # Add the gpu_mem argument
     parser.add_argument('--gpu_mem', type=int, default=-1,
                         help="The GPU memory to be used. If not provided we let TensorFlow dynamically allocate.")
-    parser.add_argument('--sims_id', type=int,
-                        help="The ID of the collective simulations we are about to run. We deploy multiple jobs per "
-                             "combination file, hence, we use this unique ID to help us identify the "
-                             "correct combination for this set of simulations.",
+    parser.add_argument('--starting_sim_id_in_submit', type=int,
+                        help="The starting simulation ID (index in the combinations file). "
+                             "The first simulation will have this ID.",
                         required=True)
     args = parser.parse_args()
 
-    starting_sim_id = args.sims_id * args.n_sims
+    slurm_procid = int(os.environ.get('SLURM_PROCID'))
+
+    starting_sim_id = args.starting_sim_id_in_submit + slurm_procid * args.n_sims
 
     gpu_id_generator = gpu_id_gen(args.n_gpus)
 
