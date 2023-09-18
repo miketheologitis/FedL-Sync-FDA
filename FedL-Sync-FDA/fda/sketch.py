@@ -131,7 +131,7 @@ def client_train_sketch(w_t0, client_cnn, client_dataset, ams_sketch):
     Delta_i = client_cnn.trainable_vars_as_vector() - w_t0
     
     #  ||D(t)_i||^2 , shape = ()
-    Delta_i_euc_norm_squared = tf.reduce_sum(tf.square(Delta_i)) # ||D(t)_i||^2 
+    Delta_i_euc_norm_squared = tf.reduce_sum(tf.square(Delta_i))  # ||D(t)_i||^2
     
     # sketch approx
     sketch = ams_sketch.sketch_for_vector(Delta_i)

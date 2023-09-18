@@ -11,7 +11,9 @@ def variance(server_model, client_models):
     parameters of each client model and the server model.
 
     Args:
-    - server_model (object): An object representing the server model, expected to have a method `trainable_vars_as_vector` that returns the model's trainable parameters as a 1D tensor. In our context, for some time t, it is assumed that the given `server_model` is the aggregated global model from the `client_models` at time t.
+    - server_model (object): An object representing the server model, expected to have a method `trainable_vars_as_vector`
+            that returns the model's trainable parameters as a 1D tensor. In our context, for some time t, it is assumed
+            that the given `server_model` is the aggregated global model from the `client_models` at time t.
     - client_models (list of objects): A list of objects representing the client models, each expected to have a
       method `trainable_vars_as_vector` that returns the model's trainable parameters as a 1D tensor.
 
@@ -148,3 +150,27 @@ def synchronize_clients(server_model, client_models):
     """
     for client_model in client_models:
         client_model.set_trainable_variables(server_model.trainable_variables)
+
+
+def set_trainable_variables(model, trainable_vars):
+    """
+    Set the model's trainable variables.
+
+    Args:
+    - model (object): An object representing the model. It is expected to have an attribute `trainable_variables`
+    - trainable_vars (list of tf.Tensor): A list of tensors representing the trainable variables to be set.
+
+    This method sets each of the model's trainable variables to the corresponding tensor in `trainable_vars`.
+    """
+    for model_var, var in zip(model.trainable_variables, trainable_vars):
+        model_var.assign(var)
+
+
+def trainable_vars_as_vector(model):
+    """
+    Get the model's trainable variables as a single vector.
+
+    Returns:
+    - tf.Tensor: A 1D tensor containing all of the model's trainable variables.
+    """
+    return tf.concat([tf.reshape(var, [-1]) for var in model.trainable_variables], axis=0)

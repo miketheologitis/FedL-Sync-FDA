@@ -35,8 +35,8 @@ Attributes:
     - num_steps_until_rtc_check (int): Number of steps until the RTC check.
     - theta (float): The threshold value for FDA.
     - nn_num_weights (int): Number of weights in the neural network.
-    - sketch_width (int): Width of the sketch.
-    - sketch_depth (int): Depth of the sketch.
+    - sketch_width (int): Width of the sketch. -1 if not applicable
+    - sketch_depth (int): Depth of the sketch. -1 if not applicable
 """
 # Define a named tuple to represent test IDs for different experiments.
 TestId = namedtuple(
@@ -56,7 +56,6 @@ def process_metrics_with_test_id(epoch_metrics_list, test_id):
     
     Args:
     - epoch_metrics_list (list of EpochMetrics): List of epoch metrics.
-    - round_metrics_list (list of RoundMetrics): List of round metrics.
     - test_id (TestId): An instance of TestId namedtuple.
 
     Returns:
