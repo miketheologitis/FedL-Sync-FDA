@@ -1,19 +1,6 @@
 from collections import namedtuple
 
 """
-RoundMetrics namedtuple:
-Attributes:
-    - epoch (int): The epoch number at which this round ended.
-    - round (int): The round number.
-    - total_fda_steps (int): Total FDA steps taken till this round.
-    - est_var (float): Estimated variance at the end of this round.
-    - actual_var (float): Actual variance at the end of this round.
-"""
-# Define a named tuple to store round-specific metrics in federated learning.
-RoundMetrics = namedtuple("RoundMetrics", ["epoch", "round", "total_fda_steps", "est_var", "actual_var"])
-
-
-"""
 EpochMetrics namedtuple:
 Attributes:
     - epoch (int): The epoch number.
@@ -47,7 +34,6 @@ TestId = namedtuple(
 
 # Extend the EpochMetrics and RoundMetrics namedtuples to include TestId.
 EpochMetricsWithId = namedtuple('EpochMetricsWithId', TestId._fields + EpochMetrics._fields)
-RoundMetricsWithId = namedtuple('RoundMetricsWithId', TestId._fields + RoundMetrics._fields)
 
 
 def process_metrics_with_test_id(epoch_metrics_list, test_id):
