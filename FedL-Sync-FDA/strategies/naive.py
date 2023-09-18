@@ -1,9 +1,7 @@
 import tensorflow as tf
 
-from ..metrics import EpochMetrics
-from ..models import average_client_weights, current_accuracy, synchronize_clients
-
-import time  # REMOVE
+from ..metrics.epoch_metrics import EpochMetrics
+from ..models.miscellaneous import average_client_weights, current_accuracy, synchronize_clients
 
 
 def client_train_naive(w_t0, client_cnn, client_dataset):
@@ -54,10 +52,12 @@ def clients_train_naive(w_t0, client_cnns, federated_dataset):
 
 def F_naive(S_i_clients):
     """
-    Calculates the naive approximation of the variance based on the squares of the Euclidean norms of the update vectors.
+    Calculates the naive approximation of the variance based on the squares of the Euclidean
+    norms of the update vectors.
 
     Args:
-    - S_i_clients (list of tf.Tensor): A list of tensors, each representing the square of the Euclidean norm of the update vector for each client.
+    - S_i_clients (list of tf.Tensor): A list of tensors, each representing the square of the
+        Euclidean norm of the update vector for each client.
 
     Returns:
     - tf.Tensor: Naive variance approximation. Shape=(), dtype=tf.float32.

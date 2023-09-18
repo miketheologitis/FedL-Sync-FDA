@@ -1,7 +1,7 @@
 import tensorflow as tf
 
-from ..metrics import EpochMetrics
-from ..models import average_client_weights, current_accuracy, synchronize_clients
+from ..metrics.epoch_metrics import EpochMetrics
+from ..models.miscellaneous import average_client_weights, current_accuracy, synchronize_clients
 
 
 def ksi_unit(w_t0, w_tminus1):
@@ -44,7 +44,7 @@ def client_train_linear(w_t0, w_tminus1, client_cnn, client_dataset):
     
     Delta_i = client_cnn.trainable_vars_as_vector() - w_t0
     
-    #||D(t)_i||^2 , shape = () 
+    # ||D(t)_i||^2 , shape = ()
     Delta_i_euc_norm_squared = tf.reduce_sum(tf.square(Delta_i)) # ||D(t)_i||^2
     
     # heuristic unit vector ksi
@@ -58,7 +58,8 @@ def client_train_linear(w_t0, w_tminus1, client_cnn, client_dataset):
 
 def clients_train_linear(w_t0, w_tminus1, client_cnns, federated_dataset):
     """
-    Trains multiple client models and returns two lists containing the square of the Euclidean norms and the dot products with ksi.
+    Trains multiple client models and returns two lists containing the square of the Euclidean
+    norms and the dot products with ksi.
 
     Args:
     - w_t0 (tf.Tensor): Initial model parameters for the current round. Shape=(d,).

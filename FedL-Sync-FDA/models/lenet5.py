@@ -1,5 +1,4 @@
 import tensorflow as tf
-from tensorflow.keras import layers
 
 
 class LeNet5(tf.keras.Model):
@@ -27,20 +26,20 @@ class LeNet5(tf.keras.Model):
         
         super(LeNet5, self).__init__()
         
-        self.reshape = layers.Reshape(cnn_input_reshape)
+        self.reshape = tf.keras.layers.Reshape(cnn_input_reshape)
         
         # Layer 1 Conv2D
-        self.conv1 = layers.Conv2D(filters=6, kernel_size=(5, 5), strides=(1, 1), activation='tanh', padding='same')
+        self.conv1 = tf.keras.layers.Conv2D(filters=6, kernel_size=(5, 5), strides=(1, 1), activation='tanh', padding='same')
         # Layer 2 Pooling Layer
-        self.avgpool1 = layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid')
+        self.avgpool1 = tf.keras.layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid')
         # Layer 3 Conv2D
-        self.conv2 = layers.Conv2D(filters=16, kernel_size=(5, 5), strides=(1, 1), activation='tanh', padding='valid')
+        self.conv2 = tf.keras.layers.Conv2D(filters=16, kernel_size=(5, 5), strides=(1, 1), activation='tanh', padding='valid')
         # Layer 4 Pooling Layer
-        self.avgpool2 = layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid')
-        self.flatten = layers.Flatten()
-        self.dense1 = layers.Dense(units=120, activation='tanh')
-        self.dense2 = layers.Dense(units=84, activation='tanh')
-        self.dense3 = layers.Dense(units=num_classes, activation='softmax')
+        self.avgpool2 = tf.keras.layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid')
+        self.flatten = tf.keras.layers.Flatten()
+        self.dense1 = tf.keras.layers.Dense(units=120, activation='tanh')
+        self.dense2 = tf.keras.layers.Dense(units=84, activation='tanh')
+        self.dense3 = tf.keras.layers.Dense(units=num_classes, activation='softmax')
 
     def call(self, inputs, training=None):
         """
@@ -167,21 +166,21 @@ def sequential_lenet5(cnn_input_reshape, num_classes):
     """
     return tf.keras.models.Sequential([
         # Reshape layer
-        layers.Reshape(cnn_input_reshape, input_shape=(28, 28)),  # Example input shape, change as needed
+        tf.keras.layers.Reshape(cnn_input_reshape, input_shape=(28, 28)),  # Example input shape, change as needed
         # Layer 1 Conv2D
-        layers.Conv2D(filters=6, kernel_size=(5, 5), strides=(1, 1), activation='tanh', padding='same'),
+        tf.keras.layers.Conv2D(filters=6, kernel_size=(5, 5), strides=(1, 1), activation='tanh', padding='same'),
         # Layer 2 Pooling Layer
-        layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'),
+        tf.keras.layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'),
         # Layer 3 Conv2D
-        layers.Conv2D(filters=16, kernel_size=(5, 5), strides=(1, 1), activation='tanh', padding='valid'),
+        tf.keras.layers.Conv2D(filters=16, kernel_size=(5, 5), strides=(1, 1), activation='tanh', padding='valid'),
         # Layer 4 Pooling Layer
-        layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'),
+        tf.keras.layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'),
         # Flatten
-        layers.Flatten(),
+        tf.keras.layers.Flatten(),
         # Layer 5 Dense
-        layers.Dense(units=120, activation='tanh'),
+        tf.keras.layers.Dense(units=120, activation='tanh'),
         # Layer 6 Dense
-        layers.Dense(units=84, activation='tanh'),
+        tf.keras.layers.Dense(units=84, activation='tanh'),
         # Layer 7 Dense
-        layers.Dense(units=num_classes, activation='softmax')  # Example num_classes=10, change as needed
+        tf.keras.layers.Dense(units=num_classes, activation='softmax')  # Example num_classes=10, change as needed
     ])

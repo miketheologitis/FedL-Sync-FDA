@@ -1,7 +1,7 @@
 import tensorflow as tf
 
-from ..metrics import EpochMetrics
-from ..models import average_client_weights, current_accuracy, synchronize_clients
+from ..metrics.epoch_metrics import EpochMetrics
+from ..models.miscellaneous import average_client_weights, current_accuracy, synchronize_clients
 
 
 class AmsSketch:
@@ -14,13 +14,14 @@ class AmsSketch:
         self.width = width
         self.F = tf.random.uniform(shape=(6, depth), minval=0, maxval=(1 << 31) - 1, dtype=tf.int32)
 
-    def hash31(self, x, a, b):
-
+    @staticmethod
+    def hash31(x, a, b):
         r = a * x + b
         fold = tf.bitwise.bitwise_xor(tf.bitwise.right_shift(r, 31), r)
         return tf.bitwise.bitwise_and(fold, 2147483647)
 
-    def tensor_hash31(self, x, a, b):  # GOOD
+    @staticmethod
+    def tensor_hash31(x, a, b):  # GOOD
         """ Assumed that x is tensor shaped (d,) , i.e., a vector (for example, indices, i.e., tf.range(d)) """
 
         # Reshape x to have an extra dimension, resulting in a shape of (k, 1)

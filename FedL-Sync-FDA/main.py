@@ -43,10 +43,14 @@ if __name__ == '__main__':
     import time
     import pandas as pd
 
-    from data import load_data, convert_to_tf_dataset, MNIST_N_TRAIN, MNIST_CNN_BATCH_INPUT, MNIST_CNN_INPUT_RESHAPE
-    from models import get_compiled_and_built_lenet, get_compiled_and_built_advanced_cnn
-    from simulation import single_simulation
-    from utils import print_finish_testing_info, print_current_test_info, get_test_hyper_parameters
+    from data.mnist import load_data, MNIST_N_TRAIN, MNIST_CNN_BATCH_INPUT, MNIST_CNN_INPUT_RESHAPE
+    from data.preprocessing import convert_to_tf_dataset
+    from models.lenet5 import get_compiled_and_built_lenet
+    from models.advanced_cnn import get_compiled_and_built_advanced_cnn
+    from simulation.fda_simulation import single_simulation
+
+    from utils.read_combinations import get_test_hyper_parameters
+    from utils.pretty_printers import print_finish_testing_info, print_current_test_info
 
     hyperparameters = get_test_hyper_parameters(f'{args.comb_file_id}', args.sim_id)
 

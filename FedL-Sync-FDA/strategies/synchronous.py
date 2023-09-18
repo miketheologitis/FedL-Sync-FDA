@@ -1,5 +1,5 @@
-from ..metrics import EpochMetrics
-from ..models import average_client_weights, synchronize_clients, current_accuracy
+from ..metrics.epoch_metrics import EpochMetrics
+from ..models.miscellaneous import average_client_weights, synchronize_clients, current_accuracy
 
 
 def clients_train_synchronous(client_cnns, federated_dataset):
@@ -29,7 +29,8 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
     - server_cnn (object): The server's CNN model object.
     - client_cnns (list): A list of client CNN model objects.
     - num_epochs (int): The total number of epochs to run.
-    - fda_steps_in_one_epoch (int): The number of FDA steps in one epoch (number of steps per `clients_train_syncrhonous` calls).
+    - fda_steps_in_one_epoch (int): The number of FDA steps in one epoch (number of
+        steps per `clients_train_synchronous` calls).
     - compile_and_build_model_func (callable): Function to compile and build the model.
     
     Returns:

@@ -1,5 +1,4 @@
 import tensorflow as tf
-from tensorflow.keras import layers
 
 
 class AdvancedCNN(tf.keras.Model):
@@ -27,26 +26,26 @@ class AdvancedCNN(tf.keras.Model):
         """
         super(AdvancedCNN, self).__init__()
         
-        self.reshape = layers.Reshape(cnn_input_reshape)
+        self.reshape = tf.keras.layers.Reshape(cnn_input_reshape)
         
-        self.conv1 = layers.Conv2D(64, kernel_size=3, activation='relu', padding='same')
-        self.conv2 = layers.Conv2D(64, kernel_size=3, activation='relu', padding='same')
-        self.max_pool1 = layers.MaxPooling2D(pool_size=(2, 2))
+        self.conv1 = tf.keras.layers.Conv2D(64, kernel_size=3, activation='relu', padding='same')
+        self.conv2 = tf.keras.layers.Conv2D(64, kernel_size=3, activation='relu', padding='same')
+        self.max_pool1 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))
         
-        self.conv3 = layers.Conv2D(128, kernel_size=3, activation='relu', padding='same')
-        self.conv4 = layers.Conv2D(128, kernel_size=3, activation='relu', padding='same')
-        self.max_pool2 = layers.MaxPooling2D(pool_size=(2, 2))
+        self.conv3 = tf.keras.layers.Conv2D(128, kernel_size=3, activation='relu', padding='same')
+        self.conv4 = tf.keras.layers.Conv2D(128, kernel_size=3, activation='relu', padding='same')
+        self.max_pool2 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))
         
-        self.conv5 = layers.Conv2D(256, kernel_size=3, activation='relu', padding='same')
-        self.conv6 = layers.Conv2D(256, kernel_size=3, activation='relu', padding='same')
-        self.max_pool3 = layers.MaxPooling2D(pool_size=(2, 2))
+        self.conv5 = tf.keras.layers.Conv2D(256, kernel_size=3, activation='relu', padding='same')
+        self.conv6 = tf.keras.layers.Conv2D(256, kernel_size=3, activation='relu', padding='same')
+        self.max_pool3 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))
 
-        self.flatten = layers.Flatten()
-        self.dense1 = layers.Dense(512, activation='relu')
-        self.dropout1 = layers.Dropout(0.5)
-        self.dense2 = layers.Dense(512, activation='relu')
-        self.dropout2 = layers.Dropout(0.5)
-        self.dense3 = layers.Dense(num_classes, activation='softmax')
+        self.flatten = tf.keras.layers.Flatten()
+        self.dense1 = tf.keras.layers.Dense(512, activation='relu')
+        self.dropout1 = tf.keras.layers.Dropout(0.5)
+        self.dense2 = tf.keras.layers.Dense(512, activation='relu')
+        self.dropout2 = tf.keras.layers.Dropout(0.5)
+        self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax')
 
     def call(self, inputs, training=None):
         """
@@ -185,26 +184,26 @@ def sequential_advanced_cnn(cnn_input_reshape, num_classes):
     """
     return tf.keras.models.Sequential([
         # Reshape layer
-        layers.Reshape(cnn_input_reshape, input_shape=(28, 28)),  # Example input shape, change as needed
+        tf.keras.layers.Reshape(cnn_input_reshape, input_shape=(28, 28)),  # Example input shape, change as needed
         # First Convolutional Block
-        layers.Conv2D(64, kernel_size=3, activation='relu', padding='same'),
-        layers.Conv2D(64, kernel_size=3, activation='relu', padding='same'),
-        layers.MaxPooling2D(pool_size=(2, 2)),
+        tf.keras.layers.Conv2D(64, kernel_size=3, activation='relu', padding='same'),
+        tf.keras.layers.Conv2D(64, kernel_size=3, activation='relu', padding='same'),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
         # Second Convolutional Block
-        layers.Conv2D(128, kernel_size=3, activation='relu', padding='same'),
-        layers.Conv2D(128, kernel_size=3, activation='relu', padding='same'),
-        layers.MaxPooling2D(pool_size=(2, 2)),
+        tf.keras.layers.Conv2D(128, kernel_size=3, activation='relu', padding='same'),
+        tf.keras.layers.Conv2D(128, kernel_size=3, activation='relu', padding='same'),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
         # Third Convolutional Block
-        layers.Conv2D(256, kernel_size=3, activation='relu', padding='same'),
-        layers.Conv2D(256, kernel_size=3, activation='relu', padding='same'),
-        layers.MaxPooling2D(pool_size=(2, 2)),
+        tf.keras.layers.Conv2D(256, kernel_size=3, activation='relu', padding='same'),
+        tf.keras.layers.Conv2D(256, kernel_size=3, activation='relu', padding='same'),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
         # Fully Connected Layers
-        layers.Flatten(),
-        layers.Dense(512, activation='relu'),
-        layers.Dropout(0.5),
-        layers.Dense(512, activation='relu'),
-        layers.Dropout(0.5),
-        layers.Dense(num_classes, activation='softmax')
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(512, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(512, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(num_classes, activation='softmax')
     ])
 
 

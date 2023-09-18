@@ -1,10 +1,12 @@
 from math import sqrt
 
-from ..data import prepare_federated_data
-from ..metrics import TestId, process_metrics_with_test_id
-from ..models import count_weights, synchronize_clients
-from ..strategies import naive_federated_simulation, linear_federated_simulation,\
-    sketch_federated_simulation, synchronous_federated_simulation, AmsSketch
+from ..data.preprocessing import prepare_federated_data
+from ..metrics.epoch_metrics import TestId, process_metrics_with_test_id
+from ..models.miscellaneous import count_weights
+from ..strategies.naive import naive_federated_simulation
+from ..strategies.linear import linear_federated_simulation
+from ..strategies.sketch import sketch_federated_simulation, AmsSketch
+from ..strategies.synchronous import synchronous_federated_simulation
 
 
 def prepare_for_federated_simulation(n_train, train_dataset, num_clients, batch_size, num_steps_until_rtc_check, 
@@ -87,6 +89,8 @@ def single_simulation(fda_name, num_clients, n_train, train_dataset, test_datase
         n_train, train_dataset, num_clients, batch_size, num_steps_until_rtc_check, 
         compile_and_build_model_func, bench_test=bench_test
     )
+
+    epoch_metrics_list = None
 
     # 2. Simulation
     if fda_name == "naive":
