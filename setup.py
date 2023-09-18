@@ -1,12 +1,17 @@
-from setuptools import setup, find_namespace_packages
+from setuptools import setup
 
 setup(
     name="fda",
     version="0.1",
-    packages=find_namespace_packages(
-        include=["FedL-Sync-FDA.strategies", "FedL-Sync-FDA.models", "FedL-Sync-FDA.metrics"]
-    ),
+    packages=['fda', 'fda.metrics', 'fda.models', 'fda.strategies'],
+    package_dir={
+        'fda': 'FedL-Sync-FDA',
+        'fda.strategies': 'FedL-Sync-FDA/strategies',
+        'fda.models': 'FedL-Sync-FDA/models',
+        'fda.metrics': 'FedL-Sync-FDA/metrics'
+    },
     install_requires=[
         'tensorflow', 'numpy'
     ],
 )
+

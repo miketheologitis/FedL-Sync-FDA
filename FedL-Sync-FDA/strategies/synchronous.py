@@ -1,5 +1,5 @@
-from metrics import EpochMetrics
-from models import average_client_weights, synchronize_clients, current_accuracy
+from ..metrics import EpochMetrics
+from ..models import average_client_weights, synchronize_clients, current_accuracy
 
 
 def clients_train_synchronous(client_cnns, federated_dataset):

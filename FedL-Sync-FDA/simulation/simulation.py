@@ -1,9 +1,9 @@
 from math import sqrt
 
-from data import prepare_federated_data
-from metrics import TestId, process_metrics_with_test_id
-from models import count_weights, synchronize_clients
-from strategies import naive_federated_simulation, linear_federated_simulation,\
+from ..data import prepare_federated_data
+from ..metrics import TestId, process_metrics_with_test_id
+from ..models import count_weights, synchronize_clients
+from ..strategies import naive_federated_simulation, linear_federated_simulation,\
     sketch_federated_simulation, synchronous_federated_simulation, AmsSketch
 
 

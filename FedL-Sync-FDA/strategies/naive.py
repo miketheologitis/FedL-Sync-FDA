@@ -1,7 +1,7 @@
 import tensorflow as tf
 
-from metrics import EpochMetrics
-from models import average_client_weights, current_accuracy, synchronize_clients
+from ..metrics import EpochMetrics
+from ..models import average_client_weights, current_accuracy, synchronize_clients
 
 import time  # REMOVE
 
