@@ -55,7 +55,14 @@ class AmsSketch:
 
     @tf.function
     def sketch_for_vector(self, v):
-        """ Extremely efficient computation of sketch with only using tensors. """
+        """ Extremely efficient computation of sketch with only using tensors.
+
+        Args:
+        - v (tf.Tensor): Vector to sketch. Shape=(d,).
+
+        Returns:
+        - tf.Tensor: An AMS - Sketch. Shape=(`depth`, `width`).
+        """
         
         sketch = tf.zeros(shape=(self.depth, self.width), dtype=tf.float32)
         
@@ -81,22 +88,17 @@ class AmsSketch:
         sketch = tf.tensor_scatter_nd_add(sketch, indices, deltas_tensor)
         
         return sketch
-    
-    def sketch_for_vector2(self, v):
-        """ Bad implementation for tensorflow. """
-
-        sketch = tf.zeros(shape=(self.depth, self.width), dtype=tf.float32)
-
-        for i in tf.range(tf.shape(v)[0], dtype=tf.int32):
-            pos = self.hash31(i, self.F[0], self.F[1]) % self.width
-            delta = tf.cast(self.fourwise(i), dtype=tf.float32) * v[i]
-            indices_to_update = tf.stack([tf.range(self.depth, dtype=tf.int32), pos], axis=1)
-            sketch = tf.tensor_scatter_nd_add(sketch, indices_to_update, delta)
-
-        return sketch
 
     @staticmethod
     def estimate_euc_norm_squared(sketch):
+        """ Estimate the Euclidean norm squared of a vector using its AMS sketch.
+
+        Args:
+        - sketch (tf.Tensor): AMS sketch of a vector. Shape=(`depth`, `width`).
+
+        Returns:
+        - tf.Tensor: Estimated squared Euclidean norm.
+        """
 
         def _median(v):
             """ Median of tensor `v` with shape=(n,). Note: Suboptimal O(nlogn) but it's ok bcz n = `depth`"""
