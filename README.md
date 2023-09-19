@@ -18,6 +18,7 @@ pip install fdavg
 - [FDA Strategies](#fda-strategies-fdavgstrategies)
   - [Linear](#linear)
   - [Sketch](#sketch--amssketch)
+- [Metrics](#metrics-fdavgmetrics)
 
 
 ## Model Architectures `fdavg.models`
@@ -107,4 +108,62 @@ sketch = ams_sketch.sketch_for_vector(v)
 # Estimate the squared Euclidian norm of `v`, i.e., `||v||^2`
 # using the aforementioned `sketch`
 est_norm_squared = ams_sketch.estimate_euc_norm_squared(sketch)
+```
+
+# Metrics `fdavg.metrics`
+
+### Epoch Metrics : `EpochMetrics`
+
+This namedtuple represents metrics specific to each epoch during federated learning.
+
+#### Attributes:
+- **epoch (int)**: The epoch number.
+- **total_rounds (int)**: The total number of rounds at the end of this epoch.
+- **total_fda_steps (int)**: Total FDA steps taken till this epoch.
+- **accuracy (float)**: Model's accuracy at the end of this epoch.
+
+### Test-Id : `TestId`
+
+This namedtuple represents IDs for different tests/experiments.
+
+#### Attributes:
+- **dataset_name (str)**: Name of the dataset used.
+- **fda_name (str)**: FDA method name.
+- **num_clients (int)**: Number of clients in the FL training.
+- **batch_size (int)**: Batch size for training.
+- **num_steps_until_rtc_check (int)**: Number of steps until the RTC check (usually `1`).
+- **theta (float)**: The threshold (Θ) for monitoring the variance.
+- **nn_num_weights (int)**: Number of weights in the neural network.
+- **sketch_width (int)**: Width of the sketch. (`-1` if not applicable)
+- **sketch_depth (int)**: Depth of the sketch. (`-1` if not applicable)
+
+### Prefix all Epoch Metrics with Test-Id
+
+- **Function**: `process_metrics_with_test_id(epoch_metrics_list, test_id)`
+- **Description** : Given a list of `EpochMetrics`, i.e., `epoch_metrics_list`, and a `TestId` namedtuple, i.e., `test_id`, this function 
+will prefix each `EpochMetrics` with the `test_id` and return the processed list.
+
+#### Args:
+- **epoch_metrics_list** (list of ``EpochMetrics``): List of epoch metrics.
+- **test_id** (`TestId` instance): An instance of `TestId` namedtuple.
+
+#### Returns:
+- **epoch_metrics_with_test_id**: Processed list of epoch metrics with appended TestId.
+
+
+## Example
+
+```python
+from fdavg.metrics import EpochMetrics, TestId, process_metrics_with_test_id
+import pandas as pd
+
+epoch_metrics_list = [EpochMetrics(...), EpochMetrics(...), ...]
+test_id = TestId(...)
+
+# Append test_id to each EpochMetrics in the list
+epoch_metrics_list = process_metrics_with_test_id(epoch_metrics_list, test_id)
+
+# Create dataframe and save it
+df = pd.DataFrame(epoch_metrics_list)
+df.to_parquet('metrics.parquet')
 ```
