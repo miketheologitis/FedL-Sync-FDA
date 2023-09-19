@@ -5,10 +5,10 @@ setup(
     version="0.1",
     packages=['fdavg', 'fdavg.metrics', 'fdavg.models', 'fdavg.strategies'],
     package_dir={
-        'fdavg': 'FedL-Sync-FDA',
-        'fdavg.strategies': 'FedL-Sync-FDA/strategies',
-        'fdavg.models': 'FedL-Sync-FDA/models',
-        'fdavg.metrics': 'FedL-Sync-FDA/metrics'
+        'fdavg': 'FdAvg',
+        'fdavg.strategies': 'FdAvg/strategies',
+        'fdavg.models': 'FdAvg/models',
+        'fdavg.metrics': 'FdAvg/metrics'
     },
     install_requires=[
         'tensorflow', 'numpy'
