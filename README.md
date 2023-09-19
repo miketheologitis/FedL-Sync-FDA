@@ -47,6 +47,7 @@ advanced_cnn = sequential_advanced_cnn(
 
 ```python
 from fdavg.models import sequential_lenet5
+import tensorflow as tf
 
 # For MNIST
 lenet5 = sequential_lenet5(
