@@ -104,6 +104,7 @@ v = tf.random.uniform(shape=(1000,))
 # Sketch vector of shape (5, 250)
 sketch = ams_sketch.sketch_for_vector(v)
 
-# Estimate the squared euclician norm of `v`, i.e., `||v||^2`
-est_norm_squared = ams_sketch.estimate_euc_norm_squared(v)
+# Estimate the squared Euclidian norm of `v`, i.e., `||v||^2`
+# using the aforementioned `sketch`
+est_norm_squared = ams_sketch.estimate_euc_norm_squared(sketch)
 ```
