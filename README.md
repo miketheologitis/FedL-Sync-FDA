@@ -161,7 +161,7 @@ import pandas as pd
 epoch_metrics_list = [EpochMetrics(...), EpochMetrics(...), ...]
 test_id = TestId(...)
 
-# Append test_id to each EpochMetrics in the list
+# Prefix test_id to each EpochMetrics in the list
 epoch_metrics_list = process_metrics_with_test_id(epoch_metrics_list, test_id)
 
 # Create dataframe and save it
