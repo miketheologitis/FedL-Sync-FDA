@@ -23,7 +23,7 @@ slurm_template = """#!/bin/bash -l
 #SBATCH --mem={mem}G    # memory per NODE
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:{gpus_per_node}
-#SBATCH --account=pa230401
+#SBATCH --account=pa230902
 
 ## LOAD MODULES ##
 module purge            # clean up loaded modules
