@@ -43,9 +43,17 @@ def create_combinations(args):
         combination["bench_test"] = args.test
         combination["epochs"] = args.e
 
-    with open(f'{os.path.join(script_directory, "../tmp/combinations")}/{args.comb_file_id}.json', 'w') as f:
-        json.dump(combinations, f)
-        print(f"OK! Created {len(combinations)} combinations, i.e., `n_sims` = {len(combinations)}.")
+    if not args.append_to:
+        with open(f'{os.path.join(script_directory, "../tmp/combinations")}/{args.comb_file_id}.json', 'w') as f:
+            json.dump(combinations, f)
+            print(f"OK! Created {len(combinations)} combinations, i.e., `n_sims` = {len(combinations)}.")
+    else:
+        with open(f'{os.path.join(script_directory, "../tmp/combinations")}/{args.comb_file_id}.json', 'r') as f:
+            old_combinations = json.load(f)
+        old_combinations.extend(combinations)
+        with open(f'{os.path.join(script_directory, "../tmp/combinations")}/{args.comb_file_id}.json', 'w') as f:
+            json.dump(old_combinations, f)
+            print(f"OK! Appended {len(combinations)} combinations, i.e., `n_sims` = {len(old_combinations)}.")
 
 
 if __name__ == '__main__':
@@ -59,6 +67,8 @@ if __name__ == '__main__':
     parser.add_argument('--th', nargs='+', type=float, help="Theta threshold(s).", required=True)
     parser.add_argument('--num_clients', nargs='+', type=int, help="Number of clients.",
                         default=[5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60])
+    parser.add_argument('--append_to', action='store_true',
+                        help="If given, then we append to the comb file.")
     parser.add_argument('--test', action='store_true', help="If given, then we bench test.")
 
     create_combinations(parser.parse_args())
