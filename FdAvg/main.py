@@ -53,7 +53,7 @@ if __name__ == '__main__':
                                   mnist_load_federated_data)
     from FdAvg.models.lenet5 import get_compiled_and_built_lenet
     from FdAvg.models.advanced_cnn import get_compiled_and_built_advanced_cnn
-    from FdAvg.simulation.fda_simulation import single_simulation
+    from FdAvg.strategies.fda_simulation import single_simulation
 
     from FdAvg.utils.read_combinations import get_test_hyper_parameters
     from FdAvg.utils.pretty_printers import print_finish_testing_info, print_current_test_info
