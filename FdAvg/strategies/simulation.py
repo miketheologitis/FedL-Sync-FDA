@@ -8,13 +8,14 @@ from FdAvg.strategies.sketch import sketch_federated_simulation, AmsSketch
 from FdAvg.strategies.synchronous import synchronous_federated_simulation
 
 
-def single_simulation(load_federated_data_fn, n_train, fda_name, num_clients, batch_size, num_steps_until_rtc_check,
-                      num_epochs, compile_and_build_model_fn, nn_name, theta=0., sketch_width=-1, sketch_depth=-1,
-                      bias=None, seed=None, bench_test=False):
+def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_clients, batch_size,
+                      num_steps_until_rtc_check, num_epochs, compile_and_build_model_fn, nn_name, theta=0.,
+                      bias=None, seed=None, bench_test=False, **kwargs):
     """
     Run a single federated learning simulation based on the given FDA method name.
     
     Args:
+        ds_name (str): Name of the dataset.
         load_federated_data_fn (callable): Function to load and preprocess the federated dataset.
         n_train (int): Number of samples in the training dataset.
         fda_name (str): Name of the FDA method to use ("naive", "linear", "sketch", "synchronous").
@@ -25,8 +26,6 @@ def single_simulation(load_federated_data_fn, n_train, fda_name, num_clients, ba
         compile_and_build_model_fn (callable): Function to compile and build the model.
         nn_name (str): Name of the neural network model.
         theta (float, optional): Variance threshold for FDA methods. Defaults to 0. for "synchronous".
-        sketch_width (int, optional): Width parameter for the AMS sketch. Defaults to -1.
-        sketch_depth (int, optional): Depth parameter for the AMS sketch. Defaults to -1.
         bias (float, optional): Bias parameter for the Fed dataset. Defaults to None.
         seed (int, optional): Random seed the shuffling of the Fed dataset. Defaults to None.
         bench_test (bool, optional): Whether the function is being used for a benchmark test. Defaults to False.
@@ -47,13 +46,16 @@ def single_simulation(load_federated_data_fn, n_train, fda_name, num_clients, ba
         fda_steps_in_one_epoch = ((n_train / batch_size) / num_clients) / num_steps_until_rtc_check
 
     # 2. Federated Dataset creation
-    federated_ds, test_ds = load_federated_data_fn(num_clients, batch_size, num_steps_until_rtc_check, bias=bias, seed=seed)
+    federated_ds, test_ds = load_federated_data_fn(
+        num_clients, batch_size, num_steps_until_rtc_check, bias=bias, seed=seed
+    )
 
     # 3. Models creation
     server_cnn = compile_and_build_model_fn()
     client_cnns = [compile_and_build_model_fn() for _ in range(num_clients)]
 
     epoch_metrics_list = None
+    sketch_width, sketch_depth = None, None
 
     # 4. Simulation
     if fda_name == "naive":
@@ -69,6 +71,7 @@ def single_simulation(load_federated_data_fn, n_train, fda_name, num_clients, ba
         )
     
     if fda_name == "sketch":
+        sketch_width, sketch_depth = 250, 5
         epoch_metrics_list = sketch_federated_simulation(
             test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta, fda_steps_in_one_epoch,
             compile_and_build_model_fn, AmsSketch(width=sketch_width, depth=sketch_depth), 1. / sqrt(sketch_width)
@@ -82,11 +85,11 @@ def single_simulation(load_federated_data_fn, n_train, fda_name, num_clients, ba
 
     # 5. Create Test ID
     test_id = TestId(
-        "MNIST", fda_name, num_clients, batch_size, num_steps_until_rtc_check, theta, nn_name,
+        ds_name, bias, fda_name, num_clients, batch_size, num_steps_until_rtc_check, theta, nn_name,
         count_weights(server_cnn), sketch_width, sketch_depth
     )
 
-    # 6. Store ID'd Metrics
+    # 6. Extend the metrics with Test ID
     epoch_metrics_with_test_id_list = process_metrics_with_test_id(
         epoch_metrics_list, test_id
     )

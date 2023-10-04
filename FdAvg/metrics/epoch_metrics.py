@@ -16,19 +16,20 @@ EpochMetrics = namedtuple("EpochMetrics", ["epoch", "total_rounds", "total_fda_s
 TestId namedtuple:
 Attributes:
     - dataset_name (str): Name of the dataset used.
+    - bias (float): Bias parameter for the Fed dataset.
     - fda_name (str): FDA method name.
     - num_clients (int): Number of clients in the federated network.
     - batch_size (int): Batch size for training.
     - num_steps_until_rtc_check (int): Number of steps until the RTC check.
     - theta (float): The threshold value for FDA.
     - nn_num_weights (int): Number of weights in the neural network.
-    - sketch_width (int): Width of the sketch. -1 if not applicable
-    - sketch_depth (int): Depth of the sketch. -1 if not applicable
+    - sketch_width (int): Width of the sketch. None if not applicable
+    - sketch_depth (int): Depth of the sketch. None if not applicable
 """
 # Define a named tuple to represent test IDs for different experiments.
 TestId = namedtuple(
         'TestId',
-        ["dataset_name", "fda_name", "num_clients", "batch_size", "num_steps_until_rtc_check",
+        ["dataset_name", "bias", "fda_name", "num_clients", "batch_size", "num_steps_until_rtc_check",
          "theta", "nn_name", "nn_num_weights", "sketch_width", "sketch_depth"]
 )
 
