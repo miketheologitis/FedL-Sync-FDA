@@ -1,79 +1,139 @@
 import tensorflow as tf
+import numpy as np
 
 
-def convert_to_tf_dataset(X_train, y_train, X_test, y_test):
-    """
-    Convert NumPy arrays to TensorFlow datasets.
-
-    This function takes training and testing data in the form of NumPy arrays and converts
-    them into TensorFlow datasets. The test dataset is also batched with a batch size of 256.
-
-    Args:
-    - X_train (numpy.ndarray): The training data, a 3D array of shape (num_samples, 28, 28).
-    - y_train (numpy.ndarray): The labels for the training data, a 1D array of shape (num_samples,).
-    - X_test (numpy.ndarray): The test data, a 3D array of shape (num_samples, 28, 28).
-    - y_test (numpy.ndarray): The labels for the test data, a 1D array of shape (num_samples,).
-
-    Returns:
-    - train_dataset (tf.data.Dataset): The training dataset as a TensorFlow Dataset object.
-      Each element is a tuple containing:
-        - A 2D tensor of shape (28, 28), representing a grayscale image.
-        - A scalar tensor, representing the label of the image.
-    - test_dataset (tf.data.Dataset): The test dataset as a TensorFlow Dataset object, batched with a size of 256.
-      Each element is a batch containing:
-        - A 3D tensor of shape (batch_size, 28, 28), representing a batch of grayscale images.
-        - A 1D tensor of shape (batch_size,), representing the labels of the images in the batch.
-
-    """
-    
-    # Convert to TensorFlow Datasets
-    train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train))
-    test_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(256)
-
-    return train_dataset, test_dataset
-
-
-def prepare_federated_data(train_dataset, num_clients, batch_size, num_steps_until_rtc_check, seed=None):
+def prepare_federated_data(federated_dataset, batch_size, num_steps_until_rtc_check, seed=None):
     """
     Prepare federated data by sharding the original training dataset across multiple clients.
 
     https://cs230.stanford.edu/blog/datapipeline/#best-practices
 
     Args:
-        train_dataset (tf.data.Dataset): The original training dataset as a TensorFlow Dataset object.
-            Each element is a tuple containing:
-            - A 2D tensor of shape (28, 28), representing a grayscale image.
-            - A scalar tensor, representing the label of the image.
-        num_clients (int): The number of clients across which to shard the dataset.
+        federated_dataset (list of tf.data.Dataset): A list of datasets for each client.
         batch_size (int): The size of the batches to be used.
         num_steps_until_rtc_check (int): The number of batches to take from each client dataset.
         seed (int, optional): The random seed for shuffling the dataset. Default is None.
 
     Returns:
         federated_dataset_prepared (list of tf.data.Dataset): A list of prepared TensorFlow Dataset objects,
-            one for each client dataset. The datasets are batched, shuffled, and prefetched.
+            one for each client dataset. The datasets are batched, shuffled.
             Each element of a prepared client dataset is a batch containing:
             - A 3D tensor of shape (batch_size, 28, 28), representing a batch of grayscale images.
             - A 1D tensor of shape (batch_size,), representing the labels of the images in the batch.
-
-    Notes:
-        - The function first shards the dataset using the `.shard` method, assigning a portion to each client.
-        - It then processes each client's dataset by shuffling, batching, and prefetching.
     """
-    
+
     def process_client_dataset(_client_dataset, _batch_size, _num_steps_until_rtc_check, _seed):
         shuffle_size = _client_dataset.cardinality()  # Uniform shuffling
-        return _client_dataset.shuffle(shuffle_size, seed=_seed).repeat().batch(_batch_size)\
+        return _client_dataset.shuffle(shuffle_size, seed=_seed).repeat().batch(_batch_size) \
             .take(_num_steps_until_rtc_check)
-    
+
+    federated_dataset_prepared = [
+        process_client_dataset(client_dataset, batch_size, num_steps_until_rtc_check, seed)
+        for client_dataset in federated_dataset
+    ]
+    return federated_dataset_prepared
+
+
+def create_unbiased_federated_data(X_train, y_train, num_clients):
+    """
+    Create federated data by equally distributing the dataset across multiple clients.
+
+    This function shards the given training dataset uniformly across the specified number of clients.
+
+    Args:
+        X_train (numpy.ndarray): The training data features.
+        y_train (numpy.ndarray): The training data labels.
+        num_clients (int): The number of clients among which the data should be distributed.
+
+    Returns:
+        list of tf.data.Dataset: A list of TensorFlow Dataset objects. Each dataset in the list corresponds to
+        the data shard for a client. The order of the datasets in the list corresponds to the order of the clients.
+
+    Example:
+        >>> X_train = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+        >>> y_train = np.array([0, 1, 0, 1])
+        >>> num_clients = 2
+        >>> federated_ds = create_unbiased_federated_data(X_train, y_train, num_clients)
+        >>> len(federated_ds)
+        2
+    """
+    train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train))
+
     # Shard the data across clients CLIENT LEVEL
-    clients_federated_data = [
+    unbiased_federated_dataset = [
         train_dataset.shard(num_clients, i)
         for i in range(num_clients)
     ]
-        
-    federated_dataset_prepared = [
-        process_client_dataset(client_dataset, batch_size, num_steps_until_rtc_check, seed)
-        for client_dataset in clients_federated_data
-    ]
-    return federated_dataset_prepared
+
+    return unbiased_federated_dataset
+
+
+def create_biased_federated_data(X_train, y_train, num_clients, bias):
+    """
+    Create federated data with a specified bias across multiple clients.
+
+    This function shards the given training dataset among clients in a way that introduces a specified bias.
+    The bias is applied by sorting the labels and distributing them across the clients unevenly.
+
+    Args:
+        X_train (numpy.ndarray): The training data features.
+        y_train (numpy.ndarray): The training data labels.
+        num_clients (int): The number of clients among which the data should be distributed.
+        bias (float): The proportion of the data that should be biased. A value between 0 and 1.
+
+    Returns:
+        list of tf.data.Dataset: A list of TensorFlow Dataset objects. Each dataset in the list corresponds to
+        the data shard for a client. The order of the datasets in the list corresponds to the order of the clients.
+
+    Example:
+        >>> X_train = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+        >>> y_train = np.array([0, 1, 0, 1])
+        >>> num_clients = 2
+        >>> bias = 0.5
+        >>> federated_ds = create_biased_federated_data(X_train, y_train, num_clients, bias)
+        >>> it = iter(federated_ds[0])
+        >>> next(it)
+        (<tf.Tensor: shape=(2,), dtype=int64, numpy=array([1, 2])>, <tf.Tensor: shape=(), dtype=int64, numpy=0>)
+        >>> next(it)
+        (<tf.Tensor: shape=(2,), dtype=int64, numpy=array([5, 6])>, <tf.Tensor: shape=(), dtype=int64, numpy=0>)
+        >>> it = iter(federated_ds[1])
+        >>> next(it)
+        (<tf.Tensor: shape=(2,), dtype=int64, numpy=array([3, 4])>, <tf.Tensor: shape=(), dtype=int64, numpy=1>)
+        >>> next(it)
+        (<tf.Tensor: shape=(2,), dtype=int64, numpy=array([7, 8])>, <tf.Tensor: shape=(), dtype=int64, numpy=1>)
+    """
+
+    n = len(y_train)
+    biased_n = int(n * bias)
+
+    X_train_biased = X_train[:biased_n]
+    y_train_biased = y_train[:biased_n]
+
+    X_train_unbiased = X_train[biased_n:]
+    y_train_unbiased = y_train[biased_n:]
+
+    sorted_indices = y_train_biased.argsort()
+
+    X_train_sorted = X_train_biased[sorted_indices]
+    y_train_sorted = y_train_biased[sorted_indices]
+
+    X_train_biased_lst = np.array_split(X_train_sorted, num_clients)
+    y_train_biased_lst = np.array_split(y_train_sorted, num_clients)
+
+    X_train_unbiased_lst = np.array_split(X_train_unbiased, num_clients)
+    y_train_unbiased_lst = np.array_split(y_train_unbiased, num_clients)
+
+    biased_federated_dataset = []
+
+    client_data_gen = zip(X_train_biased_lst, y_train_biased_lst, X_train_unbiased_lst, y_train_unbiased_lst)
+
+    for X_biased, y_biased, X_unbiased, y_unbiased in client_data_gen:
+
+        X_train = np.concatenate((X_biased, X_unbiased))
+        y_train = np.concatenate((y_biased, y_unbiased))
+
+        biased_federated_dataset.append(
+            tf.data.Dataset.from_tensor_slices((X_train, y_train))
+        )
+
+    return biased_federated_dataset

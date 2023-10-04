@@ -49,8 +49,8 @@ if __name__ == '__main__':
     import time
     import pandas as pd
 
-    from FdAvg.data.mnist import load_data, MNIST_N_TRAIN, MNIST_CNN_BATCH_INPUT, MNIST_CNN_INPUT_RESHAPE
-    from FdAvg.data.preprocessing import convert_to_tf_dataset
+    from FdAvg.data.mnist import (MNIST_N_TRAIN, MNIST_CNN_BATCH_INPUT, MNIST_CNN_INPUT_RESHAPE,
+                                  mnist_load_federated_data)
     from FdAvg.models.lenet5 import get_compiled_and_built_lenet
     from FdAvg.models.advanced_cnn import get_compiled_and_built_advanced_cnn
     from FdAvg.simulation.fda_simulation import single_simulation
@@ -60,20 +60,17 @@ if __name__ == '__main__':
 
     hyperparameters = get_test_hyper_parameters(f'{args.comb_file_id}', args.sim_id)
 
-    compile_and_build_model_func = None
+    compile_and_build_model_fn = None
 
     if hyperparameters['nn_name'] == 'AdvancedCNN':
-        compile_and_build_model_func = partial(
+        compile_and_build_model_fn = partial(
             get_compiled_and_built_advanced_cnn, MNIST_CNN_BATCH_INPUT, MNIST_CNN_INPUT_RESHAPE, 10
         )
 
     if hyperparameters['nn_name'] == 'LeNet-5':
-        compile_and_build_model_func = partial(
+        compile_and_build_model_fn = partial(
             get_compiled_and_built_lenet, MNIST_CNN_BATCH_INPUT, MNIST_CNN_INPUT_RESHAPE, 10
         )
-
-    # 2. Load data
-    train_dataset, test_dataset = convert_to_tf_dataset(*load_data())
 
     # 3. Metrics
     all_epoch_metrics = []
@@ -91,17 +88,17 @@ if __name__ == '__main__':
     # 1. Naive simulation
     if hyperparameters['fda_name'] == "naive":
         epoch_metrics_with_test_id_list = single_simulation(
+            load_federated_data_fn=mnist_load_federated_data,
             fda_name="naive",
             num_clients=hyperparameters['num_clients'],
             n_train=MNIST_N_TRAIN,
-            train_dataset=train_dataset,
-            test_dataset=test_dataset,
             batch_size=hyperparameters['batch_size'],
             num_steps_until_rtc_check=hyperparameters['rtc_steps'],
             num_epochs=hyperparameters['epochs'],
-            compile_and_build_model_func=compile_and_build_model_func,
+            compile_and_build_model_fn=compile_and_build_model_fn,
             nn_name=hyperparameters['nn_name'],
             theta=hyperparameters['theta'],
+            bias=None,
             bench_test=hyperparameters['bench_test']
         )
         all_epoch_metrics.extend(epoch_metrics_with_test_id_list)
@@ -109,17 +106,17 @@ if __name__ == '__main__':
     # 2. Linear simulation
     if hyperparameters['fda_name'] == "linear":
         epoch_metrics_with_test_id_list = single_simulation(
+            load_federated_data_fn=mnist_load_federated_data,
             fda_name="linear",
             num_clients=hyperparameters['num_clients'],
             n_train=MNIST_N_TRAIN,
-            train_dataset=train_dataset,
-            test_dataset=test_dataset,
             batch_size=hyperparameters['batch_size'],
             num_steps_until_rtc_check=hyperparameters['rtc_steps'],
             num_epochs=hyperparameters['epochs'],
-            compile_and_build_model_func=compile_and_build_model_func,
+            compile_and_build_model_fn=compile_and_build_model_fn,
             nn_name=hyperparameters['nn_name'],
             theta=hyperparameters['theta'],
+            bias=None,
             bench_test=hyperparameters['bench_test']
         )
         all_epoch_metrics.extend(epoch_metrics_with_test_id_list)
@@ -127,19 +124,19 @@ if __name__ == '__main__':
     # 3. Sketch simulation
     if hyperparameters['fda_name'] == "sketch":
         epoch_metrics_with_test_id_list = single_simulation(
+            load_federated_data_fn=mnist_load_federated_data,
             fda_name="sketch",
             num_clients=hyperparameters['num_clients'],
             n_train=MNIST_N_TRAIN,
-            train_dataset=train_dataset,
-            test_dataset=test_dataset,
             batch_size=hyperparameters['batch_size'],
             num_steps_until_rtc_check=hyperparameters['rtc_steps'],
             num_epochs=hyperparameters['epochs'],
-            compile_and_build_model_func=compile_and_build_model_func,
+            compile_and_build_model_fn=compile_and_build_model_fn,
             nn_name=hyperparameters['nn_name'],
             theta=hyperparameters['theta'],
             sketch_width=250,
             sketch_depth=5,
+            bias=None,
             bench_test=hyperparameters['bench_test']
         )
         all_epoch_metrics.extend(epoch_metrics_with_test_id_list)
@@ -147,16 +144,16 @@ if __name__ == '__main__':
     # 4. Synchronous simulation
     if hyperparameters['fda_name'] == "synchronous":
         epoch_metrics_with_test_id_list = single_simulation(
+            load_federated_data_fn=mnist_load_federated_data,
             fda_name="synchronous",
             num_clients=hyperparameters['num_clients'],
             n_train=MNIST_N_TRAIN,
-            train_dataset=train_dataset,
-            test_dataset=test_dataset,
             batch_size=hyperparameters['batch_size'],
             num_steps_until_rtc_check=hyperparameters['rtc_steps'],
             num_epochs=hyperparameters['epochs'],
-            compile_and_build_model_func=compile_and_build_model_func,
+            compile_and_build_model_fn=compile_and_build_model_fn,
             nn_name=hyperparameters['nn_name'],
+            bias=None,
             bench_test=hyperparameters['bench_test']
         )
         all_epoch_metrics.extend(epoch_metrics_with_test_id_list)
