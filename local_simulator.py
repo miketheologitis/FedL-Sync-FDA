@@ -63,8 +63,8 @@ if __name__ == '__main__':
             f'--gpu_mem={args.gpu_mem}'
         ]
 
-        with open(f'FdAvg/metrics/tmp/local_out/c{args.comb_file_id}_sim{sim_id}.out', 'w') as stdout_file:
-            with open(f'FdAvg/metrics/tmp/local_out/c{args.comb_file_id}_sim{sim_id}.err', 'w') as stderr_file:
+        with open(f'metrics/tmp/local_out/c{args.comb_file_id}_sim{sim_id}.out', 'w') as stdout_file:
+            with open(f'metrics/tmp/local_out/c{args.comb_file_id}_sim{sim_id}.err', 'w') as stderr_file:
                 print(f"Running: {' '.join(cmd)}")
                 process = subprocess.Popen(cmd, stdout=stdout_file, stderr=stderr_file)
                 processes.append(process)
