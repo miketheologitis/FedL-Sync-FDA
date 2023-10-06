@@ -13,8 +13,8 @@ slurm_template = """#!/bin/bash -l
 ####################################
 
 #SBATCH --job-name={job_name}
-#SBATCH --output=FdAvg/tmp/slurm_out/{job_name}.out   # Stdout (%j expands to jobId)
-#SBATCH --error=FdAvg/tmp/slurm_out/{job_name}.err   # Stderr (%j expands to jobId)
+#SBATCH --output=FdAvg/metrics/tmp/slurm_out/{job_name}_%a.out   # Stdout %j expands to jobId, %a is array task index
+#SBATCH --error=FdAvg/metrics/tmp/slurm_out/{job_name}_%a.err   # Stderr %j expands to jobId, %a is array task index
 #SBATCH --ntasks={n_tasks}   # Number of tasks requested
 #SBATCH --nodes={n_nodes}   # Number of nodes requested
 #SBATCH --ntasks-per-node=1   # Tasks per node

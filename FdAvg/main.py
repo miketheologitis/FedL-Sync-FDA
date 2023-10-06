@@ -4,9 +4,8 @@ logging.getLogger("tensorflow").setLevel(logging.WARNING)
 
 # Get the directory of the current script (main.py)
 script_dir = os.path.dirname(os.path.realpath(__file__))
-
-# Construct the path for the epoch_metrics file
-epoch_metrics_path = os.path.join(script_dir, "tmp", "epoch_metrics")
+tmp_dir = '../metrics/tmp'
+epoch_metrics_path = os.path.normpath(os.path.join(script_dir, f'{tmp_dir}/epoch_metrics'))
 
 if __name__ == '__main__':
     import argparse

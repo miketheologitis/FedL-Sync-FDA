@@ -6,12 +6,15 @@ import argparse
 # Get the directory containing the script
 script_directory = os.path.dirname(os.path.abspath(__file__))
 
+# Relative path to the tmp directory
+tmp_dir = '../../metrics/tmp'
+
 # Define the directories relative to the script's directory
 directories = [
-    os.path.join(script_directory, '../tmp/slurm_out'),
-    os.path.join(script_directory, '../tmp/local_out'),
-    os.path.join(script_directory, '../tmp/epoch_metrics'),
-    os.path.join(script_directory, '../tmp/combinations')
+    os.path.normpath(os.path.join(script_directory, f'{tmp_dir}/slurm_out')),
+    os.path.normpath(os.path.join(script_directory, f'{tmp_dir}/local_out')),
+    os.path.normpath(os.path.join(script_directory, f'{tmp_dir}/epoch_metrics')),
+    os.path.normpath(os.path.join(script_directory, f'{tmp_dir}/combinations'))
 ]
 # Create directories if they don't exist
 for directory in directories:
@@ -47,14 +50,14 @@ def create_combinations(args):
         combination["num_epochs"] = args.e
 
     if not args.append_to:
-        with open(f'{os.path.join(script_directory, "../tmp/combinations")}/{args.comb_file_id}.json', 'w') as f:
+        with open(f'{os.path.join(script_directory, f"{tmp_dir}/combinations")}/{args.comb_file_id}.json', 'w') as f:
             json.dump(combinations, f)
             print(f"OK! Created {len(combinations)} combinations, i.e., `n_sims` = {len(combinations)}.")
     else:
-        with open(f'{os.path.join(script_directory, "../tmp/combinations")}/{args.comb_file_id}.json', 'r') as f:
+        with open(f'{os.path.join(script_directory, f"{tmp_dir}/combinations")}/{args.comb_file_id}.json', 'r') as f:
             old_combinations = json.load(f)
         old_combinations.extend(combinations)
-        with open(f'{os.path.join(script_directory, "../tmp/combinations")}/{args.comb_file_id}.json', 'w') as f:
+        with open(f'{os.path.join(script_directory, f"{tmp_dir}/combinations")}/{args.comb_file_id}.json', 'w') as f:
             json.dump(old_combinations, f)
             print(f"OK! Appended {len(combinations)} combinations, i.e., `n_sims` = {len(old_combinations)}.")
 
