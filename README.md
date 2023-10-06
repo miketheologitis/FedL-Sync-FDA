@@ -3,9 +3,7 @@
 **NOTE:** This documentation highlights the functionalities currently 
 available in the `fdavg` package. While these are functional 
 and can be used, it's worth noting that they represent only a fraction
-of the full capabilities planned for the package. 
-The development is ongoing and we plan on pushing new features 
-in future releases.
+of the full capabilities planned for the package.
 
 # Usage
 Make sure you have the version of `tensorflow` and `numpy` you want to use installed. Then, install `fdavg` with
@@ -27,7 +25,6 @@ pip install fdavg
 - [FDA Strategies](#fda-strategies-fdavgstrategies)
   - [Linear](#linear)
   - [Sketch](#sketch--amssketch)
-- [Metrics](#metrics-fdavgmetrics)
 
 
 ## Model Architectures `fdavg.models`
