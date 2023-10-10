@@ -20,7 +20,7 @@ slurm_template = """#!/bin/bash -l
 #SBATCH --ntasks-per-node=1   # Tasks per node
 #SBATCH --cpus-per-task={cpus_per_task}    # Threads per task
 #SBATCH --time={walltime}   # walltime
-#SBATCH --mem={mem}G    # memory per NODE
+#SBATCH --mem={mem}    # memory per NODE
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:{gpus_per_node}
 #SBATCH --account=pa230902
@@ -48,7 +48,7 @@ if __name__ == '__main__':
                         help="The GPU memory to be used. If not provided we let TensorFlow dynamically allocate.")
     parser.add_argument('--gpus_per_node', type=int, default=2, help="Number of GPUs per Node.")
     parser.add_argument('--sims_per_gpu', type=int, default=4, help="Number of simulations per GPU.")
-    parser.add_argument('--mem_per_sim', type=int, default=10, help="Memory per simulation.")
+    parser.add_argument('--mem_per_sim', type=int, default=1024*10, help="Memory (MB) per simulation.")
     parser.add_argument('--cpus_per_sim', type=int, default=2, help="CPUs per simulation.")
     parser.add_argument('--nodes_per_submit', type=int, default=2, help="Nodes per job.")
     parser.add_argument('--walltime', type=str, default="24:00:00", help="Walltime.")
