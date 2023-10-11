@@ -116,7 +116,7 @@ class AdvancedCNN(tf.keras.Model):
         """
         for batch in dataset:
             self.step(batch)
-            
+
     def set_trainable_variables(self, trainable_vars):
         """
         Set the model's trainable variables.
@@ -129,6 +129,7 @@ class AdvancedCNN(tf.keras.Model):
         for model_var, var in zip(self.trainable_variables, trainable_vars):
             model_var.assign(var)
 
+    @tf.function
     def trainable_vars_as_vector(self):
         """
         Get the model's trainable variables as a single vector.

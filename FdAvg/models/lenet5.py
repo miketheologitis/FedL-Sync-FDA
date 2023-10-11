@@ -114,6 +114,7 @@ class LeNet5(tf.keras.Model):
         for model_var, var in zip(self.trainable_variables, trainable_vars):
             model_var.assign(var)
 
+    @tf.function
     def trainable_vars_as_vector(self):
         """
         Get the model's trainable variables as a single vector.
