@@ -71,7 +71,7 @@ OK! Created 144 combinations, i.e., `n_sims` = 144.
 ```
 Continue with:
 ```shell
-python -m slurm_submitter --gpu_mem 5120 --gpus_per_node 2 --sims_per_gpu 2 --mem_per_sim 10 --cpus_per_sim 2 --nodes_per_submit 3 --n_sims 144 --comb_file_id 0 --walltime 24:00:00
+python -m slurm_submitter --gpu_mem 5120 --gpus_per_node 2 --sims_per_gpu 2 --mem_per_sim 10240 --cpus_per_sim 2 --nodes_per_submit 3 --n_sims 144 --comb_file_id 0 --walltime 24:00:00
 ```
 
 This will create 144 / (2 * 2 * 2) = 18 SLURM submissions, each with 2 nodes, 2 GPUs per node, 2 simulations per GPU - 4 per node, 10 * 2 * 2 = 40 GB memory per node, 2 * 2 * 2 = 8 CPUs per node, and 24 hours walltime.
