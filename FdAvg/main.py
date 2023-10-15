@@ -43,6 +43,8 @@ if __name__ == '__main__':
                 tf.config.set_logical_device_configuration(
                     gpu, [tf.config.LogicalDeviceConfiguration(memory_limit=args.gpu_mem)]
                 )
+    else:
+        print("No GPUs Available!")
 
     from functools import partial
     import time
