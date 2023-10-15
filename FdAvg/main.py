@@ -18,18 +18,6 @@ if __name__ == '__main__':
     parser.add_argument('--slurm', action='store_true', help="Use if we are in SLURM HPC env.")
     args = parser.parse_args()
 
-    if args.slurm:
-        # Fix for SSL error in Aris gr.net
-        import ssl
-        try:
-            _create_unverified_https_context = ssl._create_unverified_context
-        except AttributeError:
-            # Legacy Python that doesn't verify HTTPS certificates by default
-            pass
-        else:
-            # Handle target environment that doesn't support HTTPS verification
-            ssl._create_default_https_context = _create_unverified_https_context
-
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
     import tensorflow as tf
     if tf.config.list_physical_devices('GPU'):
@@ -46,7 +34,6 @@ if __name__ == '__main__':
     else:
         print("No GPUs Available!")
 
-    from functools import partial
     import time
     import pandas as pd
 

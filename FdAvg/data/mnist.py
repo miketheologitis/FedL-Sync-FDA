@@ -1,11 +1,17 @@
 import tensorflow as tf
+import numpy as np
 from FdAvg.data.preprocessing import (create_unbiased_federated_data, create_biased_federated_data,
                                       prepare_federated_data)
 from functools import partial
 
-MNIST_CNN_BATCH_INPUT = (None, 28, 28)  # EMNIST dataset (None is used for batch size, as it varies)
+MNIST_CNN_BATCH_INPUT = (None, 28, 28)  # MNIST dataset (None is used for batch size, as it varies)
 MNIST_CNN_INPUT_RESHAPE = (28, 28, 1)
 MNIST_N_TRAIN = 60_000
+
+
+def load_mnist_from_local_npz():
+    with np.load("data/mnist/mnist.npz") as data:
+        return (data['X_train'], data['y_train']), (data['X_test'], data['y_test'])
 
 
 def mnist_load_data():
@@ -21,7 +27,7 @@ def mnist_load_data():
     - X_test (numpy.ndarray): The test data, a 3D array of shape (num_samples, 28, 28).
     - y_test (numpy.ndarray): The labels for the test data, a 1D array of shape (num_samples,).
     """
-    (X_train, y_train), (X_test, y_test) = tf.keras.datasets.mnist.load_data()
+    (X_train, y_train), (X_test, y_test) = load_mnist_from_local_npz()
     X_train, X_test = X_train / 255.0, X_test / 255.0
 
     return X_train, y_train, X_test, y_test
