@@ -83,7 +83,7 @@ if __name__ == '__main__':
             f.write(slurm_script)
 
         # Submit the Slurm script using sbatch
-        result = subprocess.run(["sbatch", "tmp_slurm_script.slurm"], capture_output=True, text=True)
+        result = subprocess.run(["sbatch", "--exclude=gpu07", "tmp_slurm_script.slurm"], capture_output=True, text=True)
         print(result)
         print(f"Submitted slurm job {i + 1}/{num_of_submits} for combination file {args.comb_file_id}.json.")
         print()
