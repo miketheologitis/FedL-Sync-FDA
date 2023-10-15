@@ -3,14 +3,20 @@ import numpy as np
 from FdAvg.data.preprocessing import (create_unbiased_federated_data, create_biased_federated_data,
                                       prepare_federated_data)
 from functools import partial
+import os
 
 MNIST_CNN_BATCH_INPUT = (None, 28, 28)  # MNIST dataset (None is used for batch size, as it varies)
 MNIST_CNN_INPUT_RESHAPE = (28, 28, 1)
 MNIST_N_TRAIN = 60_000
 
 
+script_dir = os.path.dirname(os.path.realpath(__file__))
+mnist_dir = 'data/mnist/'
+mnist_data = os.path.normpath(os.path.join(script_dir, f'{mnist_dir}/mnist.npz'))
+
+
 def load_mnist_from_local_npz():
-    with np.load("data/mnist/mnist.npz") as data:
+    with np.load(mnist_data) as data:
         return (data['X_train'], data['y_train']), (data['X_test'], data['y_test'])
 
 
