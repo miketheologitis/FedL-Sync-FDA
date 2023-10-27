@@ -6,6 +6,7 @@ from FdAvg.strategies.naive import naive_federated_simulation
 from FdAvg.strategies.linear import linear_federated_simulation
 from FdAvg.strategies.sketch import sketch_federated_simulation, AmsSketch
 from FdAvg.strategies.synchronous import synchronous_federated_simulation
+from FdAvg.strategies.gm import gm_federated_simulation
 
 
 def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_clients, batch_size,
@@ -75,6 +76,12 @@ def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_cl
         epoch_metrics_list = sketch_federated_simulation(
             test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta, fda_steps_in_one_epoch,
             compile_and_build_model_fn, AmsSketch(width=sketch_width, depth=sketch_depth), 1. / sqrt(sketch_width)
+        )
+
+    if fda_name == "gm":
+        epoch_metrics_list = gm_federated_simulation(
+            test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta,
+            fda_steps_in_one_epoch, compile_and_build_model_fn
         )
         
     if fda_name == "synchronous":
