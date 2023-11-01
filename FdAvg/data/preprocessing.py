@@ -36,6 +36,41 @@ def prepare_federated_data(federated_dataset, batch_size, num_steps_until_rtc_ch
 
 def create_unbiased_federated_data(X_train, y_train, num_clients):
     """
+    TODO: Maybe follow shard keys i % n etc.
+    Create federated data by equally distributing the dataset across multiple clients.
+
+    This function shards the given training dataset uniformly across the specified number of clients.
+
+    Args:
+        X_train (numpy.ndarray): The training data features.
+        y_train (numpy.ndarray): The training data labels.
+        num_clients (int): The number of clients among which the data should be distributed.
+
+    Returns:
+        list of tf.data.Dataset: A list of TensorFlow Dataset objects. Each dataset in the list corresponds to
+        the data shard for a client. The order of the datasets in the list corresponds to the order of the clients.
+
+    Example:
+        >>> X_train = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+        >>> y_train = np.array([0, 1, 0, 1])
+        >>> num_clients = 2
+        >>> federated_ds = create_unbiased_federated_data(X_train, y_train, num_clients)
+        >>> len(federated_ds)
+        2
+    """
+    X_train_unbiased_lst = np.array_split(X_train, num_clients)
+    y_train_unbiased_lst = np.array_split(y_train, num_clients)
+
+    unbiased_federated_dataset = [
+        tf.data.Dataset.from_tensor_slices((X_train, y_train))
+        for X_train, y_train in zip(X_train_unbiased_lst, y_train_unbiased_lst)
+    ]
+
+    return unbiased_federated_dataset
+
+
+def create_unbiased_federated_data2(X_train, y_train, num_clients):
+    """
     Create federated data by equally distributing the dataset across multiple clients.
 
     This function shards the given training dataset uniformly across the specified number of clients.
