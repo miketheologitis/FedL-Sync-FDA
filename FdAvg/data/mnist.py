@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from FdAvg.data.preprocessing import (create_unbiased_federated_data, create_biased_federated_data,
-                                      prepare_federated_data)
+                                      prepare_federated_data, create_one_label_biased_federated_data)
 from functools import partial
 import os
 
@@ -53,7 +53,8 @@ def mnist_load_federated_data(num_clients, batch_size, num_steps_until_rtc_check
         num_steps_until_rtc_check (int): The number of batches to take from each client dataset.
         bias (float, optional): The proportion of the data that should be biased. If provided,
             the data will be biased according to this value; otherwise, it will be unbiased.
-            The value should be between 0 and 1. Default is None.
+            The value should be between 0 and 1. Default is None. If -1 given then we create
+            one label biasing. See corresponding comments.
         seed (int, optional): The random seed for shuffling the dataset. Default is None.
 
     Returns:
@@ -65,12 +66,18 @@ def mnist_load_federated_data(num_clients, batch_size, num_steps_until_rtc_check
 
     X_train, y_train, X_test, y_test = mnist_load_data()
 
-    test_ds = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(256)
+    test_ds = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(batch_size)
+
+    create_federated_data_fn = None
 
     if not bias:
         create_federated_data_fn = create_unbiased_federated_data
-    else:
+
+    if bias >= 0:
         create_federated_data_fn = partial(create_biased_federated_data, bias=bias)
+
+    if bias == -1:
+        create_federated_data_fn = create_one_label_biased_federated_data
 
     federated_ds = prepare_federated_data(
         federated_dataset=create_federated_data_fn(X_train, y_train, num_clients),

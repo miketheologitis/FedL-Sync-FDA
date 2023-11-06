@@ -36,7 +36,6 @@ def prepare_federated_data(federated_dataset, batch_size, num_steps_until_rtc_ch
 
 def create_unbiased_federated_data(X_train, y_train, num_clients):
     """
-    TODO: Maybe follow shard keys i % n etc.
     Create federated data by equally distributing the dataset across multiple clients.
 
     This function shards the given training dataset uniformly across the specified number of clients.
@@ -69,46 +68,13 @@ def create_unbiased_federated_data(X_train, y_train, num_clients):
     return unbiased_federated_dataset
 
 
-def create_unbiased_federated_data2(X_train, y_train, num_clients):
-    """
-    Create federated data by equally distributing the dataset across multiple clients.
-
-    This function shards the given training dataset uniformly across the specified number of clients.
-
-    Args:
-        X_train (numpy.ndarray): The training data features.
-        y_train (numpy.ndarray): The training data labels.
-        num_clients (int): The number of clients among which the data should be distributed.
-
-    Returns:
-        list of tf.data.Dataset: A list of TensorFlow Dataset objects. Each dataset in the list corresponds to
-        the data shard for a client. The order of the datasets in the list corresponds to the order of the clients.
-
-    Example:
-        >>> X_train = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
-        >>> y_train = np.array([0, 1, 0, 1])
-        >>> num_clients = 2
-        >>> federated_ds = create_unbiased_federated_data(X_train, y_train, num_clients)
-        >>> len(federated_ds)
-        2
-    """
-    train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train))
-
-    # Shard the data across clients CLIENT LEVEL
-    unbiased_federated_dataset = [
-        train_dataset.shard(num_clients, i)
-        for i in range(num_clients)
-    ]
-
-    return unbiased_federated_dataset
-
-
 def create_biased_federated_data(X_train, y_train, num_clients, bias):
     """
     Create federated data with a specified bias across multiple clients.
 
     This function shards the given training dataset among clients in a way that introduces a specified bias.
-    The bias is applied by sorting the labels and distributing them across the clients unevenly.
+    The bias is applied by sorting the labels and distributing them across the clients evenly. Each clients'
+    dataset is composed of `bias`% of biased samples.
 
     Args:
         X_train (numpy.ndarray): The training data features.
@@ -172,3 +138,41 @@ def create_biased_federated_data(X_train, y_train, num_clients, bias):
         )
 
     return biased_federated_dataset
+
+
+def create_one_label_biased_federated_data(X_train, y_train, num_clients):
+    """
+    Create non-iid federated data with a specific label (0-label) completely non-uniformly distributed (potentially
+    whole samples of said label will go on a few clients only). Almost equal cardinality of each clients' dataset.
+    Rest of dataset is iid (without the zero label examples).
+
+    Args:
+        X_train (numpy.ndarray): The training data features.
+        y_train (numpy.ndarray): The training data labels.
+        num_clients (int): The number of clients among which the data should be distributed.
+
+    Returns:
+        list of tf.data.Dataset: A list of TensorFlow Dataset objects. Each dataset in the list corresponds to
+        the data shard for a client. The order of the datasets in the list corresponds to the order of the clients.
+    """
+
+    X_train_zeros = X_train[y_train == 0]
+    y_train_zeros = y_train[y_train == 0]
+
+    X_train_rest = X_train[y_train != 0]
+    y_train_rest = y_train[y_train != 0]
+
+    X_train_one_label_biased = np.concatenate((X_train_zeros, X_train_rest))
+    y_train_one_label_biased = np.concatenate((y_train_zeros, y_train_rest))
+
+    X_train_one_label_biased_lst = np.array_split(X_train_one_label_biased, num_clients)
+    y_train_one_label_biased_lst = np.array_split(y_train_one_label_biased, num_clients)
+
+    one_label_biased_federated_dataset = []
+
+    for X_train, y_train in zip(X_train_one_label_biased_lst, y_train_one_label_biased_lst):
+        one_label_biased_federated_dataset.append(
+            tf.data.Dataset.from_tensor_slices((X_train, y_train))
+        )
+
+    return one_label_biased_federated_dataset
