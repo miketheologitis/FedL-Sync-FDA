@@ -17,7 +17,8 @@ def ksi_unit(w_t0, w_tminus1):
     """
     if tf.reduce_all(tf.equal(w_t0, w_tminus1)):
         # if equal then ksi becomes a random vector (will only happen in round 1)
-        ksi = tf.random.normal(shape=w_t0.shape)
+        ksi = tf.random.stateless_normal(shape=w_t0.shape, seed=[1, 2])
+
     else:
         ksi = w_t0 - w_tminus1
 
