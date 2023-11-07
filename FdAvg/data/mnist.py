@@ -73,10 +73,10 @@ def mnist_load_federated_data(num_clients, batch_size, num_steps_until_rtc_check
     if not bias:
         create_federated_data_fn = create_unbiased_federated_data
 
-    if bias >= 0:
+    elif bias >= 0:
         create_federated_data_fn = partial(create_biased_federated_data, bias=bias)
 
-    if bias == -1:
+    elif bias == -1:
         create_federated_data_fn = create_one_label_biased_federated_data
 
     federated_ds = prepare_federated_data(
