@@ -77,7 +77,10 @@ def mnist_load_federated_data(num_clients, batch_size, num_steps_until_rtc_check
         create_federated_data_fn = partial(create_biased_federated_data, bias=bias)
 
     elif bias == -1:
-        create_federated_data_fn = create_one_label_biased_federated_data
+        create_federated_data_fn = partial(create_one_label_biased_federated_data, biased_label=0)
+
+    elif bias == -2:
+        create_federated_data_fn = partial(create_one_label_biased_federated_data, biased_label=8)
 
     federated_ds = prepare_federated_data(
         federated_dataset=create_federated_data_fn(X_train, y_train, num_clients),

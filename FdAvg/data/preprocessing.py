@@ -140,9 +140,9 @@ def create_biased_federated_data(X_train, y_train, num_clients, bias):
     return biased_federated_dataset
 
 
-def create_one_label_biased_federated_data(X_train, y_train, num_clients):
+def create_one_label_biased_federated_data(X_train, y_train, num_clients, biased_label):
     """
-    Create non-iid federated data with a specific label (0-label) completely non-uniformly distributed (potentially
+    Create non-iid federated data with a specific label (biased_label) completely non-uniformly distributed (potentially
     whole samples of said label will go on a few clients only). Almost equal cardinality of each clients' dataset.
     Rest of dataset is iid (without the zero label examples).
 
@@ -156,11 +156,11 @@ def create_one_label_biased_federated_data(X_train, y_train, num_clients):
         the data shard for a client. The order of the datasets in the list corresponds to the order of the clients.
     """
 
-    X_train_zeros = X_train[y_train == 0]
-    y_train_zeros = y_train[y_train == 0]
+    X_train_zeros = X_train[y_train == biased_label]
+    y_train_zeros = y_train[y_train == biased_label]
 
-    X_train_rest = X_train[y_train != 0]
-    y_train_rest = y_train[y_train != 0]
+    X_train_rest = X_train[y_train != biased_label]
+    y_train_rest = y_train[y_train != biased_label]
 
     X_train_one_label_biased = np.concatenate((X_train_zeros, X_train_rest))
     y_train_one_label_biased = np.concatenate((y_train_zeros, y_train_rest))
