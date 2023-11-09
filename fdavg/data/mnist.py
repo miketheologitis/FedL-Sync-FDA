@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from FdAvg.data.preprocessing import (create_unbiased_federated_data, create_biased_federated_data,
+from fdavg.data.preprocessing import (create_unbiased_federated_data, create_biased_federated_data,
                                       prepare_federated_data, create_one_label_biased_federated_data)
 from functools import partial
 import os

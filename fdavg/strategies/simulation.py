@@ -1,12 +1,12 @@
 from math import sqrt
 
-from FdAvg.metrics.epoch_metrics import TestId, process_metrics_with_test_id
-from FdAvg.models.miscellaneous import count_weights
-from FdAvg.strategies.naive import naive_federated_simulation
-from FdAvg.strategies.linear import linear_federated_simulation
-from FdAvg.strategies.sketch import sketch_federated_simulation, AmsSketch
-from FdAvg.strategies.synchronous import synchronous_federated_simulation
-from FdAvg.strategies.gm import gm_federated_simulation
+from fdavg.metrics.epoch_metrics import TestId, process_metrics_with_test_id
+from fdavg.models.miscellaneous import count_weights
+from fdavg.strategies.naive import naive_federated_simulation
+from fdavg.strategies.linear import linear_federated_simulation
+from fdavg.strategies.sketch import sketch_federated_simulation, AmsSketch
+from fdavg.strategies.synchronous import synchronous_federated_simulation
+from fdavg.strategies.gm import gm_federated_simulation
 
 
 def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_clients, batch_size,

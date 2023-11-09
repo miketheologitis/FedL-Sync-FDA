@@ -37,10 +37,10 @@ if __name__ == '__main__':
     import time
     import pandas as pd
 
-    from FdAvg.strategies.simulation import single_simulation
-    from FdAvg.utils.read_combinations import get_test_hyper_parameters
-    from FdAvg.utils.pretty_printers import print_finish_testing_info, print_current_test_info
-    from FdAvg.utils.parameter_tools import derive_params
+    from fdavg.strategies.simulation import single_simulation
+    from fdavg.utils.read_combinations import get_test_hyper_parameters
+    from fdavg.utils.pretty_printers import print_finish_testing_info, print_current_test_info
+    from fdavg.utils.parameter_tools import derive_params
 
     hyperparameters = get_test_hyper_parameters(f'{args.comb_file_id}', args.sim_id)
 

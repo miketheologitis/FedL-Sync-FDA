@@ -1,6 +1,6 @@
-from FdAvg.data.mnist import MNIST_N_TRAIN, MNIST_CNN_BATCH_INPUT, MNIST_CNN_INPUT_RESHAPE, mnist_load_federated_data
-from FdAvg.models.lenet5 import get_compiled_and_built_lenet
-from FdAvg.models.advanced_cnn import get_compiled_and_built_advanced_cnn
+from fdavg.data.mnist import MNIST_N_TRAIN, MNIST_CNN_BATCH_INPUT, MNIST_CNN_INPUT_RESHAPE, mnist_load_federated_data
+from fdavg.models.lenet5 import get_compiled_and_built_lenet
+from fdavg.models.advanced_cnn import get_compiled_and_built_advanced_cnn
 
 from functools import partial
 

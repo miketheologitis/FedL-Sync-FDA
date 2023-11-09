@@ -42,7 +42,7 @@ if __name__ == '__main__':
     for sim_id in range(starting_sim_id, starting_sim_id + args.n_sims):
         # Construct the command
         cmd = [
-            'python', '-u', '-m', 'FdAvg.main', f'--comb_file_id={args.comb_file_id}',
+            'python', '-u', '-m', 'fdavg.main', f'--comb_file_id={args.comb_file_id}',
             f'--sim_id={sim_id}', f'--gpu_id={next(gpu_id_generator)}',
             f'--gpu_mem={args.gpu_mem}', '--slurm'
         ]

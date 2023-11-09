@@ -1,18 +1,40 @@
 import tensorflow as tf
+import numpy as np
 
-from FdAvg.metrics.epoch_metrics import EpochMetrics
-from FdAvg.models.miscellaneous import average_client_weights, current_accuracy, synchronize_clients
+from fdavg.metrics.epoch_metrics import EpochMetrics
+from fdavg.models.miscellaneous import average_client_weights, current_accuracy, synchronize_clients
 
 
 class AmsSketch:
-    """ 
+    """
     AMS Sketch class for approximate second moment estimation.
     """
-        
-    def __init__(self, depth=7, width=1500):
-        self.depth = depth
-        self.width = width
+
+    def __init__(self, depth=5, width=250):
+        self.depth = tf.constant(depth)
+        self.width = tf.constant(width)
         self.F = tf.random.uniform(shape=(6, depth), minval=0, maxval=(1 << 31) - 1, dtype=tf.int32)
+        self.zeros_sketch = tf.zeros(shape=(self.depth, self.width), dtype=tf.float32)
+
+        self.precomputed_dict = {}
+
+    def precompute(self, d):
+        pos_tensor = self.tensor_hash31(tf.range(d), self.F[0], self.F[1]) % self.width  # shape=(d, 5)
+
+        self.precomputed_dict[('four', d)] = tf.cast(self.tensor_fourwise(tf.range(d)),
+                                                     dtype=tf.float32)  # shape=(d, 5)
+
+        range_tensor = tf.range(self.depth)  # shape=(5,)
+
+        # Expand dimensions to create a 2D tensor with shape (1, `self.depth`)
+        range_tensor_expanded = tf.expand_dims(range_tensor, 0)  # shape=(1, 5)
+
+        # Use tf.tile to repeat the range `d` times
+        repeated_range_tensor = tf.tile(range_tensor_expanded, [d, 1])  # shape=(d, 5)
+
+        # shape=(`d`, `self.depth`, 2)
+        self.precomputed_dict[('indices', d)] = tf.stack([repeated_range_tensor, pos_tensor],
+                                                         axis=-1)  # shape=(d, 5, 2)
 
     @staticmethod
     def hash31(x, a, b):
@@ -31,29 +53,30 @@ class AmsSketch:
         r = tf.multiply(a, x_reshaped) + b
 
         fold = tf.bitwise.bitwise_xor(tf.bitwise.right_shift(r, 31), r)
-        
+
         return tf.bitwise.bitwise_and(fold, 2147483647)
 
     def tensor_fourwise(self, x):
         """ Assumed that x is tensor shaped (d,) , i.e., a vector (for example, indices, i.e., tf.range(d)) """
+
         # 1st use the tensor hash31
         in1 = self.tensor_hash31(x, self.F[2], self.F[3])  # shape = (`x_dim`,  `self.depth`)
-        
+
         # 2st use the tensor hash31
         in2 = self.tensor_hash31(x, in1, self.F[4])  # shape = (`x_dim`,  `self.depth`)
-        
+
         # 3rd use the tensor hash31
         in3 = self.tensor_hash31(x, in2, self.F[5])  # shape = (`x_dim`,  `self.depth`)
-        
+
         in4 = tf.bitwise.bitwise_and(in3, 32768)  # shape = (`x_dim`,  `self.depth`)
-        
+
         return 2 * (tf.bitwise.right_shift(in4, 15)) - 1  # shape = (`x_dim`,  `self.depth`)
 
     def fourwise(self, x):
-        result = 2 * (tf.bitwise.right_shift(tf.bitwise.bitwise_and(self.hash31(self.hash31(self.hash31(x, self.F[2], self.F[3]), x, self.F[4]), x, self.F[5]), 32768), 15)) - 1
+        result = 2 * (tf.bitwise.right_shift(tf.bitwise.bitwise_and(
+            self.hash31(self.hash31(self.hash31(x, self.F[2], self.F[3]), x, self.F[4]), x, self.F[5]), 32768), 15)) - 1
         return result
 
-    @tf.function
     def sketch_for_vector(self, v):
         """ Extremely efficient computation of sketch with only using tensors.
 
@@ -63,30 +86,23 @@ class AmsSketch:
         Returns:
         - tf.Tensor: An AMS - Sketch. Shape=(`depth`, `width`).
         """
-        
-        sketch = tf.zeros(shape=(self.depth, self.width), dtype=tf.float32)
-        
-        len_v = v.shape[0]
-        
-        pos_tensor = self.tensor_hash31(tf.range(len_v), self.F[0], self.F[1]) % self.width
-        
-        v_expand = tf.expand_dims(v, axis=-1)
-        
-        deltas_tensor = tf.multiply(tf.cast(self.tensor_fourwise(tf.range(len_v)), dtype=tf.float32), v_expand)
-        
-        range_tensor = tf.range(self.depth)
-        
-        # Expand dimensions to create a 2D tensor with shape (1, `self.depth`)
-        range_tensor_expanded = tf.expand_dims(range_tensor, 0)
 
-        # Use tf.tile to repeat the range `len_v` times
-        repeated_range_tensor = tf.tile(range_tensor_expanded, [len_v, 1])
-        
-        # shape=(`len_v`, `self.depth`, 2)
-        indices = tf.stack([repeated_range_tensor, pos_tensor], axis=-1)
-        
-        sketch = tf.tensor_scatter_nd_add(sketch, indices, deltas_tensor)
-        
+        d = v.shape[0]
+
+        if ('four', d) not in self.precomputed_dict:
+            self.precompute(d)
+
+        return self._sketch_for_vector(v, self.precomputed_dict[('four', d)], self.precomputed_dict[('indices', d)])
+
+    @tf.function
+    def _sketch_for_vector(self, v, four, indices):
+        v_expand = tf.expand_dims(v, axis=-1)  # shape=(d, 1)
+
+        # shape=(d, 5): +- for each value v_i , i = 1, ..., d
+        deltas_tensor = tf.multiply(four, v_expand)
+
+        sketch = tf.tensor_scatter_nd_add(self.zeros_sketch, indices, deltas_tensor)  # shape=(5, 250)
+
         return sketch
 
     @staticmethod
@@ -100,20 +116,9 @@ class AmsSketch:
         - tf.Tensor: Estimated squared Euclidean norm.
         """
 
-        def _median(v):
-            """ Median of tensor `v` with shape=(n,). Note: Suboptimal O(nlogn) but it's ok bcz n = `depth`"""
-            length = tf.shape(v)[0]
-            sorted_v = tf.sort(v)
-            middle = length // 2
+        norm_sq_rows = tf.reduce_sum(tf.square(sketch), axis=1)
+        return np.median(norm_sq_rows)
 
-            return tf.cond(
-                tf.equal(length % 2, 0),
-                lambda: (sorted_v[middle - 1] + sorted_v[middle]) / 2.0,
-                lambda: sorted_v[middle]
-            )
-
-        return _median(tf.reduce_sum(tf.square(sketch), axis=1))
-    
 
 def client_train_sketch(w_t0, client_cnn, client_dataset, ams_sketch):
     """

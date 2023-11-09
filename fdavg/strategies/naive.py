@@ -1,7 +1,7 @@
 import tensorflow as tf
 
-from FdAvg.metrics.epoch_metrics import EpochMetrics
-from FdAvg.models.miscellaneous import average_client_weights, current_accuracy, synchronize_clients
+from fdavg.metrics.epoch_metrics import EpochMetrics
+from fdavg.models.miscellaneous import average_client_weights, current_accuracy, synchronize_clients
 
 
 def client_train_naive(w_t0, client_cnn, client_dataset):
