@@ -17,6 +17,7 @@ TestId namedtuple:
 Attributes:
     - dataset_name (str): Name of the dataset used.
     - bias (float): Bias parameter for the Fed dataset.
+    - aggr_scheme (str): Aggregation scheme, 'avg', 'wavg_drifts'
     - fda_name (str): FDA method name.
     - num_clients (int): Number of clients in the federated network.
     - batch_size (int): Batch size for training.
@@ -29,8 +30,8 @@ Attributes:
 # Define a named tuple to represent test IDs for different experiments.
 TestId = namedtuple(
         'TestId',
-        ["dataset_name", "bias", "fda_name", "num_clients", "batch_size", "num_steps_until_rtc_check",
-         "theta", "nn_name", "nn_num_weights", "sketch_width", "sketch_depth"]
+        ["dataset_name", "bias", "aggr_scheme", "fda_name", "num_clients", "batch_size",
+         "num_steps_until_rtc_check", "theta", "nn_name", "nn_num_weights", "sketch_width", "sketch_depth"]
 )
 
 # Extend the EpochMetrics and RoundMetrics namedtuples to include TestId.

@@ -1,7 +1,8 @@
 import tensorflow as tf
 
 from fdavg.metrics.epoch_metrics import EpochMetrics
-from fdavg.models.miscellaneous import average_client_weights, current_accuracy, synchronize_clients
+from fdavg.models.miscellaneous import (average_client_weights, weighted_average_client_weights,
+                                        current_accuracy, synchronize_clients)
 
 
 def client_train_gm(w_t0, client_cnn, client_dataset):
@@ -69,7 +70,7 @@ def f_gm(S_i_clients):
 
 
 def gm_federated_simulation(test_dataset, federated_dataset, server_cnn, client_cnns, num_epochs, theta,
-                            fda_steps_in_one_epoch, compile_and_build_model_func):
+                            fda_steps_in_one_epoch, compile_and_build_model_func, aggr_scheme):
     """
     Run a federated learning simulation using the Geometric (kamp) method and collect general and time-series metrics.
 
@@ -82,6 +83,7 @@ def gm_federated_simulation(test_dataset, federated_dataset, server_cnn, client_
     - theta (float): The threshold for the variance of the update vectors.
     - fda_steps_in_one_epoch (int): The number of FDA steps in one epoch.
     - compile_and_build_model_func (function): Function to compile and build the model.
+    - aggr_scheme (string): 'avg' (averaging), 'wavg_drift' weighted-average with drifts squared
 
     Returns:
     - epoch_metrics_list (list): A list of EpochMetrics namedtuples, storing metrics per epoch.
@@ -106,15 +108,17 @@ def gm_federated_simulation(test_dataset, federated_dataset, server_cnn, client_
     # Initialize lists for storing metrics
     epoch_metrics_list = []
 
+    euc_norm_squared_clients = None
+
     while epoch_count <= num_epochs:
 
         # Continue training until estimated variance crosses the threshold
         while est_var <= theta:
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
-            Delta_i_euc_norm_squared = clients_train_gm(w_t0, client_cnns, federated_dataset)
+            euc_norm_squared_clients = clients_train_gm(w_t0, client_cnns, federated_dataset)
 
             # gm estimation of variance
-            est_var = f_gm(Delta_i_euc_norm_squared).numpy()
+            est_var = f_gm(euc_norm_squared_clients).numpy()
 
             tmp_fda_steps += 1
             total_fda_steps += 1
@@ -142,7 +146,15 @@ def gm_federated_simulation(test_dataset, federated_dataset, server_cnn, client_
         # Round finished
 
         # server average
-        server_cnn.set_trainable_variables(average_client_weights(client_cnns))
+        if aggr_scheme == 'avg':
+            server_cnn.set_trainable_variables(average_client_weights(client_cnns))
+        elif aggr_scheme == 'wavg_drifts':
+            sum_delta_i = tf.reduce_sum(euc_norm_squared_clients)
+            weights = [tf.divide(delta_i_sq, sum_delta_i) for delta_i_sq in euc_norm_squared_clients]
+            server_cnn.set_trainable_variables(weighted_average_client_weights(client_cnns, weights))
+        else:
+            print("Unrecognized aggregation scheme")
+            return
 
         w_t0 = server_cnn.trainable_vars_as_vector()
 

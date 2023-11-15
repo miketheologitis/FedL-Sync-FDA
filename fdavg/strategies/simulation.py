@@ -11,7 +11,7 @@ from fdavg.strategies.gm import gm_federated_simulation
 
 def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_clients, batch_size,
                       num_steps_until_rtc_check, num_epochs, compile_and_build_model_fn, nn_name, theta=0.,
-                      bias=None, seed=None, bench_test=False, **kwargs):
+                      bias=None, seed=None, bench_test=False, aggr_scheme='avg', **kwargs):
     """
     Run a single federated learning simulation based on the given FDA method name.
     
@@ -30,6 +30,7 @@ def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_cl
         bias (float, optional): Bias parameter for the Fed dataset. Defaults to None.
         seed (int, optional): Random seed the shuffling of the Fed dataset. Defaults to None.
         bench_test (bool, optional): Whether the function is being used for a benchmark test. Defaults to False.
+        aggr_scheme (str): either averaging 'avg', or weighted average with drifts 'wavg_drifts'
 
     Returns:
         tuple: A tuple containing two lists:
@@ -62,26 +63,27 @@ def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_cl
     if fda_name == "naive":
         epoch_metrics_list = naive_federated_simulation(
             test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta,
-            fda_steps_in_one_epoch, compile_and_build_model_fn
+            fda_steps_in_one_epoch, compile_and_build_model_fn, aggr_scheme
         )
     
     if fda_name == "linear":  
         epoch_metrics_list = linear_federated_simulation(
             test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta,
-            fda_steps_in_one_epoch, compile_and_build_model_fn
+            fda_steps_in_one_epoch, compile_and_build_model_fn, aggr_scheme
         )
     
     if fda_name == "sketch":
         sketch_width, sketch_depth = 250, 5
         epoch_metrics_list = sketch_federated_simulation(
             test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta, fda_steps_in_one_epoch,
-            compile_and_build_model_fn, AmsSketch(width=sketch_width, depth=sketch_depth), 1. / sqrt(sketch_width)
+            compile_and_build_model_fn, AmsSketch(width=sketch_width, depth=sketch_depth), 1. / sqrt(sketch_width),
+            aggr_scheme
         )
 
     if fda_name == "gm":
         epoch_metrics_list = gm_federated_simulation(
             test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta,
-            fda_steps_in_one_epoch, compile_and_build_model_fn
+            fda_steps_in_one_epoch, compile_and_build_model_fn, aggr_scheme
         )
         
     if fda_name == "synchronous":
@@ -92,7 +94,7 @@ def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_cl
 
     # 5. Create Test ID
     test_id = TestId(
-        ds_name, bias, fda_name, num_clients, batch_size, num_steps_until_rtc_check, theta, nn_name,
+        ds_name, bias, aggr_scheme, fda_name, num_clients, batch_size, num_steps_until_rtc_check, theta, nn_name,
         count_weights(server_cnn), sketch_width, sketch_depth
     )
 

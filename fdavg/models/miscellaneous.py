@@ -64,15 +64,13 @@ def count_weights(model):
 
 def current_accuracy(client_models, test_dataset, compile_and_build_model_func):
     """
-    Compute the current test accuracy using averaged client model weights.
+    Compute the current test accuracy with the specific models weights.
 
     This function takes a list of client models, averages their trainable parameters,
     and then evaluates the test accuracy on a given test dataset using these averaged parameters.
 
     Args:
-    - client_models (list of objects): A list of objects representing the client models. Each object is expected
-      to have an attribute `trainable_variables` that returns a list of `tf.Variable` objects representing the
-      trainable parameters of the model.
+    - model_weights (list of tf.Tensor): The current model parameters.
     - test_dataset (tf.data.Dataset): A TensorFlow Dataset object representing the test data.
       Each element of the dataset is expected to be a batch containing:
         - A 3D tensor of shape (batch_size, 28, 28), representing a batch of grayscale images.
@@ -130,6 +128,52 @@ def average_client_weights(client_models):
     ]
 
     return avg_weights
+
+
+def weighted_average_client_weights(client_models, weights):
+    """
+    Compute the weighted average of the trainable parameters across multiple client models.
+
+    This function takes a list of client models and their associated weights, and calculates the weighted
+    average of their trainable parameters. The averaging is done layer-wise, meaning that the weighted
+    average for each layer is computed separately and then returned as a list of weighted average weights
+    for each layer.
+
+    Args:
+    - client_models (list of objects): A list of objects representing the client models. Each object
+      is expected to have an attribute `trainable_variables` that returns a list of `tf.Variable` objects
+      representing the trainable parameters of the model.
+    - weights (list of tf.Tensor floats, i.e., shape=()): A list of weights, each corresponding to a client model in
+      `client_models`. These weights are used to calculate the weighted average of the model parameters. The length
+      of this list should match the number of client models.
+
+    Returns:
+    - weighted_avg_weights (list of tf.Tensor): A list of tensors representing the weighted average weights
+      of the trainable parameters of the client models. Each tensor in the list corresponds to the weighted
+      average weight for a specific layer.
+
+    Example:
+    If client_models[0].trainable_variables = [W1, b1, W2, b2], where W1, b1, W2, b2 are tensors, and
+    weights = [0.3, 0.7], then weighted_avg_weights = [weighted_avg_W1, weighted_avg_b1, weighted_avg_W2,
+    weighted_avg_b2], where weighted_avg_W1, weighted_avg_b1, weighted_avg_W2, weighted_avg_b2 are the
+    weighted average weights for each corresponding layer, with the weights applied accordingly.
+    """
+    def scale_layer_weights(_layer_weight_tensors, _weights):
+        # Scale each tensor by its corresponding weight
+        scaled_weights = [tensor * weight for tensor, weight in zip(_layer_weight_tensors, _weights)]
+
+        return scaled_weights
+
+    # Retrieve the trainable variables from each client model
+    client_weights = [model.trainable_variables for model in client_models]
+
+    # Compute the average weights for each layer
+    weighted_avg_weights = [
+        tf.reduce_sum(scale_layer_weights(layer_weight_tensors, weights), axis=0)
+        for layer_weight_tensors in zip(*client_weights)
+    ]
+
+    return weighted_avg_weights
 
 
 def synchronize_clients(server_model, client_models):

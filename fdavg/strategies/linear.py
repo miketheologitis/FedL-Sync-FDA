@@ -1,7 +1,8 @@
 import tensorflow as tf
 
 from fdavg.metrics.epoch_metrics import EpochMetrics
-from fdavg.models.miscellaneous import average_client_weights, current_accuracy, synchronize_clients
+from fdavg.models.miscellaneous import (average_client_weights, weighted_average_client_weights,
+                                        current_accuracy, synchronize_clients)
 
 
 def ksi_unit(w_t0, w_tminus1):
@@ -105,7 +106,7 @@ def f_linear(euc_norm_squared_clients, ksi_delta_clients):
 
 
 def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, client_cnns, num_epochs, theta, 
-                                fda_steps_in_one_epoch, compile_and_build_model_func):
+                                fda_steps_in_one_epoch, compile_and_build_model_func, aggr_scheme):
     """
     Run a federated learning simulation using the Linear FDA method. 
     Collects both general and time-series-like metrics.
@@ -142,6 +143,8 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
     
     # Initialize lists for storing metrics
     epoch_metrics_list = []
+
+    euc_norm_squared_clients = None
     
     while epoch_count <= num_epochs:
         
@@ -181,8 +184,16 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         
         # Round finished
 
-        # server average
-        server_cnn.set_trainable_variables(average_client_weights(client_cnns))
+        # aggregation
+        if aggr_scheme == 'avg':
+            server_cnn.set_trainable_variables(average_client_weights(client_cnns))
+        elif aggr_scheme == 'wavg_drifts':
+            sum_delta_i = tf.reduce_sum(euc_norm_squared_clients)
+            weights = [tf.divide(delta_i_sq, sum_delta_i) for delta_i_sq in euc_norm_squared_clients]
+            server_cnn.set_trainable_variables(weighted_average_client_weights(client_cnns, weights))
+        else:
+            print("Unrecognized aggregation scheme")
+            return
 
         w_tminus1 = w_t0
         w_t0 = server_cnn.trainable_vars_as_vector()

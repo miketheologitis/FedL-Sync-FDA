@@ -31,6 +31,7 @@ def create_combinations(args):
         "fda_name": args.fda,
         "batch_size": args.b,
         "theta": args.th,
+        "aggr_scheme": args.aggr_scheme,
         "num_steps_until_rtc_check": [1],
         "num_clients": args.num_clients
     }
@@ -45,6 +46,7 @@ def create_combinations(args):
             f"{combination['nn_name'].replace('-', '')}_{combination['fda_name']}_b{combination['batch_size']}"
             f"_c{combination['num_clients']}_t{str(combination['theta']).replace('.','')}"
             f"_bias{str(combination['bias']).replace('.','')}"
+            f"_{combination['aggr_scheme'].replace('_', '')}"
         )
         combination["bench_test"] = args.test
         combination["num_epochs"] = args.e
@@ -52,14 +54,16 @@ def create_combinations(args):
     if not args.append_to:
         with open(f'{os.path.join(script_directory, f"{tmp_dir}/combinations")}/{args.comb_file_id}.json', 'w') as f:
             json.dump(combinations, f)
-            print(f"OK! Created {len(combinations)} combinations, i.e., `n_sims` = {len(combinations)}.")
+            print(f"OK! Created {len(combinations)} combinations in {args.comb_file_id}.json, "
+                  f"i.e., `n_sims` = {len(combinations)}.")
     else:
         with open(f'{os.path.join(script_directory, f"{tmp_dir}/combinations")}/{args.comb_file_id}.json', 'r') as f:
             old_combinations = json.load(f)
         old_combinations.extend(combinations)
         with open(f'{os.path.join(script_directory, f"{tmp_dir}/combinations")}/{args.comb_file_id}.json', 'w') as f:
             json.dump(old_combinations, f)
-            print(f"OK! Appended {len(combinations)} combinations, i.e., `n_sims` = {len(old_combinations)}.")
+            print(f"OK! Appended {len(combinations)} combinations in {args.comb_file_id}.json,"
+                  f" i.e., `n_sims` = {len(old_combinations)}.")
 
 
 if __name__ == '__main__':
@@ -74,7 +78,9 @@ if __name__ == '__main__':
     parser.add_argument('--nn', nargs='+', type=str, help="The CNN name(s) ('LeNet-5' , 'AdvancedCNN')", required=True)
     parser.add_argument('--th', nargs='+', type=float, help="Theta threshold(s).", required=True)
     parser.add_argument('--num_clients', nargs='+', type=int, help="Number of clients.",
-                        default=[5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60])
+                        default=[60, 55, 5, 10, 50, 45, 40, 35, 15, 20, 30, 25])
+    parser.add_argument('--aggr_scheme', nargs='+', type=str,
+                        help="Aggregation schemes (e.g., 'avg', 'wavg_drifts')", default=['avg'])
     parser.add_argument('--append_to', action='store_true',
                         help="If given, then we append to the comb file.")
     parser.add_argument('--test', action='store_true', help="If given, then we bench test.")
