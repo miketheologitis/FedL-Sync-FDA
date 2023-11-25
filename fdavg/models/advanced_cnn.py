@@ -138,6 +138,30 @@ class AdvancedCNN(tf.keras.Model):
         - tf.Tensor: A 1D tensor containing all of the model's trainable variables.
         """
         return tf.concat([tf.reshape(var, [-1]) for var in self.trainable_variables], axis=0)
+
+    def per_layer_trainable_vars_as_vector(self):
+
+        layer_vectors = [
+            tf.concat([tf.reshape(var, [-1]) for var in layer.trainable_weights], axis=0)
+            for layer in self.layers
+            if layer.trainable_weights
+        ]
+
+        return layer_vectors
+
+    def set_layer_weights(self, layer_i, weights):
+
+        for model_var, var in zip(self.layers[layer_i].trainable_weights, weights):
+            model_var.assign(var)
+
+    def get_trainable_layers_indices(self):
+
+        trainable_layers_idx = [
+            i for i, layer in enumerate(self.layers)
+            if layer.trainable_weights
+        ]
+
+        return trainable_layers_idx
     
 
 def get_compiled_and_built_advanced_cnn(cnn_batch_input, cnn_input_reshape, num_classes):

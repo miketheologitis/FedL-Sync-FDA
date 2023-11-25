@@ -176,6 +176,17 @@ def weighted_average_client_weights(client_models, weights):
     return weighted_avg_weights
 
 
+def avg_client_layer_weights(layer_i, client_models):
+    client_layer_weights = [model.layers[layer_i].trainable_weights for model in client_models]
+
+    avg_layer_weights = [
+        tf.reduce_mean(layer_vars, axis=0)
+        for layer_vars in zip(*client_layer_weights)
+    ]
+
+    return avg_layer_weights
+
+
 def synchronize_clients(server_model, client_models):
     """
     Synchronize the trainable parameters of client models with those of a server model.

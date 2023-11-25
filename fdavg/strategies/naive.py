@@ -2,7 +2,7 @@ import tensorflow as tf
 
 from fdavg.metrics.epoch_metrics import EpochMetrics
 from fdavg.models.miscellaneous import (average_client_weights, weighted_average_client_weights,
-                                        current_accuracy, synchronize_clients)
+                                        current_accuracy, synchronize_clients, avg_client_layer_weights)
 
 
 def client_train_naive(w_t0, client_cnn, client_dataset):
@@ -63,9 +63,9 @@ def f_naive(S_i_clients):
     Returns:
     - tf.Tensor: Naive variance approximation. Shape=(), dtype=tf.float32.
     """
-    
+
     S = tf.reduce_mean(S_i_clients)
-    
+
     return S
 
 
@@ -164,4 +164,182 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
         total_rounds += 1
         
     return epoch_metrics_list
-                
+
+
+def client_train_naive_per_layer(w_t0, client_cnn, client_dataset):
+    """
+    Trains a single client model and returns the square of the Euclidean norm of the update vector.
+
+    Args:
+    - w_t0 (list): List of the initial per-layer model parameters as a vector.
+    - client_cnn (object): The client's CNN model.
+    - client_dataset (tf.data.Dataset): The dataset on which the client model will be trained.
+
+    Returns:
+    - list: The square of the Euclidean norm of the update vector per-layer. Each one with Shape=(), dtype=tf.float32.
+    """
+
+    # number of steps depend on `.take()` from `dataset`
+    client_cnn.train(client_dataset)
+
+    deltas = [curr_w - w for curr_w, w in zip(client_cnn.per_layer_trainable_vars_as_vector(), w_t0)]
+
+    # list of ||D(t)_i||^2 , shape = ()
+    deltas_squared = [tf.reduce_sum(tf.square(v)) for v in deltas]  # ||D(t)_i||^2
+
+    return deltas_squared
+
+
+def clients_train_naive_per_layer(w_t0, client_cnns, federated_dataset):
+    """
+    Trains multiple client models and returns the squares of the Euclidean norms of their update vectors.
+
+    Args:
+    - w_t0 (list): List of the initial per-layer model parameters as a vector.
+    - client_cnns (list): A list of client CNN models.
+    - federated_dataset (list of tf.data.Dataset): A list of datasets for the client models.
+
+    Returns:
+    - list(list): A list of a list of tensors. Each i-th inner list represents the square of the Euclidean norm of the
+        drift vector for each layer of the i-th client.
+    """
+
+    S_i_clients = []
+
+    for client_cnn, client_dataset in zip(client_cnns, federated_dataset):
+        Delta_i_euc_norm_squared = client_train_naive_per_layer(w_t0, client_cnn, client_dataset)
+        S_i_clients.append(Delta_i_euc_norm_squared)
+
+    return S_i_clients
+
+
+def f_naive_per_layer(S_i_clients):
+    """
+    Calculates the naive approximation of the variance based on the squares of the Euclidean
+    norms of the update vectors.
+
+    Args:
+    - S_i_clients list(list): A list of a list of tensors. Each i-th inner list represents the square of the Euclidean
+        norm of the drift vector for each layer of the i-th client.
+
+    Returns:
+    - list(tf.Tensor): Per-layer naive variance approximation. Shape=(), dtype=tf.float32.
+    """
+
+    S = [
+        tf.reduce_mean(s_per_payer) for s_per_payer in zip(*S_i_clients)
+    ]
+
+    return S
+
+
+def naive_federated_simulation_per_layer(test_dataset, federated_dataset, server_cnn, client_cnns, num_epochs, thetas,
+                                         fda_steps_in_one_epoch, compile_and_build_model_func, aggr_scheme):
+    """
+    Run a federated learning simulation using the Naive FDA method and collect general and time-series metrics.
+
+    Args:
+    - test_dataset (tf.data.Dataset): The dataset for evaluating the model's performance.
+    - federated_dataset (list of tf.data.Dataset): A list of datasets for the client models.
+    - server_cnn (object): The server's CNN model.
+    - client_cnns (list): A list of client CNN models.
+    - num_epochs (int): The number of epochs to run the simulation for.
+    - thetas (list): A list of floats, thresholds for each layer
+    - fda_steps_in_one_epoch (int): The number of FDA steps in one epoch.
+    - compile_and_build_model_func (function): Function to compile and build the model.
+
+    Returns:
+    - epoch_metrics_list (list): A list of EpochMetrics namedtuples, storing metrics per epoch.
+
+    Note:
+    - We consider an FDA step to be a single update from each client.
+    - The function also outputs the metrics at the end of each epoch and round for monitoring.
+    """
+    num_clients = len(client_cnns)
+    trainable_layers_indices = server_cnn.get_trainable_layers_indices()
+
+    # Initialize counters and metrics lists
+    tmp_fda_steps = 0  # Counter for FDA steps within an epoch
+    epoch_count = 1  # Current epoch number
+    total_rounds = [1] * num_clients  # Total number of rounds completed
+    total_fda_steps = 0  # Total number of FDA steps taken
+    est_var = [0] * num_clients  # Estimated variance
+
+    synchronize_clients(server_cnn, client_cnns)
+
+    # List of per-layer vectors
+    w_t0 = server_cnn.per_layer_trainable_vars_as_vector()
+
+    # Initialize lists for storing metrics
+    epoch_metrics_list = []
+
+    euc_norm_squared_clients = None
+
+    while epoch_count <= num_epochs:
+
+        # Continue training until any per-layer estimated variance crosses the threshold
+        while all([est <= var for est, var in zip(est_var, thetas)]):
+            # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
+            euc_norm_squared_clients = clients_train_naive_per_layer(w_t0, client_cnns, federated_dataset)
+
+            # Naive estimation of variance
+            est_var = [est.numpy() for est in f_naive_per_layer(euc_norm_squared_clients)]
+
+            tmp_fda_steps += 1
+            total_fda_steps += 1
+
+            # If Epoch has passed in this fda step
+            if tmp_fda_steps >= fda_steps_in_one_epoch:
+
+                # Minus here and not `tmp_fda_steps = 0` because `fda_steps_in_one_epoch` is not an integer necessarily
+                # and we need to keep track of potentially more data seen in this fda step
+                # (many clients, large batch sizes)
+                tmp_fda_steps -= fda_steps_in_one_epoch
+
+                # ---------- Metrics ------------
+                acc = current_accuracy(client_cnns, test_dataset, compile_and_build_model_func)
+                epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc)
+                epoch_metrics_list.append(epoch_metrics)
+                print(epoch_metrics)  # remove
+                # -------------------------------
+
+                epoch_count += 1
+
+                if epoch_count > num_epochs:
+                    break
+
+        # Round finished
+
+        # aggregation
+        # TODO: Check complicated logic. Is this necessary? (we use i later on). I think it is ok
+        if aggr_scheme == 'avg':
+            layer_index_avg_weights = [
+                (i, layer_i, avg_client_layer_weights(layer_i, client_cnns)) for i, (layer_i, need_sync) in
+                enumerate(zip(trainable_layers_indices, [est <= var for est, var in zip(est_var, thetas)]))
+                if need_sync
+            ]
+        else:
+            print("Unrecognized aggregation scheme")
+            return
+
+        # Server Update (only needed layers)
+        # Here we only change the layers of the server_cnn that need synchronization. Hence, the old w_t0 is updated
+        # correctly if we again request the per-layer vectors. The un-synchronized vectors will remain of
+        # course the same.
+        for _, layer_i, layer_weights in layer_index_avg_weights:
+            server_cnn.set_layer_weights(layer_i, layer_weights)
+
+        w_t0 = server_cnn.per_layer_trainable_vars_as_vector()
+
+        # TODO: Check logic
+        # clients sync
+        for _, layer_i, layer_weights in layer_index_avg_weights:
+            for client_cnn in client_cnns:
+                client_cnn.set_layer_weights(layer_i, layer_weights)
+
+        # TODO: Check logic
+        for i, _, _ in layer_index_avg_weights:
+            est_var[i] = 0
+            total_rounds[i] += 1
+
+    return epoch_metrics_list
