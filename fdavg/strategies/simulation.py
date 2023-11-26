@@ -2,7 +2,7 @@ from math import sqrt
 
 from fdavg.metrics.epoch_metrics import TestId, process_metrics_with_test_id
 from fdavg.models.miscellaneous import count_weights
-from fdavg.strategies.naive import naive_federated_simulation
+from fdavg.strategies.naive import naive_federated_simulation, naive_federated_simulation_per_layer
 from fdavg.strategies.linear import linear_federated_simulation
 from fdavg.strategies.sketch import sketch_federated_simulation, AmsSketch
 from fdavg.strategies.synchronous import synchronous_federated_simulation
@@ -11,7 +11,7 @@ from fdavg.strategies.gm import gm_federated_simulation
 
 def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_clients, batch_size,
                       num_steps_until_rtc_check, num_epochs, compile_and_build_model_fn, nn_name, theta=0.,
-                      bias=None, seed=None, bench_test=False, aggr_scheme='avg', **kwargs):
+                      bias=None, seed=None, bench_test=False, aggr_scheme='avg', per_layer=False, **kwargs):
     """
     Run a single federated learning simulation based on the given FDA method name.
     
@@ -31,6 +31,8 @@ def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_cl
         seed (int, optional): Random seed the shuffling of the Fed dataset. Defaults to None.
         bench_test (bool, optional): Whether the function is being used for a benchmark test. Defaults to False.
         aggr_scheme (str): either averaging 'avg', or weighted average with drifts 'wavg_drifts'
+        per_layer (bool): If True, we train with per-layer theta, else we train with a single theta for all trainable
+            variables of the model.
 
     Returns:
         tuple: A tuple containing two lists:
@@ -60,37 +62,52 @@ def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_cl
     sketch_width, sketch_depth = None, None
 
     # 4. Simulation
-    if fda_name == "naive":
-        epoch_metrics_list = naive_federated_simulation(
-            test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta,
-            fda_steps_in_one_epoch, compile_and_build_model_fn, aggr_scheme
-        )
-    
-    if fda_name == "linear":  
-        epoch_metrics_list = linear_federated_simulation(
-            test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta,
-            fda_steps_in_one_epoch, compile_and_build_model_fn, aggr_scheme
-        )
-    
-    if fda_name == "sketch":
-        sketch_width, sketch_depth = 250, 5
-        epoch_metrics_list = sketch_federated_simulation(
-            test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta, fda_steps_in_one_epoch,
-            compile_and_build_model_fn, AmsSketch(width=sketch_width, depth=sketch_depth), 1. / sqrt(sketch_width),
-            aggr_scheme
-        )
 
-    if fda_name == "gm":
-        epoch_metrics_list = gm_federated_simulation(
-            test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta,
-            fda_steps_in_one_epoch, compile_and_build_model_fn, aggr_scheme
-        )
-        
     if fda_name == "synchronous":
         epoch_metrics_list = synchronous_federated_simulation(
             test_ds, federated_ds, server_cnn, client_cnns, num_epochs,
             fda_steps_in_one_epoch, compile_and_build_model_fn
         )
+
+    elif not per_layer:
+        if fda_name == "naive":
+            epoch_metrics_list = naive_federated_simulation(
+                test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta,
+                fda_steps_in_one_epoch, compile_and_build_model_fn, aggr_scheme
+            )
+
+        if fda_name == "linear":
+            epoch_metrics_list = linear_federated_simulation(
+                test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta,
+                fda_steps_in_one_epoch, compile_and_build_model_fn, aggr_scheme
+            )
+
+        if fda_name == "sketch":
+            sketch_width, sketch_depth = 250, 5
+            epoch_metrics_list = sketch_federated_simulation(
+                test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta, fda_steps_in_one_epoch,
+                compile_and_build_model_fn, AmsSketch(width=sketch_width, depth=sketch_depth), 1. / sqrt(sketch_width),
+                aggr_scheme
+            )
+
+        if fda_name == "gm":
+            epoch_metrics_list = gm_federated_simulation(
+                test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta,
+                fda_steps_in_one_epoch, compile_and_build_model_fn, aggr_scheme
+            )
+    else:
+
+        trainable_layers_indices = server_cnn.get_trainable_layers_indices()
+        num_weights_per_layer = [len(v) for v in server_cnn.per_layer_trainable_vars_as_vector()]
+        total_num_weights = sum(num_weights_per_layer)
+        # percent-wise (on num. of weights) thetas per layer
+        thetas = [theta * (num_weights / total_num_weights) for num_weights in num_weights_per_layer]
+
+        if fda_name == "naive":
+            epoch_metrics_list = naive_federated_simulation_per_layer(
+                test_ds, federated_ds, server_cnn, client_cnns, num_epochs, thetas,
+                fda_steps_in_one_epoch, compile_and_build_model_fn, aggr_scheme, trainable_layers_indices
+            )
 
     # 5. Create Test ID
     test_id = TestId(

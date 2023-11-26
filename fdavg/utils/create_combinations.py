@@ -42,14 +42,16 @@ def create_combinations(args):
     ]
 
     for i, combination in enumerate(combinations):
-        combination["test_id"] = (
-            f"{combination['nn_name'].replace('-', '')}_{combination['fda_name']}_b{combination['batch_size']}"
-            f"_c{combination['num_clients']}_t{str(combination['theta']).replace('.','')}"
-            f"_bias{str(combination['bias']).replace('.','')}"
-            f"_{combination['aggr_scheme'].replace('_', '')}"
-        )
+        combination["per_layer"] = args.per_layer
         combination["bench_test"] = args.test
         combination["num_epochs"] = args.e
+
+        combination["test_id"] = (
+            f"{combination['nn_name'].replace('-', '')}_{combination['fda_name']}_b{combination['batch_size']}"
+            f"_c{combination['num_clients']}_t{str(combination['theta']).replace('.', '')}"
+            f"_bias{str(combination['bias']).replace('.', '')}"
+            f"_{combination['aggr_scheme'].replace('_', '')}_{'perlayer' if combination['per_layer'] else 'classic'}"
+        )
 
     if not args.append_to:
         with open(f'{os.path.join(script_directory, f"{tmp_dir}/combinations")}/{args.comb_file_id}.json', 'w') as f:
@@ -81,6 +83,7 @@ if __name__ == '__main__':
                         default=[60, 55, 5, 10, 50, 45, 40, 35, 15, 20, 30, 25])
     parser.add_argument('--aggr_scheme', nargs='+', type=str,
                         help="Aggregation schemes (e.g., 'avg', 'wavg_drifts')", default=['avg'])
+    parser.add_argument('--per_layer', action='store_true', help="Per-layer FDA training.")
     parser.add_argument('--append_to', action='store_true',
                         help="If given, then we append to the comb file.")
     parser.add_argument('--test', action='store_true', help="If given, then we bench test.")

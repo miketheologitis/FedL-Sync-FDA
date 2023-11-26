@@ -177,8 +177,11 @@ def weighted_average_client_weights(client_models, weights):
 
 
 def avg_client_layer_weights(layer_i, client_models):
+    # Here, each client_layer_weights[i] corresponds to a list of tf.Variables for the `layer_i` of the i-th client
+    # Note: Most layers have the actual weights and the biases, so usually each such client list is len 2
     client_layer_weights = [model.layers[layer_i].trainable_weights for model in client_models]
 
+    # Stack all client weights horizontally, i.e., all actual weights together, all biases together and average.
     avg_layer_weights = [
         tf.reduce_mean(layer_vars, axis=0)
         for layer_vars in zip(*client_layer_weights)

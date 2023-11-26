@@ -1,6 +1,6 @@
 
 def print_current_test_info(ds_name, bias, fda_name, num_clients, batch_size, num_epochs,
-                            num_steps_until_rtc_check, nn_name, bench_test, theta, aggr_scheme, **kwargs):
+                            num_steps_until_rtc_check, nn_name, bench_test, theta, aggr_scheme, per_layer, **kwargs):
     print()
     print(f"------------ Current Test : ------------")
     print(f"Dataset name : {ds_name}")
@@ -14,12 +14,13 @@ def print_current_test_info(ds_name, bias, fda_name, num_clients, batch_size, nu
     print(f"Number of steps until we check RTC : {num_steps_until_rtc_check}")
     print(f"Theta : {theta}")
     print(f"Aggr. Scheme : {aggr_scheme}")
+    print(f"Per-Layer training : {per_layer}")
     print("-----------------------------------------")
     print()
     
     
 def print_finish_testing_info(start_time, end_time, ds_name, bias, fda_name, num_clients, batch_size, num_epochs,
-                              num_steps_until_rtc_check, nn_name, bench_test, theta, aggr_scheme, **kwargs):
+                              num_steps_until_rtc_check, nn_name, bench_test, theta, aggr_scheme, per_layer, **kwargs):
     print()
     print(f"------------ Finished Testing : ------------")
     print(f"Dataset name : {ds_name}")
@@ -33,6 +34,7 @@ def print_finish_testing_info(start_time, end_time, ds_name, bias, fda_name, num
     print(f"Number of steps until we check RTC : {num_steps_until_rtc_check}")
     print(f"Theta : {theta}")
     print(f"Aggr. Scheme : {aggr_scheme}")
+    print(f"Per-Layer training : {per_layer}")
     print(f"Total simulation time: {end_time-start_time} sec")
     print("-----------------------------------------")
     print()

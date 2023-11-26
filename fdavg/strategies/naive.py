@@ -1,4 +1,5 @@
 import tensorflow as tf
+import copy
 
 from fdavg.metrics.epoch_metrics import EpochMetrics
 from fdavg.models.miscellaneous import (average_client_weights, weighted_average_client_weights,
@@ -118,7 +119,7 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
 
             # Naive estimation of variance
             est_var = f_naive(euc_norm_squared_clients).numpy()
-            
+
             tmp_fda_steps += 1
             total_fda_steps += 1
             
@@ -234,7 +235,8 @@ def f_naive_per_layer(S_i_clients):
 
 
 def naive_federated_simulation_per_layer(test_dataset, federated_dataset, server_cnn, client_cnns, num_epochs, thetas,
-                                         fda_steps_in_one_epoch, compile_and_build_model_func, aggr_scheme):
+                                         fda_steps_in_one_epoch, compile_and_build_model_func, aggr_scheme,
+                                         trainable_layers_indices):
     """
     Run a federated learning simulation using the Naive FDA method and collect general and time-series metrics.
 
@@ -247,6 +249,8 @@ def naive_federated_simulation_per_layer(test_dataset, federated_dataset, server
     - thetas (list): A list of floats, thresholds for each layer
     - fda_steps_in_one_epoch (int): The number of FDA steps in one epoch.
     - compile_and_build_model_func (function): Function to compile and build the model.
+    - aggr_scheme (string): 'avg' only supported rn
+    - trainable_layers_indices (list): List of integers, where each corresponds to the index of a trainable layer.
 
     Returns:
     - epoch_metrics_list (list): A list of EpochMetrics namedtuples, storing metrics per epoch.
@@ -255,15 +259,14 @@ def naive_federated_simulation_per_layer(test_dataset, federated_dataset, server
     - We consider an FDA step to be a single update from each client.
     - The function also outputs the metrics at the end of each epoch and round for monitoring.
     """
-    num_clients = len(client_cnns)
-    trainable_layers_indices = server_cnn.get_trainable_layers_indices()
+    num_layers = len(trainable_layers_indices)
 
     # Initialize counters and metrics lists
     tmp_fda_steps = 0  # Counter for FDA steps within an epoch
     epoch_count = 1  # Current epoch number
-    total_rounds = [1] * num_clients  # Total number of rounds completed
+    total_rounds = [1] * num_layers  # Total number of rounds completed
     total_fda_steps = 0  # Total number of FDA steps taken
-    est_var = [0] * num_clients  # Estimated variance
+    est_var = [0] * num_layers  # Estimated variance
 
     synchronize_clients(server_cnn, client_cnns)
 
@@ -273,17 +276,35 @@ def naive_federated_simulation_per_layer(test_dataset, federated_dataset, server
     # Initialize lists for storing metrics
     epoch_metrics_list = []
 
-    euc_norm_squared_clients = None
+    # euc_norm_squared_clients = None
 
     while epoch_count <= num_epochs:
 
         # Continue training until any per-layer estimated variance crosses the threshold
-        while all([est <= var for est, var in zip(est_var, thetas)]):
+        while all([est <= theta for est, theta in zip(est_var, thetas)]):
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
             euc_norm_squared_clients = clients_train_naive_per_layer(w_t0, client_cnns, federated_dataset)
 
             # Naive estimation of variance
             est_var = [est.numpy() for est in f_naive_per_layer(euc_norm_squared_clients)]
+
+            # ------------ FOR TESTING ------------------------------------------------------
+            print()
+            print(f"Rounds: {total_rounds}")
+            print(f"thetas: {thetas}")
+            print(f"est_var: {est_var}")
+            client_layer_vecs = [
+                [w_curr - w_old for w_curr, w_old in zip(client_cnn.per_layer_trainable_vars_as_vector(), w_t0)]
+                for client_cnn in client_cnns
+            ]
+            avg_weights_vecs = [
+                tf.reduce_mean(vecs, axis=0) for vecs in zip(*client_layer_vecs)
+            ]
+            avg_sq_weights = [tf.reduce_sum(tf.square(v)).numpy() for v in avg_weights_vecs]
+            actual_var = [d - dm for d, dm in zip(est_var, avg_sq_weights)]
+            print(f"act_var: {actual_var}")
+            print()
+            # ------------ FOR TESTING ------------------------------------------------------
 
             tmp_fda_steps += 1
             total_fda_steps += 1
@@ -296,9 +317,10 @@ def naive_federated_simulation_per_layer(test_dataset, federated_dataset, server
                 # (many clients, large batch sizes)
                 tmp_fda_steps -= fda_steps_in_one_epoch
 
+                # TODO: Fix metrics. Also beware of modifying `total_rounds`. Use copy()
                 # ---------- Metrics ------------
                 acc = current_accuracy(client_cnns, test_dataset, compile_and_build_model_func)
-                epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc)
+                epoch_metrics = EpochMetrics(epoch_count, copy.copy(total_rounds), total_fda_steps, acc)
                 epoch_metrics_list.append(epoch_metrics)
                 print(epoch_metrics)  # remove
                 # -------------------------------
@@ -308,36 +330,37 @@ def naive_federated_simulation_per_layer(test_dataset, federated_dataset, server
                 if epoch_count > num_epochs:
                     break
 
-        # Round finished
+        # Round finished (for some layers)
 
-        # aggregation
-        # TODO: Check complicated logic. Is this necessary? (we use i later on). I think it is ok
+        # For the layers that the est. of the variance is not bellow the thresh, we aggregate (avg.) them and also
+        # store the index `i` that corresponds to the index of each layer in our per-layer lists, and the index
+        # `layer_i` which corresponds to the layer of the model that will be used when we update our models (to know
+        # which layer corresponds to the avg. weights).
         if aggr_scheme == 'avg':
             layer_index_avg_weights = [
-                (i, layer_i, avg_client_layer_weights(layer_i, client_cnns)) for i, (layer_i, need_sync) in
-                enumerate(zip(trainable_layers_indices, [est <= var for est, var in zip(est_var, thetas)]))
-                if need_sync
+                (i, layer_i, avg_client_layer_weights(layer_i, client_cnns)) for i, (layer_i, bellow_thresh) in
+                enumerate(zip(trainable_layers_indices, [est <= theta for est, theta in zip(est_var, thetas)]))
+                if not bellow_thresh
             ]
         else:
             print("Unrecognized aggregation scheme")
             return
 
-        # Server Update (only needed layers)
-        # Here we only change the layers of the server_cnn that need synchronization. Hence, the old w_t0 is updated
-        # correctly if we again request the per-layer vectors. The un-synchronized vectors will remain of
-        # course the same.
+        # Server - Clients Update (only needed layers)
+        # Some layers need synchronization, i.e., the layers that are in `layer_index_avg_weights`. We sync the
+        # server model and the client models (only the respective layers of course)
         for _, layer_i, layer_weights in layer_index_avg_weights:
             server_cnn.set_layer_weights(layer_i, layer_weights)
 
-        w_t0 = server_cnn.per_layer_trainable_vars_as_vector()
-
-        # TODO: Check logic
-        # clients sync
-        for _, layer_i, layer_weights in layer_index_avg_weights:
             for client_cnn in client_cnns:
                 client_cnn.set_layer_weights(layer_i, layer_weights)
 
-        # TODO: Check logic
+        # The old `w_t0` is given by the server's per-layer trainable variables. The layers that did not change are of
+        # course the same with the previous `w_t0`. Only the layers that did change will change in the new `w_t0`.
+        w_t0 = server_cnn.per_layer_trainable_vars_as_vector()
+
+        # For the layers that did change, we need to update the estimated variance of them to 0 and also store that
+        # a per-layer round finished (sync happened) for these layers.
         for i, _, _ in layer_index_avg_weights:
             est_var[i] = 0
             total_rounds[i] += 1

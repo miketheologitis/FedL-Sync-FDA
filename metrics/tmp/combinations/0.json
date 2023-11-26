@@ -1,0 +1,1 @@
+[{"ds_name": "MNIST", "bias": null, "nn_name": "AdvancedCNN", "fda_name": "naive", "batch_size": 32, "theta": 100.0, "aggr_scheme": "avg", "num_steps_until_rtc_check": 1, "num_clients": 5, "per_layer": true, "bench_test": true, "num_epochs": 2, "test_id": "AdvancedCNN_naive_b32_c5_t1000_biasNone_avg_perlayer"}]
