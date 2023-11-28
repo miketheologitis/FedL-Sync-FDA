@@ -289,6 +289,7 @@ def naive_federated_simulation_per_layer(test_dataset, federated_dataset, server
             est_var = [est.numpy() for est in f_naive_per_layer(euc_norm_squared_clients)]
 
             # ------------ FOR TESTING ------------------------------------------------------
+            """
             print()
             print(f"Rounds: {total_rounds}")
             print(f"thetas: {thetas}")
@@ -304,6 +305,7 @@ def naive_federated_simulation_per_layer(test_dataset, federated_dataset, server
             actual_var = [d - dm for d, dm in zip(est_var, avg_sq_weights)]
             print(f"act_var: {actual_var}")
             print()
+            """
             # ------------ FOR TESTING ------------------------------------------------------
 
             tmp_fda_steps += 1
