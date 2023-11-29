@@ -1,6 +1,5 @@
 import tensorflow as tf
 
-
 class LeNet5(tf.keras.Model):
     """
     LeNet-5 model for image classification.
