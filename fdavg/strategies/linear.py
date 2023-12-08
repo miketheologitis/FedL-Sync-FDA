@@ -205,4 +205,37 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         total_rounds += 1
         
     return epoch_metrics_list
+
+
+def client_train_linear_per_layer(w_t0, w_tminus1, client_cnn, client_dataset):
+    """
+    Trains a client model and returns the square of the Euclidean norm of the update vector and the dot product with ksi.
+
+    Args:
+    - w_t0 (list): List of the initial per-layer model parameters as a vector.
+    - w_tminus1 (list): List of the previous round per-layer model parameters as a vector.
+    - client_cnn (object): The client's CNN model.
+    - client_dataset (tf.data.Dataset): The dataset on which the client model will be trained.
+
+    Returns:
+    - tuple: (Square of the Euclidean norm of the update vector, Dot product with ksi), both as tf.Tensor with shape=().
+    """
+
+    # number of steps depend on `.take()` from `dataset`
+    client_cnn.train(client_dataset)
+
+    Delta_i = client_cnn.trainable_vars_as_vector() - w_t0
+
+    # ||D(t)_i||^2 , shape = ()
+    Delta_i_euc_norm_squared = tf.reduce_sum(tf.square(Delta_i))  # ||D(t)_i||^2
+
+    # heuristic unit vector ksi
+    ksi = ksi_unit(w_t0, w_tminus1)
+
+    # ksi * Delta_i (* is dot) , shape = ()
+    ksi_Delta_i = tf.reduce_sum(tf.multiply(ksi, Delta_i))
+
+    return Delta_i_euc_norm_squared, ksi_Delta_i
+
+
                 
