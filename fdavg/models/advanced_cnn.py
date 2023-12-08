@@ -175,13 +175,19 @@ def get_compiled_and_built_advanced_cnn(cnn_batch_input, cnn_input_reshape, num_
 
     Returns:
     - AdvancedCNN: A compiled and built Advanced CNN model.
+
+    Examples:
+        MNIST:
+            adv_mnist = get_compiled_and_built_advanced_cnn((None, 28, 28), (28, 28, 1), 10)
+        CIFAR-10:
+            adv_cifar = get_compiled_and_built_advanced_cnn((None, 32, 32, 3), (32, 32, 3), 10)
     """
     advanced_cnn = AdvancedCNN(cnn_input_reshape, num_classes)
     
     advanced_cnn.compile(
         optimizer=tf.keras.optimizers.Adam(),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),  # we have softmax
-        metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')]
+        metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')]
     )
     
     advanced_cnn.build(cnn_batch_input)
@@ -202,10 +208,11 @@ def sequential_advanced_cnn(cnn_input_reshape, num_classes):
     Returns:
     - tf.keras.models.Sequential: An AdvancedCNN model using the Sequential API.
 
-    Example for MNIST:
-        advanced_cnn = sequential_advanced_cnn((28, 28, 1), 10)
-        advanced_cnn.compile(...)
-        advanced_cnn.fit(...)
+    Examples:
+        MNIST:
+            adv_mnist = get_compiled_and_built_advanced_cnn((28, 28, 3), 10)
+        CIFAR-10:
+            adv_cifar = get_compiled_and_built_advanced_cnn((32, 32, 3), 10)
     """
     return tf.keras.models.Sequential([
         # Reshape layer
@@ -231,11 +238,3 @@ def sequential_advanced_cnn(cnn_input_reshape, num_classes):
         tf.keras.layers.Dense(num_classes, activation='softmax')
     ])
 
-
-"""
-loss = self.compiled_loss(
-    y_true=y_batch,
-    y_pred=y_batch_pred,
-    regularization_losses=self.losses
-)
-"""

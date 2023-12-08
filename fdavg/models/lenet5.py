@@ -165,7 +165,7 @@ def get_compiled_and_built_lenet(cnn_batch_input, cnn_input_reshape, num_classes
     cnn.compile(
         optimizer=tf.keras.optimizers.Adam(),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),  # we have softmax
-        metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')]
+        metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')]
     )
     
     cnn.build(cnn_batch_input)
