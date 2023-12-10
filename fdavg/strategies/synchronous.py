@@ -1,5 +1,6 @@
 from fdavg.metrics.epoch_metrics import EpochMetrics
 from fdavg.models.miscellaneous import average_client_weights, synchronize_clients, current_accuracy
+import tensorflow as tf
 
 
 def clients_train_synchronous(client_cnns, federated_dataset):
@@ -70,10 +71,15 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
 
             # ---------- Metrics ------------
             acc = current_accuracy(client_cnns, test_dataset, compile_and_build_model_func)
-            epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc)
+            train_acc = tf.reduce_mean([cnn.metrics[1].result() for cnn in client_cnns]).numpy()
+            epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc, train_acc)
             epoch_metrics_list.append(epoch_metrics)
             print(epoch_metrics)  # remove
             # -------------------------------
+
+            # Reset training accuracy
+            for cnn in client_cnns:
+                cnn.metrics[1].reset_state()
 
             epoch_count += 1
         

@@ -2,6 +2,7 @@ from fdavg.data.mnist import MNIST_N_TRAIN, MNIST_CNN_BATCH_INPUT, MNIST_CNN_INP
 from fdavg.data.cifar10 import CIFAR10_N_TRAIN, CIFAR10_CNN_BATCH_INPUT, cifar10_load_federated_data
 from fdavg.models.lenet5 import get_compiled_and_built_lenet
 from fdavg.models.advanced_cnn import get_compiled_and_built_advanced_cnn
+from fdavg.models.dense_net import get_compiled_and_built_densenet
 
 from functools import partial
 
@@ -21,14 +22,10 @@ def derive_params(nn_name, ds_name, **kwargs):
         )
 
     # Only for CIFAR10 dataset
-    if nn_name == 'DenseNet121':
-        pass
-
-    if nn_name == 'DenseNet169':
-        pass
-
-    if nn_name == 'DenseNet201':
-        pass
+    if nn_name == 'DenseNet121' or nn_name == 'DenseNet169' or nn_name == 'DenseNet201':
+        derived_params['compile_and_build_model_fn'] = partial(
+            get_compiled_and_built_densenet, nn_name, CIFAR10_CNN_BATCH_INPUT
+        )
 
     if ds_name == 'MNIST':
         derived_params['load_federated_data_fn'] = mnist_load_federated_data

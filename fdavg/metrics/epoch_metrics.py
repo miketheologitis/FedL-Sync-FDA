@@ -9,7 +9,9 @@ Attributes:
     - accuracy (float): Model's accuracy at the end of this epoch.
 """
 # Define a named tuple to store epoch-specific metrics in federated learning.
-EpochMetrics = namedtuple("EpochMetrics", ["epoch", "total_rounds", "total_fda_steps", "accuracy"])
+EpochMetrics = namedtuple(
+    "EpochMetrics", ["epoch", "total_rounds", "total_fda_steps", "accuracy", "train_accuracy"]
+)
 
 
 """
