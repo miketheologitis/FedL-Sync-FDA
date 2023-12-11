@@ -122,6 +122,17 @@ class DenseNet:
         for model_var, var in zip(self.trainable_variables, trainable_vars):
             model_var.assign(var)
 
+    def set_non_trainable_variables(self, non_trainable_vars):
+        """
+        Set the model's non-trainable variables.
+
+        Args:
+        - non_trainable_vars (list of tf.Tensor): A list of tensors representing the non-trainable variables to be set.
+
+        This method sets each of the model's trainable variables to the corresponding tensor in `non_trainable_vars`.
+        """
+        for model_var, var in zip(self.non_trainable_variables, non_trainable_vars):
+            model_var.assign(var)
     @tf.function
     def trainable_vars_as_vector(self):
         return tf.concat([tf.reshape(var, [-1]) for var in self.trainable_variables], axis=0)

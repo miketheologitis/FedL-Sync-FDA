@@ -1,5 +1,5 @@
 from fdavg.metrics.epoch_metrics import EpochMetrics
-from fdavg.models.miscellaneous import average_client_weights, synchronize_clients, current_accuracy
+from fdavg.models.miscellaneous import average_client_weights2, synchronize_clients2, current_accuracy2
 import tensorflow as tf
 
 
@@ -48,10 +48,13 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
     total_rounds = 1  # Round counter
     total_fda_steps = 0  # Total FDA steps taken
 
-    synchronize_clients(server_cnn, client_cnns)  # Set clients to server model
+    synchronize_clients2(server_cnn, client_cnns)  # Set clients to server model
 
     # Initialize list for storing epoch metrics
     epoch_metrics_list = []
+
+    # Temporary model to evaluate the testing accuracy on, without messing up the training process
+    tmp_model_for_acc = compile_and_build_model_func()
     
     while epoch_count <= num_epochs:
             
@@ -70,7 +73,7 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
             tmp_fda_steps -= fda_steps_in_one_epoch
 
             # ---------- Metrics ------------
-            acc = current_accuracy(client_cnns, test_dataset, compile_and_build_model_func)
+            acc = current_accuracy2(client_cnns, test_dataset, tmp_model_for_acc)
             train_acc = tf.reduce_mean([cnn.metrics[1].result() for cnn in client_cnns]).numpy()
             epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc, train_acc)
             epoch_metrics_list.append(epoch_metrics)
@@ -86,9 +89,11 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
         # Round finished
 
         # server average
-        server_cnn.set_trainable_variables(average_client_weights(client_cnns))
+        avg_trainable_weights, avg_non_trainable_weights = average_client_weights2(client_cnns)
+        server_cnn.set_trainable_variables(avg_trainable_weights)
+        server_cnn.set_non_trainable_variables(avg_non_trainable_weights)
         
-        synchronize_clients(server_cnn, client_cnns)
+        synchronize_clients2(server_cnn, client_cnns)
         total_rounds += 1
     
     return epoch_metrics_list
