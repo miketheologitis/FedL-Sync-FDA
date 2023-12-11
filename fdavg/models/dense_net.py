@@ -133,6 +133,7 @@ class DenseNet:
         """
         for model_var, var in zip(self.non_trainable_variables, non_trainable_vars):
             model_var.assign(var)
+
     @tf.function
     def trainable_vars_as_vector(self):
         return tf.concat([tf.reshape(var, [-1]) for var in self.trainable_variables], axis=0)

@@ -80,32 +80,9 @@ class AdvancedCNN(tf.keras.Model):
         x = self.dense3(x)
         return x
 
-    @tf.function
     def step(self, batch):
-        """
-        Perform one training step on a given batch of data.
-
-        Args:
-        - batch (tuple): A tuple containing two elements:
-            - x_batch (tf.Tensor): A batch of input data.
-            - y_batch (tf.Tensor): A batch of labels.
-
-        This method computes the gradients using backpropagation and updates the model's trainable parameters.
-        """
         x_batch, y_batch = batch
-
-        with tf.GradientTape() as tape:
-            # Forward pass: Compute predictions
-            y_batch_pred = self(x_batch, training=True)
-
-            # Compute the loss value
-            loss = self.loss(y_batch, y_batch_pred)
-
-        # Compute gradients
-        gradients = tape.gradient(loss, self.trainable_variables)
-        
-        # Apply gradients to the model's trainable variables (update weights)
-        self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+        return self.train_on_batch(x=x_batch, y=y_batch)
        
     def train(self, dataset):
         """
