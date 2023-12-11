@@ -1,8 +1,8 @@
 import tensorflow as tf
 
 from fdavg.metrics.epoch_metrics import EpochMetrics
-from fdavg.models.miscellaneous import (average_client_weights2, weighted_average_client_weights,
-                                        current_accuracy2, synchronize_clients2)
+from fdavg.models.miscellaneous import (average_trainable_client_weights, weighted_average_client_weights,
+                                        current_accuracy, synchronize_clients)
 
 
 def ksi_unit(w_t0, w_tminus1):
@@ -137,7 +137,7 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
     total_fda_steps = 0  # Total number of FDA steps taken
     est_var = 0  # Estimated variance
 
-    synchronize_clients2(server_cnn, client_cnns)  # Set clients to server model
+    synchronize_clients(server_cnn, client_cnns)  # Set clients to server model
 
     w_t0 = server_cnn.trainable_vars_as_vector()
     w_tminus1 = w_t0   # Initialize w_tminus1 to be the same as w_t0 for the first round
@@ -175,7 +175,7 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
                 tmp_fda_steps -= fda_steps_in_one_epoch
                 
                 # ---------- Metrics ------------
-                acc = current_accuracy2(client_cnns, test_dataset, tmp_model_for_acc)
+                acc = current_accuracy(client_cnns, test_dataset, tmp_model_for_acc)
                 train_acc = tf.reduce_mean([cnn.metrics[1].result() for cnn in client_cnns]).numpy()
                 epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc, train_acc)
                 epoch_metrics_list.append(epoch_metrics)
@@ -195,9 +195,7 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
 
         # aggregation
         if aggr_scheme == 'avg':
-            avg_trainable_weights, avg_non_trainable_weights = average_client_weights2(client_cnns)
-            server_cnn.set_trainable_variables(avg_trainable_weights)
-            server_cnn.set_non_trainable_variables(avg_non_trainable_weights)
+            server_cnn.set_trainable_variables(average_trainable_client_weights(client_cnns))
         elif aggr_scheme == 'wavg_drifts':
             # TODO: follow above scheme w/ non-trainable params
             sum_delta_i = tf.reduce_sum(euc_norm_squared_clients)
@@ -211,7 +209,7 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         w_t0 = server_cnn.trainable_vars_as_vector()
 
         # clients sync
-        synchronize_clients2(server_cnn, client_cnns)
+        synchronize_clients(server_cnn, client_cnns)
         est_var = 0
 
         total_rounds += 1
