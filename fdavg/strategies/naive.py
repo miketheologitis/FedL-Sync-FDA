@@ -125,13 +125,6 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
 
             tmp_fda_steps += 1
             total_fda_steps += 1
-
-            # ----------- Invest. on ||w_t||^2 ------------------
-            tmp_model_for_acc.set_trainable_variables(average_trainable_client_weights(client_cnns))
-            w_t = tmp_model_for_acc.trainable_vars_as_vector()
-            w_t_norm_sq = tf.reduce_sum(tf.square(w_t))
-            print(f"Round : {total_rounds}  ,  Step : {total_fda_steps}  ,  ||avg(w_t)||^2 : {w_t_norm_sq}")
-            # ---------------------------------------------------
             
             # If Epoch has passed in this fda step
             if tmp_fda_steps >= fda_steps_in_one_epoch:

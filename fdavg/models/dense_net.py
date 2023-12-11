@@ -160,11 +160,16 @@ class DenseNet:
         return trainable_layers_idx
 
 
-def get_compiled_and_built_densenet(name, cnn_batch_input):
+def get_compiled_and_built_densenet(name, cnn_batch_input, learning_rate_schedule):
     densenet = DenseNet(name)
 
     densenet.compile(
-        optimizer=tf.keras.optimizers.Adam(weight_decay=1e-4),
+        optimizer=tf.keras.optimizers.SGD(
+            learning_rate=learning_rate_schedule,
+            momentum=0.9,
+            weight_decay=1e-4,
+            nesterov=True
+        ),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),  # we have softmax
         metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')]
     )
@@ -174,29 +179,22 @@ def get_compiled_and_built_densenet(name, cnn_batch_input):
     return densenet
 
 
-"""
-def densenet_lr_schedule(epoch, lr, epochs=150):
-    
-    epoch_50_percent = int(epochs * 0.5)
-    epoch_75_percent = int(epochs * 0.75)
-    
-    # Reduce learning rate by a factor of 10 after 50% of epochs and again
-    # by a factor of 10 after 75% of epochs.
-    
-    if epoch == epoch_50_percent or epoch == epoch_75_percent:
-        return lr * 0.1
+def create_learning_rate_schedule(total_epochs, steps_per_epoch):
+    """
+    DenseNet paper, where the learning rate changes at specific epochs (50% and 75% of total training epochs).
+    Starts at 0.1, goes to 0.01 at 50% of epochs, and finally after 75% goes to 0.001
 
-    return lr
+    Ref: https://www.tensorflow.org/api_docs/python/tf/keras/optimizers/schedules/PiecewiseConstantDecay
+    """
 
-lr_callback = tf.keras.callbacks.LearningRateScheduler(densenet_lr_schedule)
+    total_steps = total_epochs * steps_per_epoch
 
+    steps_at_50_percent = 0.5 * total_steps
+    steps_at_75_percent = 0.75 * total_steps
 
-# Compile the model
-densenet.compile(
-    optimizer=tf.keras.optimizers.SGD(learning_rate=0.1, momentum=0.9, weight_decay=1e-4, nesterov=True),
-    loss=tf.keras.losses.SparseCategoricalCrossentropy(),  # we have softmax
-    metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')]
-)
+    boundaries = [steps_at_50_percent, steps_at_75_percent]
+    values = [0.1, 0.01, 0.001]
 
-densenet.fit(X_train_dense, y_train, batch_size=32, epochs=150, validation_data=(X_test_dense, y_test), callbacks=[lr_callback])
-"""
+    learning_rate_schedule = tf.keras.optimizers.schedules.PiecewiseConstantDecay(boundaries, values)
+
+    return learning_rate_schedule
