@@ -78,6 +78,7 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
             epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc, train_acc)
             epoch_metrics_list.append(epoch_metrics)
             print(epoch_metrics)  # remove
+            print([cnn.optimizer.learning_rate.numpy() for cnn in client_cnns])
             # -------------------------------
 
             # Reset training accuracy
