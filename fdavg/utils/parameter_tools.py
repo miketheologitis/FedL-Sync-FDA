@@ -26,10 +26,12 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, **kwarg
 
         # Specific learning rate schedule for each client.
         steps_in_one_epoch = (CIFAR10_N_TRAIN / batch_size) / num_clients
-        learning_rate_schedule = create_learning_rate_schedule(num_epochs, steps_in_one_epoch)
+        learning_rate_fn = partial(
+            create_learning_rate_schedule, num_epochs, steps_in_one_epoch
+        )
 
         derived_params['compile_and_build_model_fn'] = partial(
-            get_compiled_and_built_densenet, nn_name, CIFAR10_CNN_BATCH_INPUT, learning_rate_schedule
+            get_compiled_and_built_densenet, nn_name, CIFAR10_CNN_BATCH_INPUT, learning_rate_fn
         )
 
     if ds_name == 'MNIST':

@@ -160,12 +160,12 @@ class DenseNet:
         return trainable_layers_idx
 
 
-def get_compiled_and_built_densenet(name, cnn_batch_input, learning_rate_schedule):
+def get_compiled_and_built_densenet(name, cnn_batch_input, learning_rate_fn):
     densenet = DenseNet(name)
 
     densenet.compile(
         optimizer=tf.keras.optimizers.SGD(
-            learning_rate=learning_rate_schedule,
+            learning_rate=learning_rate_fn(),
             momentum=0.9,
             weight_decay=1e-4,
             nesterov=True
