@@ -7,7 +7,8 @@ Implementation from https://github.com/keras-team/keras-applications/blob/master
 DenseNet, not pre-trained, specifically for the CIFAR-10 datasets. 
 
 Note:
-    - Preprocessing on input is assumed using `tensorflow.keras.applications.densenet.preprocess_input`.
+    - Beforehand preprocessing on input is assumed using `tensorflow.keras.applications.densenet.preprocess_input`.
+    - We assume NHWC input data format (which we then handle internally).
 
 Deviations from original keras implementation:
     1) We add dropout layers with rate=0.2 as suggested by Huang et. al, 2016 for training on CIFAR-10
