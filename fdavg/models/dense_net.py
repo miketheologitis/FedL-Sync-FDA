@@ -15,6 +15,9 @@ Deviations from original keras implementation:
     3) We adopt NCHW data format (channels first). The input is expected to be in NHWC format which we then transform
         to NCHW format. This is due to layout optimization error/explanation of in
         https://github.com/tensorflow/tensorflow/issues/34499#issuecomment-652316457
+    4) We do not put `weight_decay=1e-4` in the `optimizers.SGD` but rather equivalently replicate it by putting
+        `regularizers.L2(1e-4)` on the weights (kernel) of the `Conv2D` and `Dense` layers. This is because in TF 2.7
+        `weight_decay` is not available in the optimizer.
 """
 
 
@@ -26,29 +29,97 @@ def dense_block(x, blocks, name):
 
 def transition_block(x, reduction, name):
     bn_axis = 1  # For NCHW format : (batch_size, channels, height, width)
-    x = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name=name + '_bn')(x)
+
+    x = layers.BatchNormalization(
+        axis=bn_axis,
+        epsilon=1.001e-5,
+        name=name + '_bn'
+    )(x)
+
     x = layers.Activation('relu', name=name + '_relu')(x)
-    x = layers.Conv2D(int(x.shape[bn_axis] * reduction), 1, kernel_initializer='he_normal', use_bias=False,
-                      name=name + '_conv', data_format='channels_first')(x)
-    x = layers.AveragePooling2D(2, strides=2, name=name + '_pool', data_format='channels_first')(x)
+
+    x = layers.Conv2D(
+        int(x.shape[bn_axis] * reduction),
+        1,
+        kernel_initializer='he_normal',
+        use_bias=False,
+        name=name + '_conv',
+        data_format='channels_first',
+        kernel_regularizer=tf.keras.regularizers.L2(1e-4)
+    )(x)
+
+    x = layers.AveragePooling2D(
+        2,
+        strides=2,
+        name=name + '_pool',
+        data_format='channels_first'
+    )(x)
+
     return x
 
 
 def conv_block(x, growth_rate, name):
+
     bn_axis = 1  # For NCHW format : (batch_size, channels, height, width)
-    x1 = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name=name + '_0_bn')(x)
-    x1 = layers.Activation('relu', name=name + '_0_relu')(x1)
-    x1 = layers.Conv2D(4 * growth_rate, 1, use_bias=False, kernel_initializer='he_normal', name=name + '_1_conv',
-                       data_format='channels_first')(x1)
-    x1 = layers.Dropout(0.2, name=name + '_1_dropout')(
-        x1)  # Add dropout 0.2 after convolution as Huang et. al suggest for Cifar-10
-    x1 = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name=name + '_1_bn')(x1)
-    x1 = layers.Activation('relu', name=name + '_1_relu')(x1)
-    x1 = layers.Conv2D(growth_rate, 3, padding='same', use_bias=False, kernel_initializer='he_normal',
-                       name=name + '_2_conv', data_format='channels_first')(x1)
-    x1 = layers.Dropout(0.2, name=name + '_2_dropout')(
-        x1)  # Add dropout 0.2 after convolution as Huang et. al suggest for Cifar-10
-    x = layers.Concatenate(axis=bn_axis, name=name + '_concat')([x, x1])
+
+    x1 = layers.BatchNormalization(
+        axis=bn_axis,
+        epsilon=1.001e-5,
+        name=name + '_0_bn'
+    )(x)
+
+    x1 = layers.Activation(
+        'relu',
+        name=name + '_0_relu'
+    )(x1)
+
+    x1 = layers.Conv2D(
+        4 * growth_rate,
+        1,
+        use_bias=False,
+        kernel_initializer='he_normal',
+        name=name + '_1_conv',
+        data_format='channels_first',
+        kernel_regularizer=tf.keras.regularizers.L2(1e-4)
+    )(x1)
+
+    x1 = layers.Dropout(
+        0.2,
+        name=name + '_1_dropout'
+    )(x1)  # Add dropout 0.2 after convolution as Huang et. al suggest for Cifar-10
+
+    x1 = layers.BatchNormalization(
+        axis=bn_axis,
+        epsilon=1.001e-5,
+        name=name + '_1_bn'
+    )(x1)
+
+    x1 = layers.Activation(
+        'relu',
+        name=name + '_1_relu'
+    )(x1)
+
+    x1 = layers.Conv2D(
+        growth_rate,
+        3,
+        padding='same',
+        use_bias=False,
+        kernel_initializer='he_normal',
+        name=name + '_2_conv',
+        data_format='channels_first',
+        kernel_regularizer=tf.keras.regularizers.L2(1e-4)
+    )(x1)
+
+    x1 = layers.Dropout(
+        0.2,
+        name=name + '_2_dropout'
+    )(x1)  # Add dropout 0.2 after convolution as Huang et. al suggest for Cifar-10
+
+    x = layers.Concatenate(
+        axis=bn_axis,
+        name=name + '_concat'
+    )([x, x1])
+
     return x
 
 
@@ -59,15 +130,45 @@ def dense_net_fn(blocks, input_shape, classes):
     bn_axis = 1  # For NCHW format : (batch_size, channels, height, width)
 
     x_nchw = tf.transpose(img_input, [0, 3, 1, 2])  # Transform to NCHW format
-    # x_nchw = img_input
 
-    x = layers.ZeroPadding2D(padding=((3, 3), (3, 3)), data_format='channels_first')(x_nchw)
-    x = layers.Conv2D(64, 7, strides=2, use_bias=False, kernel_initializer='he_normal', name='conv1/conv',
-                      data_format='channels_first')(x)
-    x = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name='conv1/bn')(x)
-    x = layers.Activation('relu', name='conv1/relu')(x)
-    x = layers.ZeroPadding2D(padding=((1, 1), (1, 1)), data_format='channels_first')(x)
-    x = layers.MaxPooling2D(3, strides=2, name='pool1', data_format='channels_first')(x)
+    x = layers.ZeroPadding2D(
+        padding=((3, 3), (3, 3)),
+        data_format='channels_first'
+    )(x_nchw)
+
+    x = layers.Conv2D(
+        64,
+        7,
+        strides=2,
+        use_bias=False,
+        kernel_initializer='he_normal',
+        name='conv1/conv',
+        data_format='channels_first',
+        kernel_regularizer=tf.keras.regularizers.L2(1e-4)
+    )(x)
+
+    x = layers.BatchNormalization(
+        axis=bn_axis,
+        epsilon=1.001e-5,
+        name='conv1/bn'
+    )(x)
+
+    x = layers.Activation(
+        'relu',
+        name='conv1/relu'
+    )(x)
+
+    x = layers.ZeroPadding2D(
+        padding=((1, 1), (1, 1)),
+        data_format='channels_first'
+    )(x)
+
+    x = layers.MaxPooling2D(
+        3,
+        strides=2,
+        name='pool1',
+        data_format='channels_first'
+    )(x)
 
     x = dense_block(x, blocks[0], name='conv2')
     x = transition_block(x, 0.5, name='pool2')
@@ -77,11 +178,29 @@ def dense_net_fn(blocks, input_shape, classes):
     x = transition_block(x, 0.5, name='pool4')
     x = dense_block(x, blocks[3], name='conv5')
 
-    x = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name='bn')(x)
-    x = layers.Activation('relu', name='relu')(x)
+    x = layers.BatchNormalization(
+        axis=bn_axis,
+        epsilon=1.001e-5,
+        name='bn'
+    )(x)
 
-    x = layers.GlobalAveragePooling2D(name='avg_pool', data_format='channels_first')(x)
-    x = layers.Dense(classes, kernel_initializer='he_normal', activation='softmax', name='fc10')(x)
+    x = layers.Activation(
+        'relu',
+        name='relu'
+    )(x)
+
+    x = layers.GlobalAveragePooling2D(
+        name='avg_pool',
+        data_format='channels_first'
+    )(x)
+
+    x = layers.Dense(
+        classes,
+        kernel_initializer='he_normal',
+        activation='softmax',
+        name='fc10',
+        kernel_regularizer=tf.keras.regularizers.L2(1e-4)
+    )(x)
 
     inputs = img_input
 
@@ -175,7 +294,6 @@ def get_compiled_and_built_densenet(name, cnn_batch_input, learning_rate_fn):
         optimizer=tf.keras.optimizers.SGD(
             learning_rate=learning_rate_fn(),
             momentum=0.9,
-            weight_decay=1e-4,
             nesterov=True
         ),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),  # we have softmax
