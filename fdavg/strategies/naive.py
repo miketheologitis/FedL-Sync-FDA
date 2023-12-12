@@ -123,8 +123,6 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
             # Naive estimation of variance
             est_var = f_naive(euc_norm_squared_clients).numpy()
 
-            print(f"Round : {total_rounds} , Drifts squared : {[drift.numpy() for drift in euc_norm_squared_clients]}")
-
             tmp_fda_steps += 1
             total_fda_steps += 1
             
