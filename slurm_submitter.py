@@ -31,7 +31,8 @@ module load gnu/8
 module load cuda/10.1.168
 module load intel/18
 module load intelmpi/2018
-module load tensorflow/2.4.1
+module load python/3.8.13
+module load tftorch/270-191
 
 export TF_XLA_FLAGS="--tf_xla_enable_xla_devices"
 srun python -m slurm_simulator --n_gpus={n_gpus} --comb_file_id={comb_file_id} --gpu_mem={gpu_mem} --starting_sim_id_in_submit={starting_sim_id_in_submit} --n_sims={n_sims}
