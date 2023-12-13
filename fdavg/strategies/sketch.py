@@ -241,10 +241,6 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
 
     # Temporary model to evaluate the testing accuracy on, without messing up the training process
     tmp_model_for_acc = compile_and_build_model_func()
-
-    # ------------- REMOVE ------------
-    num_clients = len(client_cnns)
-    # ------------- REMOVE ------------
     
     while epoch_count <= num_epochs:
         
@@ -261,10 +257,6 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
             
             tmp_fda_steps += 1
             total_fda_steps += 1
-
-            # ------------- REMOVE ------------
-            print(f"Num. Clients : {num_clients}  ,  Round : {total_rounds}  ,  Step : {total_fda_steps}  ,  Est. Var : {est_var}")
-            # ------------- REMOVE ------------
             
             # If Epoch has passed in this fda step
             if tmp_fda_steps >= fda_steps_in_one_epoch:
