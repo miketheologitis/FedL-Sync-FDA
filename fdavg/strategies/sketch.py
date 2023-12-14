@@ -3,7 +3,7 @@ import numpy as np
 
 from fdavg.metrics.epoch_metrics import EpochMetrics
 from fdavg.models.miscellaneous import (average_trainable_client_weights, weighted_average_client_weights,
-                                        current_accuracy, synchronize_clients, variance)
+                                        current_accuracy, synchronize_clients)
 
 
 class AmsSketch:
@@ -255,10 +255,6 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
             # Sketch estimation of variance
             est_var = f_sketch(euc_norm_squared_clients, sketch_clients, epsilon).numpy()
 
-            # ---------- REMOVE -------------
-            print(f"Round: {total_rounds}  ,  Step: {total_fda_steps}  ,  Var:  {variance(server_cnn, client_cnns).numpy():.3f}  ,  Est Var: {est_var:.3f}")
-            # ---------- REMOVE -------------
-
             tmp_fda_steps += 1
             total_fda_steps += 1
             
@@ -299,6 +295,8 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         else:
             print("Unrecognized aggregation scheme")
             return
+
+        w_t0 = server_cnn.trainable_vars_as_vector()
 
         # clients sync
         synchronize_clients(server_cnn, client_cnns)

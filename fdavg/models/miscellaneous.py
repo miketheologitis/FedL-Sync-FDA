@@ -2,39 +2,6 @@ import tensorflow as tf
 import numpy as np
 
 
-def variance(server_model, client_models):
-    """
-    Compute the variance of trainable parameters between a server model and multiple client models.
-
-    This function calculates the variance of trainable parameters between a server model and a list of
-    client models. The variance is computed as the mean of the squared distances between the trainable
-    parameters of each client model and the server model.
-
-    Args:
-    - server_model (object): An object representing the server model, expected to have a method `trainable_vars_as_vector`
-            that returns the model's trainable parameters as a 1D tensor. In our context, for some time t, it is assumed
-            that the given `server_model` is the aggregated global model from the `client_models` at time t.
-    - client_models (list of objects): A list of objects representing the client models, each expected to have a
-      method `trainable_vars_as_vector` that returns the model's trainable parameters as a 1D tensor.
-
-    Returns:
-    - var (tf.Tensor): A scalar tensor representing the variance of trainable parameters between the server model
-      and client models.
-
-    """
-    
-    w_t0 = server_model.trainable_vars_as_vector()
-    
-    squared_distances = [
-        tf.reduce_sum(tf.square(client_model.trainable_vars_as_vector() - w_t0)) 
-        for client_model in client_models
-    ]
-    
-    var = tf.reduce_mean(squared_distances)
-    
-    return var
-
-
 def count_weights(model):
     """
     Count the total number of trainable parameters in a Keras model.
