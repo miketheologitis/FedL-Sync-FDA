@@ -367,20 +367,19 @@ def naive_federated_simulation_per_layer(test_dataset, federated_dataset, server
         # Server - Clients Update (only needed layers)
         # Some layers need synchronization, i.e., the layers that are in `layer_index_avg_weights`. We sync the
         # server model and the client models (only the respective layers of course)
-        for _, layer_i, layer_weights in layer_index_avg_weights:
+        # For the layers that did change, we need to update the estimated variance of them to 0 and also store that
+        # a per-layer round finished (sync happened) for these layers.
+        for i, layer_i, layer_weights in layer_index_avg_weights:
             server_cnn.set_layer_weights(layer_i, layer_weights)
 
             for client_cnn in client_cnns:
                 client_cnn.set_layer_weights(layer_i, layer_weights)
 
+            est_var[i] = 0
+            total_rounds[i] += 1
+
         # The old `w_t0` is given by the server's per-layer trainable variables. The layers that did not change are of
         # course the same with the previous `w_t0`. Only the layers that did change will change in the new `w_t0`.
         w_t0 = server_cnn.per_layer_trainable_vars_as_vector()
-
-        # For the layers that did change, we need to update the estimated variance of them to 0 and also store that
-        # a per-layer round finished (sync happened) for these layers.
-        for i, _, _ in layer_index_avg_weights:
-            est_var[i] = 0
-            total_rounds[i] += 1
 
     return epoch_metrics_list
