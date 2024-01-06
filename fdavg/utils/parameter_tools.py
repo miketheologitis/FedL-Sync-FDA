@@ -58,20 +58,19 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
 
         if fda_name == 'FedAdam':
 
-            """
             server_optimizer_fn = partial(
                 tf.keras.optimizers.Adam,
                 beta_2=0.99,
                 learning_rate=0.0316
             )
 
+            """
             client_optimizer_fn = partial(
                 tf.keras.optimizers.SGD,
                 learning_rate=0.00316
             )
             """
-            server_optimizer_fn = tf.keras.optimizers.Adam
-            client_optimizer_fn = tf.keras.optimizers.SGD
+            client_optimizer_fn = tf.keras.optimizers.SGD  # deviation from paper because it works better
 
             derived_params['server_compile_and_build_model_fn'] = partial(
                 get_compiled_and_build_model,

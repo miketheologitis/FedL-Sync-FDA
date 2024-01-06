@@ -60,7 +60,7 @@ def fed_opt_simulation(test_dataset, federated_dataset, server_cnn, client_cnns,
         clients_train_fed_opt(client_cnns, federated_dataset)
 
         # Remove
-        #print(f"1: {client_cnns[0].metrics[1].result().numpy()} 2: {client_cnns[0].metrics[0].result().numpy()}")
+        # print(f"1: {client_cnns[0].metrics[1].result().numpy()} 2: {client_cnns[0].metrics[0].result().numpy()}")
 
         tmp_steps += 1
         total_steps += 1
@@ -88,21 +88,23 @@ def fed_opt_simulation(test_dataset, federated_dataset, server_cnn, client_cnns,
             avg_non_trainable_variables = average_non_trainable_client_weights(client_cnns)
             server_cnn.set_non_trainable_variables(avg_non_trainable_variables)
 
+            synchronize_clients(server_cnn, client_cnns)
+
             epoch_count += 1
             total_rounds += 1
-
-            # Reset training accuracy
-            for cnn in client_cnns:
-                cnn.metrics[1].reset_state()
-
-            synchronize_clients(server_cnn, client_cnns)
 
             # ---------- Metrics ------------
             _, acc = server_cnn.evaluate(test_dataset, verbose=0)
             train_acc = tf.reduce_mean([cnn.metrics[1].result() for cnn in client_cnns]).numpy()
+            print([cnn.metrics[1].result() for cnn in client_cnns])
+            print([cnn.metrics[1].result().numpy() for cnn in client_cnns])
             epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_steps, acc, train_acc)
             epoch_metrics_list.append(epoch_metrics)
             print(epoch_metrics)  # remove
             # -------------------------------
+
+            # Reset training accuracy
+            for cnn in client_cnns:
+                cnn.metrics[1].reset_state()
 
     return epoch_metrics_list
