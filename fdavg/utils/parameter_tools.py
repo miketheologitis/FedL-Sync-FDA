@@ -15,8 +15,8 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
         1. `gm`, `sketch`, `naive`, `linear` use Adam optimizer with default params on all clients, and the server has
             no optimizer at all. We put an optimizer though in order to be able to .compile the model. We do not use
             the server optimizer at all.
-        2. `FedAdam` uses SGD with learning_rate 0.00316 on clients, and the server USES an optimizer. The server uses
-            Adam with beta_2=0.99 and learning_rate=0.0316 utilizing the pseudo-gradient average drifts.
+        2. `FedAdam` uses SGD with learning_rate 0.01 on clients, and the server USES an optimizer. The server uses
+            Adam with the defaults, utilizing the pseudo-gradient average drifts.
 
     - CIFAR-10
         1. `gm`, `sketch`, `naive`, `linear` use SGD with Nesterov momentum b=0.9 with a learning rate schedule starting
@@ -57,28 +57,13 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
             derived_params['client_compile_and_build_model_fn'] = compile_and_build_model_fn
 
         if fda_name == 'FedAdam':
-            """
-            server_optimizer_fn = partial(
-                tf.keras.optimizers.Adam,
-                beta_2=0.99,
-                learning_rate=0.0316
-            )
-
-            
-            client_optimizer_fn = partial(
-                tf.keras.optimizers.SGD,
-                learning_rate=0.00316
-            )
-            """
-            server_optimizer_fn = tf.keras.optimizers.Adam
-            client_optimizer_fn = tf.keras.optimizers.SGD  # deviation from paper because it works better
 
             derived_params['server_compile_and_build_model_fn'] = partial(
                 get_compiled_and_build_model,
                 cnn_batch_input=MNIST_CNN_BATCH_INPUT,
                 cnn_input_reshape=MNIST_CNN_INPUT_RESHAPE,
                 num_classes=10,
-                optimizer_fn=server_optimizer_fn
+                optimizer_fn=tf.keras.optimizers.Adam
             )
 
             derived_params['client_compile_and_build_model_fn'] = partial(
@@ -86,7 +71,7 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
                 cnn_batch_input=MNIST_CNN_BATCH_INPUT,
                 cnn_input_reshape=MNIST_CNN_INPUT_RESHAPE,
                 num_classes=10,
-                optimizer_fn=client_optimizer_fn
+                optimizer_fn=tf.keras.optimizers.SGD
             )
 
     if ds_name == 'CIFAR10':
