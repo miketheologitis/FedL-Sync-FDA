@@ -153,7 +153,7 @@ class AdvancedCNN(tf.keras.Model):
         return trainable_layers_idx
     
 
-def get_compiled_and_built_advanced_cnn(cnn_batch_input, cnn_input_reshape, num_classes):
+def get_compiled_and_built_advanced_cnn(cnn_batch_input, cnn_input_reshape, num_classes, optimizer_fn):
     """
     Compile and build an Advanced CNN model.
 
@@ -161,6 +161,7 @@ def get_compiled_and_built_advanced_cnn(cnn_batch_input, cnn_input_reshape, num_
     - cnn_batch_input (tuple): The shape of the input including batch size (e.g., (None, 28, 28)).
     - cnn_input_reshape (tuple): The shape to which the input should be reshaped (e.g., (28, 28, 1)).
     - num_classes (int): Number of output classes.
+    - optimizer_fn (callable): function initializing the optimizer
 
     Returns:
     - AdvancedCNN: A compiled and built Advanced CNN model.
@@ -174,7 +175,7 @@ def get_compiled_and_built_advanced_cnn(cnn_batch_input, cnn_input_reshape, num_
     advanced_cnn = AdvancedCNN(cnn_input_reshape, num_classes)
     
     advanced_cnn.compile(
-        optimizer=tf.keras.optimizers.Adam(),
+        optimizer=optimizer_fn(),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),  # we have softmax
         metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')]
     )

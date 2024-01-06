@@ -288,15 +288,11 @@ class DenseNet:
         return trainable_layers_idx
 
 
-def get_compiled_and_built_densenet(name, cnn_batch_input, learning_rate_fn):
+def get_compiled_and_built_densenet(name, cnn_batch_input, learning_rate_fn, optimizer_fn):
     densenet = DenseNet(name)
 
     densenet.compile(
-        optimizer=tf.keras.optimizers.SGD(
-            learning_rate=learning_rate_fn(),
-            momentum=0.9,
-            nesterov=True
-        ),
+        optimizer=optimizer_fn(learning_rate=learning_rate_fn()),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),  # we have softmax
         metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')]
     )

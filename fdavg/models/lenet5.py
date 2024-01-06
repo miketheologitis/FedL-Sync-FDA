@@ -136,7 +136,7 @@ class LeNet5(tf.keras.Model):
         return trainable_layers_idx
 
 
-def get_compiled_and_built_lenet(cnn_batch_input, cnn_input_reshape, num_classes):
+def get_compiled_and_built_lenet(cnn_batch_input, cnn_input_reshape, num_classes, optimizer_fn):
     """
     Compile and build a LeNet-5 model.
 
@@ -144,6 +144,7 @@ def get_compiled_and_built_lenet(cnn_batch_input, cnn_input_reshape, num_classes
     - cnn_batch_input (tuple): The shape of the input including batch size (e.g., (None, 28, 28)).
     - cnn_input_reshape (tuple): The shape to which the input should be reshaped (e.g., (28, 28, 1)).
     - num_classes (int): Number of output classes.
+    - optimizer_fn (callable): function initializing the optimizer
 
     Returns:
     - cnn (LeNet5): A compiled and built LeNet-5 model.
@@ -151,7 +152,7 @@ def get_compiled_and_built_lenet(cnn_batch_input, cnn_input_reshape, num_classes
     cnn = LeNet5(cnn_input_reshape, num_classes)
     
     cnn.compile(
-        optimizer=tf.keras.optimizers.Adam(),
+        optimizer=optimizer_fn(),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),  # we have softmax
         metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')]
     )

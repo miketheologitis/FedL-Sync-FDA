@@ -10,8 +10,9 @@ from fdavg.strategies.gm import gm_federated_simulation
 
 
 def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_clients, batch_size,
-                      num_steps_until_rtc_check, num_epochs, compile_and_build_model_fn, nn_name, theta=0.,
-                      bias=None, seed=None, bench_test=False, aggr_scheme='avg', per_layer=False, **kwargs):
+                      num_steps_until_rtc_check, num_epochs, server_compile_and_build_model_fn,
+                      client_compile_and_build_model_fn, nn_name, theta=0., bias=None, seed=None, bench_test=False,
+                      aggr_scheme='avg', per_layer=False, **kwargs):
     """
     Run a single federated learning simulation based on the given FDA method name.
     
@@ -55,13 +56,17 @@ def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_cl
     )
 
     # 3. Models creation
-    server_cnn = compile_and_build_model_fn()
-    client_cnns = [compile_and_build_model_fn() for _ in range(num_clients)]
+    server_cnn = server_compile_and_build_model_fn()
+    client_cnns = [client_compile_and_build_model_fn() for _ in range(num_clients)]
 
     epoch_metrics_list = None
     sketch_width, sketch_depth = None, None
 
     # 4. Simulation
+
+    # For `synchronous`, `naive`, `linear`, `sketch`
+    # server_compile_and_build_model_fn , client_compile_and_build_model_fn are the same func.
+    compile_and_build_model_fn = client_compile_and_build_model_fn
 
     if fda_name == "synchronous":
         epoch_metrics_list = synchronous_federated_simulation(
