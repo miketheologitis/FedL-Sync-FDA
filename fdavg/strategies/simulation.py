@@ -6,6 +6,7 @@ from fdavg.strategies.naive import naive_federated_simulation, naive_federated_s
 from fdavg.strategies.linear import linear_federated_simulation
 from fdavg.strategies.sketch import sketch_federated_simulation, AmsSketch
 from fdavg.strategies.synchronous import synchronous_federated_simulation
+from fdavg.strategies.fed_opt import fed_opt_simulation
 from fdavg.strategies.gm import gm_federated_simulation
 
 
@@ -47,8 +48,10 @@ def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_cl
     # 1. Helper variable to count Epochs
     if bench_test:
         fda_steps_in_one_epoch = 10
+        steps_in_one_epoch = 10
     else:
         fda_steps_in_one_epoch = ((n_train / batch_size) / num_clients) / num_steps_until_rtc_check
+        steps_in_one_epoch = ((n_train / batch_size) / num_clients)
 
     # 2. Federated Dataset creation
     federated_ds, test_ds = load_federated_data_fn(
@@ -99,6 +102,11 @@ def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_cl
             epoch_metrics_list = gm_federated_simulation(
                 test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta,
                 fda_steps_in_one_epoch, compile_and_build_model_fn, aggr_scheme
+            )
+
+        if fda_name in ["FedAdam", "FedAvgM"]:
+            epoch_metrics_list = fed_opt_simulation(
+                test_ds, federated_ds, server_cnn, client_cnns, num_epochs, steps_in_one_epoch
             )
     else:
 
