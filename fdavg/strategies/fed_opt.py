@@ -59,6 +59,9 @@ def fed_opt_simulation(test_dataset, federated_dataset, server_cnn, client_cnns,
         # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
         clients_train_fed_opt(client_cnns, federated_dataset)
 
+        # Remove
+        #print(f"1: {client_cnns[0].metrics[1].result().numpy()} 2: {client_cnns[0].metrics[0].result().numpy()}")
+
         tmp_steps += 1
         total_steps += 1
 
