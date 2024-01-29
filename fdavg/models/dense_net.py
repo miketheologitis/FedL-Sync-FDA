@@ -305,15 +305,15 @@ def get_compiled_and_built_densenet(name, cnn_batch_input, learning_rate_fn, opt
 def create_learning_rate_schedule(total_epochs, steps_per_epoch):
     """
     DenseNet paper, where the learning rate changes at specific epochs (50% and 75% of total training epochs).
-    Starts at 0.1, goes to 0.01 at 50% of epochs, and finally after 75% goes to 0.001
+    Starts at 0.1, goes to 0.01 at 80% of epochs, and finally after 90% goes to 0.001
 
     Ref: https://www.tensorflow.org/api_docs/python/tf/keras/optimizers/schedules/PiecewiseConstantDecay
     """
 
     total_steps = total_epochs * steps_per_epoch
 
-    steps_at_50_percent = 0.5 * total_steps
-    steps_at_75_percent = 0.75 * total_steps
+    steps_at_50_percent = 0.8 * total_steps
+    steps_at_75_percent = 0.9 * total_steps
 
     boundaries = [steps_at_50_percent, steps_at_75_percent]
     values = [0.1, 0.01, 0.001]
