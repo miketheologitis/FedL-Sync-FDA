@@ -264,3 +264,71 @@ EpochMetrics(epoch=246, total_rounds=503, total_fda_steps=76875, accuracy=0.8338
 EpochMetrics(epoch=247, total_rounds=503, total_fda_steps=77188, accuracy=0.8356000185012817, train_accuracy=0.99375)
 EpochMetrics(epoch=248, total_rounds=503, total_fda_steps=77500, accuracy=0.8345000147819519, train_accuracy=0.99375)
 EpochMetrics(epoch=249, total_rounds=503, total_fda_steps=77813, accuracy=0.8352000117301941, train_accuracy=0.99375)
+EpochMetrics(epoch=250, total_rounds=503, total_fda_steps=78125, accuracy=0.8360000252723694, train_accuracy=0.975)
+EpochMetrics(epoch=251, total_rounds=503, total_fda_steps=78438, accuracy=0.8345999717712402, train_accuracy=0.9875)
+EpochMetrics(epoch=252, total_rounds=503, total_fda_steps=78750, accuracy=0.835099995136261, train_accuracy=0.99375)
+EpochMetrics(epoch=253, total_rounds=503, total_fda_steps=79063, accuracy=0.8366000056266785, train_accuracy=1.0)
+EpochMetrics(epoch=254, total_rounds=503, total_fda_steps=79375, accuracy=0.8356000185012817, train_accuracy=0.99375)
+EpochMetrics(epoch=255, total_rounds=503, total_fda_steps=79688, accuracy=0.8364999890327454, train_accuracy=1.0)
+EpochMetrics(epoch=256, total_rounds=503, total_fda_steps=80000, accuracy=0.8363000154495239, train_accuracy=1.0)
+EpochMetrics(epoch=257, total_rounds=503, total_fda_steps=80313, accuracy=0.8370000123977661, train_accuracy=1.0)
+EpochMetrics(epoch=258, total_rounds=503, total_fda_steps=80625, accuracy=0.8363000154495239, train_accuracy=1.0)
+EpochMetrics(epoch=259, total_rounds=503, total_fda_steps=80938, accuracy=0.8370000123977661, train_accuracy=0.99375)
+EpochMetrics(epoch=260, total_rounds=503, total_fda_steps=81250, accuracy=0.8373000025749207, train_accuracy=1.0)
+EpochMetrics(epoch=261, total_rounds=503, total_fda_steps=81563, accuracy=0.8366000056266785, train_accuracy=1.0)
+EpochMetrics(epoch=262, total_rounds=503, total_fda_steps=81875, accuracy=0.8352000117301941, train_accuracy=1.0)
+EpochMetrics(epoch=263, total_rounds=503, total_fda_steps=82188, accuracy=0.835099995136261, train_accuracy=0.98125)
+EpochMetrics(epoch=264, total_rounds=503, total_fda_steps=82500, accuracy=0.8348000049591064, train_accuracy=0.99375)
+EpochMetrics(epoch=265, total_rounds=503, total_fda_steps=82813, accuracy=0.8349999785423279, train_accuracy=1.0)
+EpochMetrics(epoch=266, total_rounds=503, total_fda_steps=83125, accuracy=0.8352000117301941, train_accuracy=0.9875)
+EpochMetrics(epoch=267, total_rounds=503, total_fda_steps=83438, accuracy=0.8337000012397766, train_accuracy=0.99375)
+EpochMetrics(epoch=268, total_rounds=503, total_fda_steps=83750, accuracy=0.8360999822616577, train_accuracy=1.0)
+EpochMetrics(epoch=269, total_rounds=503, total_fda_steps=84063, accuracy=0.8360000252723694, train_accuracy=1.0)
+EpochMetrics(epoch=270, total_rounds=503, total_fda_steps=84375, accuracy=0.8360000252723694, train_accuracy=1.0)
+EpochMetrics(epoch=271, total_rounds=503, total_fda_steps=84688, accuracy=0.8367999792098999, train_accuracy=1.0)
+EpochMetrics(epoch=272, total_rounds=503, total_fda_steps=85000, accuracy=0.8364999890327454, train_accuracy=0.99375)
+EpochMetrics(epoch=273, total_rounds=503, total_fda_steps=85313, accuracy=0.8370000123977661, train_accuracy=0.99375)
+EpochMetrics(epoch=274, total_rounds=503, total_fda_steps=85625, accuracy=0.8363999724388123, train_accuracy=1.0)
+EpochMetrics(epoch=275, total_rounds=503, total_fda_steps=85938, accuracy=0.836899995803833, train_accuracy=1.0)
+EpochMetrics(epoch=276, total_rounds=503, total_fda_steps=86250, accuracy=0.8367999792098999, train_accuracy=1.0)
+EpochMetrics(epoch=277, total_rounds=503, total_fda_steps=86563, accuracy=0.8367000222206116, train_accuracy=1.0)
+EpochMetrics(epoch=278, total_rounds=503, total_fda_steps=86875, accuracy=0.8366000056266785, train_accuracy=0.99375)
+EpochMetrics(epoch=279, total_rounds=503, total_fda_steps=87188, accuracy=0.8367999792098999, train_accuracy=1.0)
+EpochMetrics(epoch=280, total_rounds=503, total_fda_steps=87500, accuracy=0.8367000222206116, train_accuracy=0.99375)
+EpochMetrics(epoch=281, total_rounds=503, total_fda_steps=87813, accuracy=0.8373000025749207, train_accuracy=1.0)
+EpochMetrics(epoch=282, total_rounds=503, total_fda_steps=88125, accuracy=0.8371000289916992, train_accuracy=0.99375)
+EpochMetrics(epoch=283, total_rounds=503, total_fda_steps=88438, accuracy=0.8367000222206116, train_accuracy=1.0)
+EpochMetrics(epoch=284, total_rounds=503, total_fda_steps=88750, accuracy=0.8371000289916992, train_accuracy=1.0)
+EpochMetrics(epoch=285, total_rounds=503, total_fda_steps=89063, accuracy=0.8370000123977661, train_accuracy=1.0)
+EpochMetrics(epoch=286, total_rounds=503, total_fda_steps=89375, accuracy=0.8374000191688538, train_accuracy=0.99375)
+EpochMetrics(epoch=287, total_rounds=503, total_fda_steps=89688, accuracy=0.8371000289916992, train_accuracy=1.0)
+EpochMetrics(epoch=288, total_rounds=503, total_fda_steps=90000, accuracy=0.8370000123977661, train_accuracy=1.0)
+EpochMetrics(epoch=289, total_rounds=503, total_fda_steps=90313, accuracy=0.8370000123977661, train_accuracy=1.0)
+EpochMetrics(epoch=290, total_rounds=503, total_fda_steps=90625, accuracy=0.836899995803833, train_accuracy=1.0)
+EpochMetrics(epoch=291, total_rounds=503, total_fda_steps=90938, accuracy=0.8364999890327454, train_accuracy=1.0)
+EpochMetrics(epoch=292, total_rounds=503, total_fda_steps=91250, accuracy=0.8366000056266785, train_accuracy=1.0)
+EpochMetrics(epoch=293, total_rounds=503, total_fda_steps=91563, accuracy=0.8374000191688538, train_accuracy=1.0)
+EpochMetrics(epoch=294, total_rounds=503, total_fda_steps=91875, accuracy=0.8377000093460083, train_accuracy=1.0)
+EpochMetrics(epoch=295, total_rounds=503, total_fda_steps=92188, accuracy=0.8374999761581421, train_accuracy=1.0)
+EpochMetrics(epoch=296, total_rounds=503, total_fda_steps=92500, accuracy=0.8370000123977661, train_accuracy=1.0)
+EpochMetrics(epoch=297, total_rounds=503, total_fda_steps=92813, accuracy=0.8371999859809875, train_accuracy=1.0)
+EpochMetrics(epoch=298, total_rounds=503, total_fda_steps=93125, accuracy=0.836899995803833, train_accuracy=0.99375)
+EpochMetrics(epoch=299, total_rounds=503, total_fda_steps=93438, accuracy=0.8364999890327454, train_accuracy=1.0)
+EpochMetrics(epoch=300, total_rounds=503, total_fda_steps=93750, accuracy=0.8367999792098999, train_accuracy=1.0)
+
+------------ Finished Testing : ------------
+Dataset name : CIFAR10
+Bias : None
+Bench test : False
+NN name : DenseNet201
+FDA name : naive
+Num Clients : 5
+Batch size : 32
+Num Epochs : 300
+Number of steps until we check RTC : 1
+Theta : 500.0
+Aggr. Scheme : avg
+Per-Layer training : False
+Total simulation time: 98223.97827553749 sec
+-----------------------------------------
+
