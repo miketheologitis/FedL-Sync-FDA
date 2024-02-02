@@ -175,3 +175,4 @@ EpochMetrics(epoch=157, total_rounds=322, total_fda_steps=49063, accuracy=0.8104
 EpochMetrics(epoch=158, total_rounds=325, total_fda_steps=49375, accuracy=0.8003000020980835, train_accuracy=0.81875)
 EpochMetrics(epoch=159, total_rounds=329, total_fda_steps=49688, accuracy=0.8130999803543091, train_accuracy=0.86875)
 EpochMetrics(epoch=160, total_rounds=332, total_fda_steps=50000, accuracy=0.8126999735832214, train_accuracy=0.90625)
+EpochMetrics(epoch=161, total_rounds=335, total_fda_steps=50313, accuracy=0.8154000043869019, train_accuracy=0.9)
