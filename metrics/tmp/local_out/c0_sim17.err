@@ -1,0 +1,377 @@
+2024-02-01 11:08:32.185417: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2024-02-01 11:08:32.222971: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2024-02-01 11:08:32.223048: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2024-02-01 11:08:32.223943: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2024-02-01 11:08:32.229252: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-02-01 11:08:32.953826: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2024-02-01 11:08:34.912652: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 18744 MB memory:  -> device: 0, name: NVIDIA A10, pci bus id: 0000:ca:00.0, compute capability: 8.6
+2024-02-01 11:08:39.938542: I external/local_tsl/tsl/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+2024-02-01 11:11:06.136452: I external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:454] Loaded cuDNN version 8904
+2024-02-01 11:11:06.232293: I external/local_tsl/tsl/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+2024-02-01 11:11:14.418102: I external/local_xla/xla/service/service.cc:168] XLA service 0x7efb094fb680 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2024-02-01 11:11:14.418146: I external/local_xla/xla/service/service.cc:176]   StreamExecutor device (0): NVIDIA A10, Compute Capability 8.6
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1706785874.500530 1074127 device_compiler.h:186] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+2024-02-01 11:11:47.757314: I external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:1101] failed to allocate 4.00GiB (4294967296 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:11:47.757503: I external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:1101] failed to allocate 3.60GiB (3865470464 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:11:47.757634: I external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:1101] failed to allocate 3.24GiB (3478923264 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:43.649039: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:43.685799: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:43.715349: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:43.743635: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:43.787727: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:43.833688: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:43.862297: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:43.893328: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:43.922119: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:43.956450: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:43.987286: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.016013: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.056755: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.095069: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.123739: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.152629: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.183286: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.212168: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.241039: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.271219: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.306622: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.334909: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.364994: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.399574: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.427781: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.459293: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.488648: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.516941: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.547465: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.576022: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.604748: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.634968: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.663327: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.691131: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.727325: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.756623: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.784889: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.821585: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.850254: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.878678: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.908775: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.937259: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:44.973038: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.002745: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.031097: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.059897: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.089918: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.117860: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.145699: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.175945: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.204819: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.233321: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.263611: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.291934: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.321532: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.351561: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.380649: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.409236: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.439745: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.468293: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.498791: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.528719: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.564522: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.592698: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.628489: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.657032: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.685441: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.723050: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.751132: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.779723: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.816122: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.850752: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.879417: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.909213: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.938419: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:45.970272: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.001869: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.031534: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.065403: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.094833: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.123159: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.151555: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.184056: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.212292: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.246285: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.276898: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.305341: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.340681: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.371493: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.400021: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.428310: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.459022: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.493320: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.521305: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.551015: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.579504: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.608034: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.638664: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.667625: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.695956: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.726663: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.762692: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.790614: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.820739: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.849267: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.878046: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.916699: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.945024: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:46.974622: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.010165: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.038797: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.068191: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.098328: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.126447: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.154630: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.184959: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.221098: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.255456: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.286093: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.321051: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.349629: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.379768: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.412316: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.440427: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.470684: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.499232: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.527177: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.564485: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.592964: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.623053: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.654103: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.682905: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.718854: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.755590: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.790235: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.825467: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.862805: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.891877: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.921267: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.951362: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:47.983329: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2024-02-01 11:14:48.015787: W external/local_xla/xla/service/gpu/runtime/support.cc:58] Intercepted XLA runtime error:
+RESOURCE_EXHAUSTED: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/main.py", line 60, in <module>
+    epoch_metrics_with_test_id_list = single_simulation(**derived_params, **hyperparameters)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/strategies/simulation.py", line 95, in single_simulation
+    epoch_metrics_list = sketch_federated_simulation(
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/strategies/sketch.py", line 251, in sketch_federated_simulation
+    euc_norm_squared_clients, sketch_clients = clients_train_sketch(
+                                               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/strategies/sketch.py", line 170, in clients_train_sketch
+    Delta_i_euc_norm_squared, sketch = client_train_sketch(
+                                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/strategies/sketch.py", line 138, in client_train_sketch
+    client_cnn.train(client_dataset)
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/models/dense_net.py", line 247, in train
+    self.step(batch)
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/models/dense_net.py", line 243, in step
+    return self.train_on_batch(x=x_batch, y=y_batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/keras/src/engine/training.py", line 2787, in train_on_batch
+    logs = self.train_function(iterator)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/tensorflow/python/util/traceback_utils.py", line 153, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/tensorflow/python/eager/execute.py", line 53, in quick_execute
+    tensors = pywrap_tfe.TFE_Py_Execute(ctx._handle, device_name, op_name,
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tensorflow.python.framework.errors_impl.InternalError: Graph execution error:
+
+Detected at node SGD/StatefulPartitionedCall_142 defined at (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+
+  File "<frozen runpy>", line 88, in _run_code
+
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/main.py", line 60, in <module>
+
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/strategies/simulation.py", line 95, in single_simulation
+
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/strategies/sketch.py", line 251, in sketch_federated_simulation
+
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/strategies/sketch.py", line 170, in clients_train_sketch
+
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/strategies/sketch.py", line 138, in client_train_sketch
+
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/models/dense_net.py", line 247, in train
+
+  File "/home/mtheologitis/FedL-Sync-FDA/fdavg/models/dense_net.py", line 243, in step
+
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/keras/src/engine/training.py", line 2787, in train_on_batch
+
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/keras/src/engine/training.py", line 1401, in train_function
+
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/keras/src/engine/training.py", line 1384, in step_function
+
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/keras/src/engine/training.py", line 1154, in train_step
+
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/keras/src/optimizers/optimizer.py", line 544, in minimize
+
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/keras/src/optimizers/optimizer.py", line 1223, in apply_gradients
+
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/keras/src/optimizers/optimizer.py", line 652, in apply_gradients
+
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/keras/src/optimizers/optimizer.py", line 1253, in _internal_apply_gradients
+
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/keras/src/optimizers/optimizer.py", line 1345, in _distributed_apply_gradients_fn
+
+  File "/home/mtheologitis/anaconda3/envs/tf-2.14-gpu/lib/python3.11/site-packages/keras/src/optimizers/optimizer.py", line 1340, in apply_grad_to_update_var
+
+Failed to execute XLA Runtime executable: run time error: custom call 'xla.gpu.func.launch' failed: Failed to get module function:CUDA_ERROR_OUT_OF_MEMORY: out of memory; current tracing scope: fusion; current profiling annotation: XlaModule:#hlo_module=a_inference__update_step_xla_599021__.26,program_id=2274#.
+	 [[{{node SGD/StatefulPartitionedCall_142}}]] [Op:__inference_train_function_627596]
