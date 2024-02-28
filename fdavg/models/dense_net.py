@@ -312,8 +312,8 @@ def create_learning_rate_schedule(total_epochs, steps_per_epoch):
 
     total_steps = total_epochs * steps_per_epoch
 
-    steps_at_50_percent = 0.8 * total_steps
-    steps_at_75_percent = 0.9 * total_steps
+    steps_at_50_percent = 0.9 * total_steps
+    steps_at_75_percent = 0.95 * total_steps
 
     boundaries = [steps_at_50_percent, steps_at_75_percent]
     values = [0.1, 0.01, 0.001]

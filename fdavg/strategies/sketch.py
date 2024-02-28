@@ -11,10 +11,16 @@ class AmsSketch:
     AMS Sketch class for approximate second moment estimation.
     """
 
-    def __init__(self, depth=5, width=250):
+    def __init__(self, depth=5, width=250, with_seed=False):
         self.depth = tf.constant(depth)
         self.width = tf.constant(width)
-        self.F = tf.random.uniform(shape=(6, depth), minval=0, maxval=(1 << 31) - 1, dtype=tf.int32)
+
+        if with_seed:
+            self.F = tf.random.stateless_uniform(shape=(6, depth), minval=0, maxval=(1 << 31) - 1, dtype=tf.int32,
+                                                 seed=(1, 2))
+        else:
+            self.F = tf.random.uniform(shape=(6, depth), minval=0, maxval=(1 << 31) - 1, dtype=tf.int32)
+
         self.zeros_sketch = tf.zeros(shape=(self.depth, self.width), dtype=tf.float32)
 
         self.precomputed_dict = {}
