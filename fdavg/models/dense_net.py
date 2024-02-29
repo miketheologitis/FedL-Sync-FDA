@@ -288,11 +288,11 @@ class DenseNet:
         return trainable_layers_idx
 
 
-def get_compiled_and_built_densenet(name, cnn_batch_input, learning_rate_fn, optimizer_fn):
+def get_compiled_and_built_densenet(name, cnn_batch_input, optimizer_fn):
     densenet = DenseNet(name)
 
     densenet.compile(
-        optimizer=optimizer_fn(learning_rate=learning_rate_fn()),
+        optimizer=optimizer_fn(),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),  # we have softmax
         metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')]
     )
@@ -300,103 +300,3 @@ def get_compiled_and_built_densenet(name, cnn_batch_input, learning_rate_fn, opt
     densenet.build(cnn_batch_input)
 
     return densenet
-
-
-def create_learning_rate_schedule(total_epochs, steps_per_epoch):
-    """
-    DenseNet paper, where the learning rate changes at specific epochs (50% and 75% of total training epochs).
-    Starts at 0.1, goes to 0.01 at 80% of epochs, and finally after 90% goes to 0.001
-
-    Ref: https://www.tensorflow.org/api_docs/python/tf/keras/optimizers/schedules/PiecewiseConstantDecay
-    """
-
-    total_steps = total_epochs * steps_per_epoch
-
-    steps_at_50_percent = 0.9 * total_steps
-    steps_at_75_percent = 0.95 * total_steps
-
-    boundaries = [steps_at_50_percent, steps_at_75_percent]
-    values = [0.1, 0.01, 0.001]
-
-    learning_rate_schedule = tf.keras.optimizers.schedules.PiecewiseConstantDecay(boundaries, values)
-
-    return learning_rate_schedule
-
-
-"""
-# Implementation in NHWC format (channels last)
-
-def dense_block(x, blocks, name):
-    for i in range(blocks):
-        x = conv_block(x, 32, name=name + '_block' + str(i + 1))
-    return x
-
-
-def transition_block(x, reduction, name):
-    bn_axis = 3  # channels_last data format : (batch_size, height, width, channels)
-    x = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name=name + '_bn')(x)
-    x = layers.Activation('relu', name=name + '_relu')(x)
-    x = layers.Conv2D(int(x.shape[bn_axis] * reduction), 1, kernel_initializer='he_normal', use_bias=False,
-                      name=name + '_conv')(x)
-    x = layers.AveragePooling2D(2, strides=2, name=name + '_pool')(x)
-    return x
-
-
-def conv_block(x, growth_rate, name):
-    bn_axis = 3  # channels_last data format : (batch_size, height, width, channels)
-    x1 = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name=name + '_0_bn')(x)
-    x1 = layers.Activation('relu', name=name + '_0_relu')(x1)
-    x1 = layers.Conv2D(4 * growth_rate, 1, use_bias=False, kernel_initializer='he_normal', name=name + '_1_conv')(x1)
-    x1 = layers.Dropout(0.2, name=name + '_1_dropout')(
-        x1)  # Add dropout 0.2 after convolution as Huang et. al suggest for Cifar-10
-    x1 = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name=name + '_1_bn')(x1)
-    x1 = layers.Activation('relu', name=name + '_1_relu')(x1)
-    x1 = layers.Conv2D(growth_rate, 3, padding='same', use_bias=False, kernel_initializer='he_normal',
-                       name=name + '_2_conv')(x1)
-    x1 = layers.Dropout(0.2, name=name + '_2_dropout')(
-        x1)  # Add dropout 0.2 after convolution as Huang et. al suggest for Cifar-10
-    x = layers.Concatenate(axis=bn_axis, name=name + '_concat')([x, x1])
-    return x
-
-
-def dense_net_fn(blocks, input_shape, classes):
-    # Determine proper input shape
-    img_input = layers.Input(shape=input_shape)
-
-    bn_axis = 3  # `channels_last` data format : (batch_size, height, width, channels)
-
-    x = layers.ZeroPadding2D(padding=((3, 3), (3, 3)))(img_input)
-    x = layers.Conv2D(64, 7, strides=2, use_bias=False, kernel_initializer='he_normal', name='conv1/conv')(x)
-    x = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name='conv1/bn')(x)
-    x = layers.Activation('relu', name='conv1/relu')(x)
-    x = layers.ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
-    x = layers.MaxPooling2D(3, strides=2, name='pool1')(x)
-
-    x = dense_block(x, blocks[0], name='conv2')
-    x = transition_block(x, 0.5, name='pool2')
-    x = dense_block(x, blocks[1], name='conv3')
-    x = transition_block(x, 0.5, name='pool3')
-    x = dense_block(x, blocks[2], name='conv4')
-    x = transition_block(x, 0.5, name='pool4')
-    x = dense_block(x, blocks[3], name='conv5')
-
-    x = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name='bn')(x)
-    x = layers.Activation('relu', name='relu')(x)
-
-    x = layers.GlobalAveragePooling2D(name='avg_pool')(x)
-    x = layers.Dense(classes, kernel_initializer='he_normal', activation='softmax', name='fc10')(x)
-
-    inputs = img_input
-
-    # Create model.
-    if blocks == [6, 12, 24, 16]:
-        model = models.Model(inputs, x, name='densenet121')
-    elif blocks == [6, 12, 32, 32]:
-        model = models.Model(inputs, x, name='densenet169')
-    elif blocks == [6, 12, 48, 32]:
-        model = models.Model(inputs, x, name='densenet201')
-    else:
-        model = models.Model(inputs, x, name='densenet')
-
-    return model
-"""

@@ -19,9 +19,8 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
             Adam with the defaults, utilizing the pseudo-gradient average drifts.
 
     - CIFAR-10
-        1. `gm`, `sketch`, `naive`, `linear` use SGD with Nesterov momentum b=0.9 with a learning rate schedule starting
-            from 0.1 and reducing to 0.01 and 0.001 at the 50% of epochs and 75% of epochs, respectively on all clients.
-            Server does NOT use an optimizer, we just put one there so that we can .compile.
+        1. `gm`, `sketch`, `naive`, `linear` use SGD with Nesterov momentum b=0.9 with a learning rate of 0.1 on all
+            clients. Server does NOT use an optimizer, we just put one there so that we can .compile.
         2. `FedAvgM` uses SGD with learning_rate=0.0316 on all clients and server USES an optimizer. The server uses
             SGD with momentum b=0.9 with learning_rate=0.316.
 
@@ -79,21 +78,13 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
         derived_params['load_federated_data_fn'] = cifar10_load_federated_data
         derived_params['n_train'] = CIFAR10_N_TRAIN
 
-        steps_in_one_epoch = (CIFAR10_N_TRAIN / batch_size) / num_clients
-
         if nn_name in ['DenseNet121', 'DenseNet169', 'DenseNet201']:
 
             if fda_name in ['synchronous', 'gm', 'naive', 'linear', 'sketch']:
 
-                # Specific learning rate schedule for each client.
-                learning_rate_fn = partial(
-                    create_learning_rate_schedule,
-                    total_epochs=num_epochs,
-                    steps_per_epoch=steps_in_one_epoch
-                )
-
                 optimizer_fn = partial(
                     tf.keras.optimizers.SGD,
+                    learning_rate=0.1,
                     momentum=0.9,
                     nesterov=True
                 )
@@ -102,7 +93,6 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
                     get_compiled_and_built_densenet,
                     name=nn_name,
                     cnn_batch_input=CIFAR10_CNN_BATCH_INPUT,
-                    learning_rate_fn=learning_rate_fn,
                     optimizer_fn=optimizer_fn
                 )
 
@@ -113,14 +103,19 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
 
             server_optimizer_fn = partial(
                 tf.keras.optimizers.SGD,
+                learning_rate=0.316,
                 momentum=0.9
+            )
+
+            client_optimizer_fn = partial(
+                tf.keras.optimizers.SGD,
+                learning_rate=0.0316
             )
 
             derived_params['server_compile_and_build_model_fn'] = partial(
                 get_compiled_and_built_densenet,
                 name=nn_name,
                 cnn_batch_input=CIFAR10_CNN_BATCH_INPUT,
-                learning_rate_fn=lambda: 0.316,
                 optimizer_fn=server_optimizer_fn
             )
 
@@ -128,8 +123,7 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
                 get_compiled_and_built_densenet,
                 name=nn_name,
                 cnn_batch_input=CIFAR10_CNN_BATCH_INPUT,
-                learning_rate_fn=lambda: 0.0316,
-                optimizer_fn=tf.keras.optimizers.SGD
+                optimizer_fn=client_optimizer_fn
             )
 
     return derived_params
