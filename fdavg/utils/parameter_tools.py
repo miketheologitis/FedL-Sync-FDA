@@ -2,7 +2,7 @@ from fdavg.data.mnist import MNIST_N_TRAIN, MNIST_CNN_BATCH_INPUT, MNIST_CNN_INP
 from fdavg.data.cifar10 import CIFAR10_N_TRAIN, CIFAR10_CNN_BATCH_INPUT, cifar10_load_federated_data
 from fdavg.models.lenet5 import get_compiled_and_built_lenet
 from fdavg.models.advanced_cnn import get_compiled_and_built_advanced_cnn
-from fdavg.models.dense_net import get_compiled_and_built_densenet, create_learning_rate_schedule
+from fdavg.models.dense_net import get_compiled_and_built_densenet
 
 from functools import partial
 
