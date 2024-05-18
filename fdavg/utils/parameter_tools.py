@@ -1,8 +1,10 @@
 from fdavg.data.mnist import MNIST_N_TRAIN, MNIST_CNN_BATCH_INPUT, MNIST_CNN_INPUT_RESHAPE, mnist_load_federated_data
 from fdavg.data.cifar10 import CIFAR10_N_TRAIN, CIFAR10_CNN_BATCH_INPUT, cifar10_load_federated_data
+from fdavg.data.cifar100 import CIFAR100_N_TRAIN, CIFAR100_CNN_BATCH_INPUT, cifar100_load_federated_data
 from fdavg.models.lenet5 import get_compiled_and_built_lenet
 from fdavg.models.advanced_cnn import get_compiled_and_built_advanced_cnn
 from fdavg.models.dense_net import get_compiled_and_built_densenet
+from fdavg.models.convnext import get_compiled_and_built_convnext
 
 from functools import partial
 
@@ -125,5 +127,30 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
                 cnn_batch_input=CIFAR10_CNN_BATCH_INPUT,
                 optimizer_fn=client_optimizer_fn
             )
+
+        if ds_name == 'CIFAR100':
+
+            derived_params['load_federated_data_fn'] = cifar100_load_federated_data
+            derived_params['n_train'] = CIFAR100_N_TRAIN
+
+            if nn_name in ['ConvNeXtLarge', 'ConvNeXtXLarge']:
+
+                if fda_name in ['synchronous', 'gm', 'naive', 'linear', 'sketch']:
+                    optimizer_fn = partial(
+                        tf.keras.optimizers.AdamW,
+                        learning_rate=5e-5,
+                        weight_decay=1e-8
+                    )
+
+                    compile_and_build_model_fn = partial(
+                        get_compiled_and_built_convnext,
+                        name=nn_name,
+                        cnn_batch_input=CIFAR100_CNN_BATCH_INPUT,
+                        optimizer_fn=optimizer_fn
+                    )
+
+                    derived_params[
+                        'server_compile_and_build_model_fn'] = compile_and_build_model_fn  # Only for .compile
+                    derived_params['client_compile_and_build_model_fn'] = compile_and_build_model_fn
 
     return derived_params

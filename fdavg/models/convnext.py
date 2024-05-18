@@ -1,24 +1,24 @@
 from tensorflow.keras import layers, models
 import tensorflow as tf
-from tensorflow.keras.applications import EfficientNetB7, EfficientNetV2L
+from tensorflow.keras.applications import ConvNeXtLarge, ConvNeXtXLarge
 
 
-EfficientNetB7_weight_file = 'XXXX'
-EfficientNetV2L_weight_file = 'XXXX'
+ConvNeXtLarge_weight_file = 'ConvNeXtLarge.05_acc_0.64_val_acc_0.62.weights.h5'
+ConvNeXtXLarge_weight_file = 'ConvNeXtXLarge.05_acc_0.64_val_acc_0.63.weights.h5'
 
 
-class EfficientNet:
+class ConvNeXt:
     def __init__(self, name, input_shape=(32, 32, 3), classes=100):
 
         base_model, weight_file = None, None
 
-        if name == 'EfficientNetB7':
-            base_model = EfficientNetB7(include_top=False, weights='imagenet', input_shape=input_shape)
-            weight_file = EfficientNetB7_weight_file
+        if name == 'ConvNeXtLarge':
+            base_model = ConvNeXtLarge(include_top=False, weights='imagenet', input_shape=input_shape)
+            weight_file = ConvNeXtLarge_weight_file
 
-        if name == 'EfficientNetV2L':
-            base_model = EfficientNetV2L(include_top=False, weights='imagenet', input_shape=input_shape)
-            weight_file = EfficientNetV2L_weight_file
+        if name == 'ConvNeXtXLarge':
+            base_model = ConvNeXtXLarge(include_top=False, weights='imagenet', input_shape=input_shape)
+            weight_file = ConvNeXtXLarge_weight_file
 
         base_model.trainable = True
 
@@ -94,8 +94,8 @@ class EfficientNet:
         return trainable_layers_idx
 
 
-def get_compiled_and_built_efficient_net(name, cnn_batch_input, optimizer_fn):
-    efficient_net = EfficientNet(name=name)
+def get_compiled_and_built_convnext(name, cnn_batch_input, optimizer_fn):
+    efficient_net = ConvNeXt(name=name)
 
     efficient_net.compile(
         optimizer=optimizer_fn(),
