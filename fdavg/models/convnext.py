@@ -1,12 +1,18 @@
 from tensorflow.keras import layers, models
 import tensorflow as tf
-from tensorflow.keras.applications import ConvNeXtLarge, ConvNeXtXLarge
+from tensorflow.keras.applications import ConvNeXtLarge, ConvNeXtXLarge, ConvNeXtBase
 
 import os
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
-convenet_dir = 'convnext_cifar100_imagenet/'
+convenet_dir = 'cifar100_imagenet/'
 
+
+ConvNeXtBase_weight_file = os.path.normpath(
+    os.path.join(
+        script_dir, f'{convenet_dir}/ConvNeXtBase.05_acc_0.64_val_acc_0.62.weights.h5'
+    )
+)
 
 ConvNeXtLarge_weight_file = os.path.normpath(
     os.path.join(
@@ -25,6 +31,10 @@ class ConvNeXt:
     def __init__(self, name, input_shape=(32, 32, 3), classes=100):
 
         base_model, weight_file = None, None
+
+        if name == 'ConvNeXtBase':
+            base_model = ConvNeXtBase(include_top=False, weights='imagenet', input_shape=input_shape)
+            weight_file = ConvNeXtBase_weight_file
 
         if name == 'ConvNeXtLarge':
             base_model = ConvNeXtLarge(include_top=False, weights='imagenet', input_shape=input_shape)

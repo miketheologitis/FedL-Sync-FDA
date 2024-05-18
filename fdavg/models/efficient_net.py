@@ -5,13 +5,7 @@ from tensorflow.keras.applications import EfficientNetB7, EfficientNetV2L
 import os
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
-eff_dir = 'effXXX/'
-
-EfficientNetB7_weight_file = os.path.normpath(
-    os.path.join(
-        script_dir, f'{eff_dir}/YYYY.weights.h5'
-    )
-)
+eff_dir = 'cifar100_imagenet/'
 
 EfficientNetV2L_weight_file = os.path.normpath(
     os.path.join(
@@ -25,27 +19,19 @@ class EfficientNet:
 
         base_model, weight_file = None, None
 
-        if name == 'EfficientNetB7':
-            base_model = EfficientNetB7(include_top=False, weights='imagenet', input_shape=input_shape)
-            weight_file = EfficientNetB7_weight_file
-
         if name == 'EfficientNetV2L':
             base_model = EfficientNetV2L(include_top=False, weights='imagenet', input_shape=input_shape)
             weight_file = EfficientNetV2L_weight_file
 
         base_model.trainable = True
 
-        inputs = tf.keras.Input(shape=input_shape)
-
-        # The base model contains batchnorm layers. We want to keep them in inference mode
-        # See https://keras.io/guides/transfer_learning/
-        x = base_model(inputs, training=False)
+        x = base_model.output
         x = layers.GlobalAveragePooling2D()(x)
         x = layers.Dense(512, activation='relu')(x)
         x = layers.Dropout(0.5)(x)
         outputs = layers.Dense(classes, activation='softmax')(x)
 
-        self.model = models.Model(inputs=inputs, outputs=outputs)
+        self.model = models.Model(inputs=base_model.output, outputs=outputs)
 
         self.model.load_weights(weight_file)
 

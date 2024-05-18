@@ -133,7 +133,7 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
         derived_params['load_federated_data_fn'] = cifar100_load_federated_data
         derived_params['n_train'] = CIFAR100_N_TRAIN
 
-        if nn_name in ['ConvNeXtLarge', 'ConvNeXtXLarge']:
+        if nn_name in ['ConvNeXtBase', 'ConvNeXtLarge', 'ConvNeXtXLarge']:
 
             if fda_name in ['synchronous', 'gm', 'naive', 'linear', 'sketch']:
                 optimizer_fn = partial(
