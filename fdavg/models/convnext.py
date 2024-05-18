@@ -117,8 +117,7 @@ def get_compiled_and_built_convnext(name, cnn_batch_input, optimizer_fn):
     convnet.compile(
         optimizer=optimizer_fn(),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),  # we have softmax
-        metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')],
-        run_eagerly=True
+        metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')]
     )
 
     return convnet
