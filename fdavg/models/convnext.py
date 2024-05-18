@@ -10,7 +10,7 @@ convenet_dir = 'cifar100_imagenet/'
 
 ConvNeXtBase_weight_file = os.path.normpath(
     os.path.join(
-        script_dir, f'{convenet_dir}/ConvNeXtBase.05_acc_0.64_val_acc_0.62.weights.h5'
+        script_dir, f'{convenet_dir}/ConvNeXtBase.04_acc_0.61_val_acc_0.57.weights.h5'
     )
 )
 
