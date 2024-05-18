@@ -2,9 +2,22 @@ from tensorflow.keras import layers, models
 import tensorflow as tf
 from tensorflow.keras.applications import EfficientNetB7, EfficientNetV2L
 
+import os
 
-EfficientNetB7_weight_file = 'XXXX'
-EfficientNetV2L_weight_file = 'XXXX'
+script_dir = os.path.dirname(os.path.realpath(__file__))
+eff_dir = 'effXXX/'
+
+EfficientNetB7_weight_file = os.path.normpath(
+    os.path.join(
+        script_dir, f'{eff_dir}/YYYY.weights.h5'
+    )
+)
+
+EfficientNetV2L_weight_file = os.path.normpath(
+    os.path.join(
+        script_dir, f'{eff_dir}/YYYY.weights.h5'
+    )
+)
 
 
 class EfficientNet:

@@ -2,9 +2,23 @@ from tensorflow.keras import layers, models
 import tensorflow as tf
 from tensorflow.keras.applications import ConvNeXtLarge, ConvNeXtXLarge
 
+import os
 
-ConvNeXtLarge_weight_file = 'ConvNeXtLarge.05_acc_0.64_val_acc_0.62.weights.h5'
-ConvNeXtXLarge_weight_file = 'ConvNeXtXLarge.05_acc_0.64_val_acc_0.63.weights.h5'
+script_dir = os.path.dirname(os.path.realpath(__file__))
+convenet_dir = 'convnext_cifar100_imagenet/'
+
+
+ConvNeXtLarge_weight_file = os.path.normpath(
+    os.path.join(
+        script_dir, f'{convenet_dir}/ConvNeXtLarge.05_acc_0.64_val_acc_0.62.weights.h5'
+    )
+)
+
+ConvNeXtXLarge_weight_file = os.path.normpath(
+    os.path.join(
+        script_dir, f'{convenet_dir}/ConvNeXtXLarge.05_acc_0.64_val_acc_0.63.weights.h5'
+    )
+)
 
 
 class ConvNeXt:
