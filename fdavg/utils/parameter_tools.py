@@ -128,29 +128,29 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
                 optimizer_fn=client_optimizer_fn
             )
 
-        if ds_name == 'CIFAR100':
+    if ds_name == 'CIFAR100':
 
-            derived_params['load_federated_data_fn'] = cifar100_load_federated_data
-            derived_params['n_train'] = CIFAR100_N_TRAIN
+        derived_params['load_federated_data_fn'] = cifar100_load_federated_data
+        derived_params['n_train'] = CIFAR100_N_TRAIN
 
-            if nn_name in ['ConvNeXtLarge', 'ConvNeXtXLarge']:
+        if nn_name in ['ConvNeXtLarge', 'ConvNeXtXLarge']:
 
-                if fda_name in ['synchronous', 'gm', 'naive', 'linear', 'sketch']:
-                    optimizer_fn = partial(
-                        tf.keras.optimizers.AdamW,
-                        learning_rate=5e-5,
-                        weight_decay=1e-8
-                    )
+            if fda_name in ['synchronous', 'gm', 'naive', 'linear', 'sketch']:
+                optimizer_fn = partial(
+                    tf.keras.optimizers.AdamW,
+                    learning_rate=5e-5,
+                    weight_decay=1e-8
+                )
 
-                    compile_and_build_model_fn = partial(
-                        get_compiled_and_built_convnext,
-                        name=nn_name,
-                        cnn_batch_input=CIFAR100_CNN_BATCH_INPUT,
-                        optimizer_fn=optimizer_fn
-                    )
+                compile_and_build_model_fn = partial(
+                    get_compiled_and_built_convnext,
+                    name=nn_name,
+                    cnn_batch_input=CIFAR100_CNN_BATCH_INPUT,
+                    optimizer_fn=optimizer_fn
+                )
 
-                    derived_params[
-                        'server_compile_and_build_model_fn'] = compile_and_build_model_fn  # Only for .compile
-                    derived_params['client_compile_and_build_model_fn'] = compile_and_build_model_fn
+                derived_params[
+                    'server_compile_and_build_model_fn'] = compile_and_build_model_fn  # Only for .compile
+                derived_params['client_compile_and_build_model_fn'] = compile_and_build_model_fn
 
     return derived_params
