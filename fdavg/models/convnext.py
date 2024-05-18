@@ -109,14 +109,12 @@ class ConvNeXt:
 
 
 def get_compiled_and_built_convnext(name, cnn_batch_input, optimizer_fn):
-    efficient_net = ConvNeXt(name=name)
+    convnet = ConvNeXt(name=name)
 
-    efficient_net.compile(
+    convnet.compile(
         optimizer=optimizer_fn(),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),  # we have softmax
         metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')]
     )
 
-    efficient_net.build(cnn_batch_input)
-
-    return efficient_net
+    return convnet

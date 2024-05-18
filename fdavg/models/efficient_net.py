@@ -116,6 +116,6 @@ def get_compiled_and_built_efficient_net(name, cnn_batch_input, optimizer_fn):
         metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')]
     )
 
-    efficient_net.build(cnn_batch_input)
+    #efficient_net.build(cnn_batch_input)
 
     return efficient_net
