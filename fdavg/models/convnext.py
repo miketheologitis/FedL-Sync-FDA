@@ -109,6 +109,9 @@ class ConvNeXt:
 
 
 def get_compiled_and_built_convnext(name, cnn_batch_input, optimizer_fn):
+    # TODO: The `build` method gets replaced by `.load_weights` but this function stops making sense this way.
+    # TODO: (when time allows) fIx this approach issue, it is confusing.
+
     convnet = ConvNeXt(name=name)
 
     convnet.compile(
