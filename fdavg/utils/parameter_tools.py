@@ -153,4 +153,29 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
                     'server_compile_and_build_model_fn'] = compile_and_build_model_fn  # Only for .compile
                 derived_params['client_compile_and_build_model_fn'] = compile_and_build_model_fn
 
+        if nn_name in ['EfficientNetB7', 'EfficientNetV2L']:
+
+            if fda_name in ['synchronous', 'gm', 'naive', 'linear', 'sketch']:
+                optimizer_fn = partial(
+                    tf.keras.optimizers.SGD,
+                    learning_rate=0.01,
+                    momentum=0.9,
+                    global_clipnorm=1.
+                )
+
+                # maybe change? It follows paper tho
+                # https://arxiv.org/pdf/2104.00298#page=10&zoom=100,0,0
+                # https://arxiv.org/pdf/2010.11929#page=13&zoom=100,144,854
+
+                compile_and_build_model_fn = partial(
+                    get_compiled_and_built_convnext,
+                    name=nn_name,
+                    cnn_batch_input=CIFAR100_CNN_BATCH_INPUT,
+                    optimizer_fn=optimizer_fn
+                )
+
+                derived_params[
+                    'server_compile_and_build_model_fn'] = compile_and_build_model_fn  # Only for .compile
+                derived_params['client_compile_and_build_model_fn'] = compile_and_build_model_fn
+
     return derived_params
