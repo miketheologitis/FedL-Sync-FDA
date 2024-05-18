@@ -86,7 +86,7 @@ def cifar10_load_federated_data(num_clients, batch_size, num_steps_until_rtc_che
         create_federated_data_fn = partial(create_biased_federated_data, bias=bias)
 
     elif bias == -1:
-        create_federated_data_fn = partial(create_one_label_biased_federated_data, biased_label=0)
+        create_federated_data_fn = partial(create_one_label_biased_federated_data, biased_label=6)
 
     elif bias == -2:
         create_federated_data_fn = partial(create_one_label_biased_federated_data, biased_label=8)
