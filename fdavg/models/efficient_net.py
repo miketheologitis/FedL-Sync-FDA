@@ -4,14 +4,17 @@ from tensorflow.keras.applications import EfficientNetB7, EfficientNetV2L
 
 
 class EfficientNet:
-    def __init__(self, name, input_shape=(32, 32, 3), classes=100, weight_file='XXX'):
+    def __init__(self, name, input_shape=(32, 32, 3), classes=100):
 
-        base_model = None
+        base_model, weight_file = None, None
 
         if name == 'EfficientNetB7':
             base_model = EfficientNetB7(include_top=False, weights='imagenet', input_shape=input_shape)
+            weight_file = 'trained/EfficientNetB7.24_acc_0.44_val_acc_0.50.weights.h5'
+
         if name == 'EfficientNetV2L':
             base_model = EfficientNetV2L(include_top=False, weights='imagenet', input_shape=input_shape)
+            weight_file = 'trained/EfficientNetV2L.31_acc_0.45_val_acc_0.50.weights.h5'
 
         x = base_model.output
         x = layers.GlobalAveragePooling2D()(x)
