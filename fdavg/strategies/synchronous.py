@@ -63,6 +63,8 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
 
         tmp_fda_steps += 1
         total_fda_steps += 1
+
+        print(f"Step {tmp_fda_steps}/{fda_steps_in_one_epoch}")
             
         # If Epoch has passed in this fda step
         if tmp_fda_steps >= fda_steps_in_one_epoch:
