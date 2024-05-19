@@ -94,7 +94,6 @@ def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_cl
             sketch_width, sketch_depth = 250, 5
 
             if nn_name in ['ConvNeXtLarge', 'ConvNeXtXLarge']:
-                print("\n\n\nPERFECTOOO\n\n\n")
                 ams_sketch = AmsSketch(width=sketch_width, depth=sketch_depth, save_mem=True)
             else:
                 ams_sketch = AmsSketch(width=sketch_width, depth=sketch_depth)
