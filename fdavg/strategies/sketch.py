@@ -106,7 +106,8 @@ class AmsSketch:
                 self.precompute(d)
 
         if self.save_mem:
-            return self._sketch_for_vector(v, self.precomputed_dict[('four', d)], self.precomputed_dict[('indices', d)])
+            with tf.device('/CPU:0'):
+                return self._sketch_for_vector(v, self.precomputed_dict[('four', d)], self.precomputed_dict[('indices', d)])
 
         return self._sketch_for_vector(v, self.precomputed_dict[('four', d)], self.precomputed_dict[('indices', d)])
 
