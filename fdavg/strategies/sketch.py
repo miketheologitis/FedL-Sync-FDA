@@ -11,7 +11,9 @@ class AmsSketch:
     AMS Sketch class for approximate second moment estimation.
     """
 
-    def __init__(self, depth=5, width=250, with_seed=False):
+    def __init__(self, depth=5, width=250, with_seed=False, save_mem=False):
+        self.save_mem = save_mem
+
         self.depth = tf.constant(depth)
         self.width = tf.constant(width)
 
@@ -97,7 +99,11 @@ class AmsSketch:
         d = v.shape[0]
 
         if ('four', d) not in self.precomputed_dict:
-            self.precompute(d)
+            if self.save_mem:
+                with tf.device('/CPU:0'):
+                    self.precompute(d)
+            else:
+                self.precompute(d)
 
         return self._sketch_for_vector(v, self.precomputed_dict[('four', d)], self.precomputed_dict[('indices', d)])
 

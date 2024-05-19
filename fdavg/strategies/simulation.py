@@ -92,9 +92,16 @@ def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_cl
 
         if fda_name == "sketch":
             sketch_width, sketch_depth = 250, 5
+
+            if nn_name in ['ConvNeXtLarge', 'ConvNeXtXLarge']:
+                print("\n\n\nPERFECTOOO\n\n\n")
+                ams_sketch = AmsSketch(width=sketch_width, depth=sketch_depth, save_mem=True)
+            else:
+                ams_sketch = AmsSketch(width=sketch_width, depth=sketch_depth)
+
             epoch_metrics_list = sketch_federated_simulation(
                 test_ds, federated_ds, server_cnn, client_cnns, num_epochs, theta, fda_steps_in_one_epoch,
-                compile_and_build_model_fn, AmsSketch(width=sketch_width, depth=sketch_depth), 1. / sqrt(sketch_width),
+                compile_and_build_model_fn, ams_sketch, 1. / sqrt(sketch_width),
                 aggr_scheme
             )
 
