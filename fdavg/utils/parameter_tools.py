@@ -4,7 +4,6 @@ from fdavg.data.cifar100 import CIFAR100_N_TRAIN, CIFAR100_CNN_BATCH_INPUT, cifa
 from fdavg.models.lenet5 import get_compiled_and_built_lenet
 from fdavg.models.advanced_cnn import get_compiled_and_built_advanced_cnn
 from fdavg.models.dense_net import get_compiled_and_built_densenet
-from fdavg.models.convnext import get_compiled_and_built_convnext
 
 from functools import partial
 
@@ -129,6 +128,9 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
             )
 
     if ds_name == 'CIFAR100':
+
+        # Here because ARIS has 2.7
+        from fdavg.models.convnext import get_compiled_and_built_convnext
 
         derived_params['load_federated_data_fn'] = cifar100_load_federated_data
         derived_params['n_train'] = CIFAR100_N_TRAIN
