@@ -197,6 +197,30 @@ def client_train_sketch(w_t0, client_cnn, client_dataset, ams_sketch):
     return Delta_i_euc_norm_squared, sketch
 
 
+def client_train_sketch2(w_t0, client_cnn, client_dataset, ams_sketch):  # Remove
+    """
+    Train a client model and return the AMS sketch and square of the Euclidean norm.
+
+    Args:
+    - w_t0 (tf.Tensor): Initial model parameters. Shape=(d,).
+    - client_cnn (object): Client CNN model.
+    - client_dataset (tf.data.Dataset): Client dataset.
+    - ams_sketch (AmsSketch): AMS sketch instance.
+
+    Returns:
+    - tuple: (Square of the Euclidean norm, AMS sketch)
+    """
+    # number of steps depend on `.take()` from `dataset`
+    client_cnn.train(client_dataset)
+
+    Delta_i = client_cnn.trainable_vars_as_vector() - w_t0
+
+    #  ||D(t)_i||^2 , shape = ()
+    Delta_i_euc_norm_squared = tf.reduce_sum(tf.square(Delta_i))  # ||D(t)_i||^2
+
+    return Delta_i_euc_norm_squared, Delta_i
+
+
 def clients_train_sketch(w_t0, client_cnns, federated_dataset, ams_sketch):
     """
     Train multiple client models and return lists of the AMS sketches and the square of the Euclidean norms.
@@ -216,7 +240,7 @@ def clients_train_sketch(w_t0, client_cnns, federated_dataset, ams_sketch):
 
     # client steps (number depends on `federated_dataset`, i.e., `.take(num)`)
     for client_cnn, client_dataset in zip(client_cnns, federated_dataset):
-        Delta_i_euc_norm_squared, sketch = client_train_sketch(
+        Delta_i_euc_norm_squared, sketch = client_train_sketch2(
             w_t0, client_cnn, client_dataset, ams_sketch
         )
 
@@ -224,6 +248,25 @@ def clients_train_sketch(w_t0, client_cnns, federated_dataset, ams_sketch):
         sketch_clients.append(sketch)
         
     return euc_norm_squared_clients, sketch_clients
+
+
+def f_sketch2(euc_norm_squared_clients, sketch_clients, epsilon):  # Remove
+    """
+    Compute the approximation of the variance using sketches.
+
+    Args:
+    - euc_norm_squared_clients (list): List of squared Euclidean norms.
+    - sketch_clients (list): List of AMS sketches.
+    - epsilon (float): Error bound for the AMS sketch.
+
+    Returns:
+    - tf.Tensor: Approximation of the variance.
+    """
+    S_1 = tf.reduce_mean(euc_norm_squared_clients)
+    S_2 = tf.reduce_mean(sketch_clients, axis=0)
+
+    # See theoretical analysis above
+    return S_1 - tf.reduce_sum(tf.square(S_2))
 
 
 def f_sketch(euc_norm_squared_clients, sketch_clients, epsilon):
@@ -302,7 +345,7 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
             )
 
             # Sketch estimation of variance
-            est_var = f_sketch(euc_norm_squared_clients, sketch_clients, epsilon).numpy()
+            est_var = f_sketch2(euc_norm_squared_clients, sketch_clients, epsilon).numpy()
 
             tmp_fda_steps += 1
             total_fda_steps += 1
