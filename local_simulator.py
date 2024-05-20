@@ -5,14 +5,17 @@ import signal
 processes = []
 
 
-def gpu_id_gen(n_gpus):
+def gpu_id_gen(n_gpus, use_all_gpus):
     """
     A generator that yields the GPU ID to use.
     """
     i = 0
     while True:
-        yield i % n_gpus
-        i += 1
+        if use_all_gpus:
+            yield ','.join(str(i) for i in range(n_gpus))
+        else:
+            yield i % n_gpus
+            i += 1
 
 
 def signal_handler(signum, frame):
@@ -37,9 +40,11 @@ if __name__ == '__main__':
     # Add the gpu_mem argument
     parser.add_argument('--gpu_mem', type=int, default=-1,
                         help="The GPU memory to be used. If not provided we let TensorFlow dynamically allocate.")
+    parser.add_argument('--use_all_gpus', action='store_true',
+                        help="Use all available GPUs. Defaults to False if not given.")
     args = parser.parse_args()
 
-    gpu_id_generator = gpu_id_gen(args.n_gpus)
+    gpu_id_generator = gpu_id_gen(args.n_gpus, args.use_all_gpus)
 
     for sim_id in range(args.n_sims):
         # Ask the user whether to start a new process or quit
