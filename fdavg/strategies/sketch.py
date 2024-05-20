@@ -126,6 +126,8 @@ class AmsSketch:
     def _sketch_for_vector_mem(self, v, four, indices):
         """ Less memory intensive version of `_sketch_for_vector`, working with chunks of numbers"""
 
+        d = v.shape[0]
+
         sketch = tf.zeros(shape=(self.depth, self.width), dtype=tf.float32)
 
         v_expand = tf.expand_dims(v, axis=-1)  # shape=(d, 1)
