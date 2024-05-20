@@ -11,7 +11,7 @@ class AmsSketch:
     AMS Sketch class for approximate second moment estimation.
     """
 
-    def __init__(self, depth=5, width=250, with_seed=False, save_mem=False, save_mem_chunk_size=500_000):
+    def __init__(self, depth=5, width=250, with_seed=False, save_mem=False, save_mem_chunk_size=250_000):
         self.save_mem = save_mem
         self.save_mem_chunk_size = save_mem_chunk_size
 
