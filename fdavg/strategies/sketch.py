@@ -139,6 +139,8 @@ class AmsSketch:
 
         sketch = tf.zeros(shape=(self.depth, self.width), dtype=tf.float32)
 
+        d = v.shape[0]
+
         for start in range(0, d, self.chunk_size):
             end = min(start + self.chunk_size, d)
 
