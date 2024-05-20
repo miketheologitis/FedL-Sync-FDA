@@ -3,6 +3,7 @@ import tensorflow as tf
 from fdavg.metrics.epoch_metrics import EpochMetrics
 from fdavg.models.miscellaneous import (average_trainable_client_weights, weighted_average_client_weights,
                                         current_accuracy, synchronize_clients)
+import gc
 
 
 def ksi_unit(w_t0, w_tminus1):
@@ -154,6 +155,9 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         
         # Continue training until estimated variance crosses the threshold
         while est_var <= theta:
+
+            if total_fda_steps % 100 == 0:
+                gc.collect()
                 
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
             euc_norm_squared_clients, ksi_delta_clients = clients_train_linear(
@@ -217,7 +221,6 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         total_rounds += 1
         
     return epoch_metrics_list
-
 
 
                 

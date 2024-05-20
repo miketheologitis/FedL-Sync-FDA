@@ -2,6 +2,7 @@ from fdavg.metrics.epoch_metrics import EpochMetrics
 from fdavg.models.miscellaneous import (average_trainable_client_weights, synchronize_clients, current_accuracy,
                                         average_non_trainable_client_weights)
 import tensorflow as tf
+import gc
 
 
 def clients_train_fed_opt(client_cnns, federated_dataset):
@@ -55,6 +56,9 @@ def fed_opt_simulation(test_dataset, federated_dataset, server_cnn, client_cnns,
     epoch_metrics_list = []
 
     while epoch_count <= num_epochs:
+
+        if total_steps % 100 == 0:
+            gc.collect()
 
         # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
         clients_train_fed_opt(client_cnns, federated_dataset)

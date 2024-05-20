@@ -173,18 +173,6 @@ class AmsSketch:
 
 
 def client_train_sketch2(w_t0, client_cnn, client_dataset, ams_sketch):   # TODO: Remove fucn
-    """
-    Train a client model and return the AMS sketch and square of the Euclidean norm.
-
-    Args:
-    - w_t0 (tf.Tensor): Initial model parameters. Shape=(d,).
-    - client_cnn (object): Client CNN model.
-    - client_dataset (tf.data.Dataset): Client dataset.
-    - ams_sketch (AmsSketch): AMS sketch instance.
-
-    Returns:
-    - tuple: (Square of the Euclidean norm, AMS sketch)
-    """
     # number of steps depend on `.take()` from `dataset`
     client_cnn.train(client_dataset)
 
@@ -197,19 +185,6 @@ def client_train_sketch2(w_t0, client_cnn, client_dataset, ams_sketch):   # TODO
 
 
 def clients_train_sketch2(w_t0, client_cnns, federated_dataset, ams_sketch):  # TODO: Remove fucn
-    """
-    Train multiple client models and return lists of the AMS sketches and the square of the Euclidean norms.
-
-    Args:
-    - w_t0 (tf.Tensor): Initial model parameters. Shape=(d,).
-    - client_cnns (list): List of client CNN models.
-    - federated_dataset (list): List of client datasets.
-    - ams_sketch (AmsSketch): AMS sketch instance.
-
-    Returns:
-    - tuple: (List of squares of the Euclidean norms, List of AMS sketches)
-    """
-
     euc_norm_squared_clients = []
 
     d = w_t0.shape[0]
@@ -231,17 +206,6 @@ def clients_train_sketch2(w_t0, client_cnns, federated_dataset, ams_sketch):  # 
 
 
 def f_sketch2(euc_norm_squared_clients, mean_Delta_i, epsilon):  # TODO: Remove fucn
-    """
-    Compute the approximation of the variance using sketches.
-
-    Args:
-    - euc_norm_squared_clients (list): List of squared Euclidean norms.
-    - sketch_clients (list): List of AMS sketches.
-    - epsilon (float): Error bound for the AMS sketch.
-
-    Returns:
-    - tf.Tensor: Approximation of the variance.
-    """
     S_1 = tf.reduce_mean(euc_norm_squared_clients)
     S_2 = tf.reduce_sum(tf.square(mean_Delta_i))
 
@@ -375,7 +339,7 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         # Continue training until estimated variance crosses the threshold
         while est_var <= theta:
 
-            if total_fda_steps % 100 == 0:  # TODO: Remove?
+            if total_fda_steps % 100 == 0:
                 gc.collect()
 
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)

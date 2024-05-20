@@ -1,6 +1,7 @@
 from fdavg.metrics.epoch_metrics import EpochMetrics
 from fdavg.models.miscellaneous import average_trainable_client_weights, synchronize_clients, current_accuracy
 import tensorflow as tf
+import gc
 
 
 def clients_train_synchronous(client_cnns, federated_dataset):
@@ -57,6 +58,9 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
     tmp_model_for_acc = compile_and_build_model_func()
     
     while epoch_count <= num_epochs:
+
+        if total_fda_steps % 100 == 0:
+            gc.collect()
             
         # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
         clients_train_synchronous(client_cnns, federated_dataset)

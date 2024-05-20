@@ -5,6 +5,8 @@ from fdavg.metrics.epoch_metrics import EpochMetrics
 from fdavg.models.miscellaneous import (average_trainable_client_weights, weighted_average_client_weights,
                                         current_accuracy, synchronize_clients, avg_client_layer_weights)
 
+import gc
+
 
 def client_train_naive(w_t0, client_cnn, client_dataset):
     """
@@ -117,6 +119,10 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
         
         # Continue training until estimated variance crosses the threshold
         while est_var <= theta:
+
+            if total_fda_steps % 100 == 0:
+                gc.collect()
+
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
             euc_norm_squared_clients = clients_train_naive(w_t0, client_cnns, federated_dataset)
 
