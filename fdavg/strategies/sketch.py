@@ -113,7 +113,7 @@ class AmsSketch:
 
         return self._sketch_for_vector(v, self.precomputed_dict[('four', d)], self.precomputed_dict[('indices', d)])
 
-    @tf.function
+    #@tf.function
     def _sketch_for_vector(self, v, four, indices):
         v_expand = tf.expand_dims(v, axis=-1)  # shape=(d, 1)
 
