@@ -210,7 +210,9 @@ def clients_train_sketch2(w_t0, client_cnns, federated_dataset, ams_sketch):  # 
 
     euc_norm_squared_clients = []
 
-    sum_Delta_i = tf.zeros((w_t0.shape[0],))
+    d = w_t0.shape[0]
+
+    sum_Delta_i = tf.zeros((d,))
 
     # client steps (number depends on `federated_dataset`, i.e., `.take(num)`)
     for client_cnn, client_dataset in zip(client_cnns, federated_dataset):
@@ -222,10 +224,10 @@ def clients_train_sketch2(w_t0, client_cnns, federated_dataset, ams_sketch):  # 
 
         euc_norm_squared_clients.append(Delta_i_euc_norm_squared)
 
-    return euc_norm_squared_clients, sum_Delta_i
+    return euc_norm_squared_clients, sum_Delta_i / d
 
 
-def f_sketch2(euc_norm_squared_clients, sum_Delta_i, epsilon):  # TODO: Remove fucn
+def f_sketch2(euc_norm_squared_clients, mean_Delta_i, epsilon):  # TODO: Remove fucn
     """
     Compute the approximation of the variance using sketches.
 
@@ -238,7 +240,7 @@ def f_sketch2(euc_norm_squared_clients, sum_Delta_i, epsilon):  # TODO: Remove f
     - tf.Tensor: Approximation of the variance.
     """
     S_1 = tf.reduce_mean(euc_norm_squared_clients)
-    S_2 = tf.reduce_sum(tf.square(sum_Delta_i))
+    S_2 = tf.reduce_sum(tf.square(mean_Delta_i))
 
     # See theoretical analysis above
     return S_1 - S_2
