@@ -4,6 +4,7 @@ from fdavg.models.miscellaneous import (average_trainable_client_weights, synchr
 import tensorflow as tf
 import gc
 
+
 def clients_train_fed_opt(client_cnns, federated_dataset):
     """
     Train all client models with FedOpt

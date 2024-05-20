@@ -5,6 +5,7 @@ from fdavg.models.miscellaneous import (average_trainable_client_weights, weight
                                         current_accuracy, synchronize_clients)
 import gc
 
+
 def ksi_unit(w_t0, w_tminus1):
     """
     Calculates the heuristic unit vector ksi.
@@ -220,7 +221,6 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         total_rounds += 1
         
     return epoch_metrics_list
-
 
 
                 
