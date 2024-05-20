@@ -211,6 +211,7 @@ def clients_train_sketch2(w_t0, client_cnns, federated_dataset, ams_sketch):  # 
     euc_norm_squared_clients = []
 
     d = w_t0.shape[0]
+    num_clients = len(client_cnns)
 
     sum_Delta_i = tf.zeros((d,))
 
@@ -224,7 +225,7 @@ def clients_train_sketch2(w_t0, client_cnns, federated_dataset, ams_sketch):  # 
 
         euc_norm_squared_clients.append(Delta_i_euc_norm_squared)
 
-    return euc_norm_squared_clients, sum_Delta_i / d
+    return euc_norm_squared_clients, sum_Delta_i / num_clients
 
 
 def f_sketch2(euc_norm_squared_clients, mean_Delta_i, epsilon):  # TODO: Remove fucn
