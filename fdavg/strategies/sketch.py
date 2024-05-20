@@ -11,8 +11,9 @@ class AmsSketch:
     AMS Sketch class for approximate second moment estimation.
     """
 
-    def __init__(self, depth=5, width=250, with_seed=False, save_mem=False):
+    def __init__(self, depth=5, width=250, with_seed=False, save_mem=False, save_mem_chunk_size=1_000_000):
         self.save_mem = save_mem
+        self.save_mem_chunk_size = save_mem_chunk_size
 
         self.depth = tf.constant(depth)
         self.width = tf.constant(width)
@@ -105,15 +106,13 @@ class AmsSketch:
             else:
                 self.precompute(d)
 
-        """
         if self.save_mem:
-            with tf.device('/CPU:0'):
-                return self._sketch_for_vector(v, self.precomputed_dict[('four', d)], self.precomputed_dict[('indices', d)])
-        """
+            return self._sketch_for_vector_mem(v, self.precomputed_dict[('four', d)],
+                                               self.precomputed_dict[('indices', d)])
 
         return self._sketch_for_vector(v, self.precomputed_dict[('four', d)], self.precomputed_dict[('indices', d)])
 
-    #@tf.function
+    @tf.function
     def _sketch_for_vector(self, v, four, indices):
         v_expand = tf.expand_dims(v, axis=-1)  # shape=(d, 1)
 
@@ -121,6 +120,29 @@ class AmsSketch:
         deltas_tensor = tf.multiply(four, v_expand)
 
         sketch = tf.tensor_scatter_nd_add(self.zeros_sketch, indices, deltas_tensor)  # shape=(5, 250)
+
+        return sketch
+
+    def _sketch_for_vector_mem(self, v, four, indices):
+        """ Less memory intensive version of `_sketch_for_vector`, working with chunks of numbers"""
+
+        sketch = tf.zeros(shape=(self.depth, self.width), dtype=tf.float32)
+
+        v_expand = tf.expand_dims(v, axis=-1)  # shape=(d, 1)
+
+        for start in range(0, d, self.save_mem_chunk_size):
+            end = min(start + self.save_mem_chunk_size, d)
+
+            # Slice the tensors into chunks
+            four_chunk = four[start:end, :]
+            v_expand_chunk = v_expand[start:end, :]
+
+            # Perform the multiplication on the current chunk
+            deltas_tensor_chunk = tf.multiply(four_chunk, v_expand_chunk)
+
+            indices_chunk = indices[start:end, :, :]
+
+            sketch = tf.tensor_scatter_nd_add(sketch, indices_chunk, deltas_tensor_chunk)
 
         return sketch
 
