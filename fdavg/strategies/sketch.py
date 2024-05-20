@@ -170,34 +170,7 @@ class AmsSketch:
         return np.median(norm_sq_rows)
 
 
-def client_train_sketch(w_t0, client_cnn, client_dataset, ams_sketch):
-    """
-    Train a client model and return the AMS sketch and square of the Euclidean norm.
-    
-    Args:
-    - w_t0 (tf.Tensor): Initial model parameters. Shape=(d,).
-    - client_cnn (object): Client CNN model.
-    - client_dataset (tf.data.Dataset): Client dataset.
-    - ams_sketch (AmsSketch): AMS sketch instance.
-    
-    Returns:
-    - tuple: (Square of the Euclidean norm, AMS sketch)
-    """
-    # number of steps depend on `.take()` from `dataset`
-    client_cnn.train(client_dataset)
-    
-    Delta_i = client_cnn.trainable_vars_as_vector() - w_t0
-    
-    #  ||D(t)_i||^2 , shape = ()
-    Delta_i_euc_norm_squared = tf.reduce_sum(tf.square(Delta_i))  # ||D(t)_i||^2
-    
-    # sketch approx
-    sketch = ams_sketch.sketch_for_vector(Delta_i)
-    
-    return Delta_i_euc_norm_squared, sketch
-
-
-def client_train_sketch2(w_t0, client_cnn, client_dataset, ams_sketch):  # Remove
+def client_train_sketch2(w_t0, client_cnn, client_dataset, ams_sketch):   # TODO: Remove fucn
     """
     Train a client model and return the AMS sketch and square of the Euclidean norm.
 
@@ -221,6 +194,83 @@ def client_train_sketch2(w_t0, client_cnn, client_dataset, ams_sketch):  # Remov
     return Delta_i_euc_norm_squared, Delta_i
 
 
+def clients_train_sketch2(w_t0, client_cnns, federated_dataset, ams_sketch):  # TODO: Remove fucn
+    """
+    Train multiple client models and return lists of the AMS sketches and the square of the Euclidean norms.
+
+    Args:
+    - w_t0 (tf.Tensor): Initial model parameters. Shape=(d,).
+    - client_cnns (list): List of client CNN models.
+    - federated_dataset (list): List of client datasets.
+    - ams_sketch (AmsSketch): AMS sketch instance.
+
+    Returns:
+    - tuple: (List of squares of the Euclidean norms, List of AMS sketches)
+    """
+
+    euc_norm_squared_clients = []
+
+    sum_Delta_i = tf.zeros((w_t0.shape[0],))
+
+    # client steps (number depends on `federated_dataset`, i.e., `.take(num)`)
+    for client_cnn, client_dataset in zip(client_cnns, federated_dataset):
+        Delta_i_euc_norm_squared, Delta_i = client_train_sketch2(
+            w_t0, client_cnn, client_dataset, ams_sketch
+        )
+
+        sum_Delta_i += Delta_i
+
+        euc_norm_squared_clients.append(Delta_i_euc_norm_squared)
+
+    return euc_norm_squared_clients, sum_Delta_i
+
+
+def f_sketch2(euc_norm_squared_clients, sum_Delta_i, epsilon):  # TODO: Remove fucn
+    """
+    Compute the approximation of the variance using sketches.
+
+    Args:
+    - euc_norm_squared_clients (list): List of squared Euclidean norms.
+    - sketch_clients (list): List of AMS sketches.
+    - epsilon (float): Error bound for the AMS sketch.
+
+    Returns:
+    - tf.Tensor: Approximation of the variance.
+    """
+    S_1 = tf.reduce_mean(euc_norm_squared_clients)
+    S_2 = tf.reduce_sum(tf.square(sum_Delta_i))
+
+    # See theoretical analysis above
+    return S_1 - S_2
+
+
+def client_train_sketch(w_t0, client_cnn, client_dataset, ams_sketch):
+    """
+    Train a client model and return the AMS sketch and square of the Euclidean norm.
+
+    Args:
+    - w_t0 (tf.Tensor): Initial model parameters. Shape=(d,).
+    - client_cnn (object): Client CNN model.
+    - client_dataset (tf.data.Dataset): Client dataset.
+    - ams_sketch (AmsSketch): AMS sketch instance.
+
+    Returns:
+    - tuple: (Square of the Euclidean norm, AMS sketch)
+    """
+    # number of steps depend on `.take()` from `dataset`
+    client_cnn.train(client_dataset)
+
+    Delta_i = client_cnn.trainable_vars_as_vector() - w_t0
+
+    #  ||D(t)_i||^2 , shape = ()
+    Delta_i_euc_norm_squared = tf.reduce_sum(tf.square(Delta_i))  # ||D(t)_i||^2
+
+    # sketch approx
+    sketch = ams_sketch.sketch_for_vector(Delta_i)
+
+    return Delta_i_euc_norm_squared, sketch
+
+
 def clients_train_sketch(w_t0, client_cnns, federated_dataset, ams_sketch):
     """
     Train multiple client models and return lists of the AMS sketches and the square of the Euclidean norms.
@@ -240,7 +290,7 @@ def clients_train_sketch(w_t0, client_cnns, federated_dataset, ams_sketch):
 
     # client steps (number depends on `federated_dataset`, i.e., `.take(num)`)
     for client_cnn, client_dataset in zip(client_cnns, federated_dataset):
-        Delta_i_euc_norm_squared, sketch = client_train_sketch2(
+        Delta_i_euc_norm_squared, sketch = client_train_sketch(
             w_t0, client_cnn, client_dataset, ams_sketch
         )
 
@@ -248,25 +298,6 @@ def clients_train_sketch(w_t0, client_cnns, federated_dataset, ams_sketch):
         sketch_clients.append(sketch)
         
     return euc_norm_squared_clients, sketch_clients
-
-
-def f_sketch2(euc_norm_squared_clients, sketch_clients, epsilon):  # Remove
-    """
-    Compute the approximation of the variance using sketches.
-
-    Args:
-    - euc_norm_squared_clients (list): List of squared Euclidean norms.
-    - sketch_clients (list): List of AMS sketches.
-    - epsilon (float): Error bound for the AMS sketch.
-
-    Returns:
-    - tf.Tensor: Approximation of the variance.
-    """
-    S_1 = tf.reduce_mean(euc_norm_squared_clients)
-    S_2 = tf.reduce_mean(sketch_clients, axis=0)
-
-    # See theoretical analysis above
-    return S_1 - tf.reduce_sum(tf.square(S_2))
 
 
 def f_sketch(euc_norm_squared_clients, sketch_clients, epsilon):
@@ -340,12 +371,12 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         while est_var <= theta:
 
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
-            euc_norm_squared_clients, sketch_clients = clients_train_sketch(
+            euc_norm_squared_clients, sketch_clients = clients_train_sketch2(  # TODO: Change 2
                 w_t0, client_cnns, federated_dataset, ams_sketch
             )
 
             # Sketch estimation of variance
-            est_var = f_sketch2(euc_norm_squared_clients, sketch_clients, epsilon).numpy()
+            est_var = f_sketch2(euc_norm_squared_clients, sketch_clients, epsilon).numpy()  # TODO: Change 2
 
             tmp_fda_steps += 1
             total_fda_steps += 1
