@@ -11,9 +11,10 @@ class AmsSketch:
     AMS Sketch class for approximate second moment estimation.
     """
 
-    def __init__(self, depth=5, width=250, with_seed=False, save_mem=False, save_mem_chunk_size=250_000):
-        self.save_mem = save_mem
-        self.save_mem_chunk_size = save_mem_chunk_size
+    def __init__(self, depth=5, width=250, with_seed=False, use_other_gpu=None, save_on_cpu=False, chunk_size=None):
+        self.save_on_cpu = save_on_cpu
+        self.chunk_size = chunk_size
+        self.use_other_gpu = use_other_gpu
 
         self.depth = tf.constant(depth)
         self.width = tf.constant(width)
@@ -100,17 +101,27 @@ class AmsSketch:
         d = v.shape[0]
 
         if ('four', d) not in self.precomputed_dict:
-            if self.save_mem:
+            if self.save_on_cpu:
                 with tf.device('/CPU:0'):
                     self.precompute(d)
             else:
                 self.precompute(d)
 
-        if self.save_mem:
-            return self._sketch_for_vector_mem(v, self.precomputed_dict[('four', d)],
-                                               self.precomputed_dict[('indices', d)])
+        four, indices = self.precomputed_dict[('four', d)], self.precomputed_dict[('indices', d)]
 
-        return self._sketch_for_vector(v, self.precomputed_dict[('four', d)], self.precomputed_dict[('indices', d)])
+        if self.use_other_gpu:
+
+            with tf.device(self.use_other_gpu):
+
+                if self.chunk_size:
+                    return self._sketch_for_vector_with_chunks(v, four, indices)
+
+                return self._sketch_for_vector(v, four, indices)
+
+        if self.chunk_size:
+            return self._sketch_for_vector_with_chunks(v, four, indices)
+
+        return self._sketch_for_vector(v, four, indices)
 
     @tf.function
     def _sketch_for_vector(self, v, four, indices):
@@ -123,28 +134,22 @@ class AmsSketch:
 
         return sketch
 
-    def _sketch_for_vector_mem(self, v, four, indices):
+    def _sketch_for_vector_with_chunks(self, v, four, indices):
         """ Less memory intensive version of `_sketch_for_vector`, working with chunks of numbers"""
-
-        d = v.shape[0]
 
         sketch = tf.zeros(shape=(self.depth, self.width), dtype=tf.float32)
 
-        v_expand = tf.expand_dims(v, axis=-1)  # shape=(d, 1)
-
-        for start in range(0, d, self.save_mem_chunk_size):
-            end = min(start + self.save_mem_chunk_size, d)
+        for start in range(0, d, self.chunk_size):
+            end = min(start + self.chunk_size, d)
 
             # Slice the tensors into chunks
             four_chunk = four[start:end, :]
-            v_expand_chunk = v_expand[start:end, :]
-
-            # Perform the multiplication on the current chunk
-            deltas_tensor_chunk = tf.multiply(four_chunk, v_expand_chunk)
-
+            v_chunk = v[start:end]
             indices_chunk = indices[start:end, :, :]
 
-            sketch = tf.tensor_scatter_nd_add(sketch, indices_chunk, deltas_tensor_chunk)
+            sketch_from_chunk = self._sketch_for_vector(v_chunk, four_chunk, indices_chunk)
+
+            sketch = tf.add(sketch, sketch_from_chunk)
 
         return sketch
 
