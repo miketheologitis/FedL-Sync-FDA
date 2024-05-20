@@ -5,6 +5,8 @@ from fdavg.metrics.epoch_metrics import EpochMetrics
 from fdavg.models.miscellaneous import (average_trainable_client_weights, weighted_average_client_weights,
                                         current_accuracy, synchronize_clients)
 
+import gc
+
 
 class AmsSketch:
     """
@@ -372,6 +374,9 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         
         # Continue training until estimated variance crosses the threshold
         while est_var <= theta:
+
+            if total_fda_steps % 100 == 0:  # TODO: Remove?
+                gc.collect()
 
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
             euc_norm_squared_clients, sketch_clients = clients_train_sketch2(  # TODO: Change 2
