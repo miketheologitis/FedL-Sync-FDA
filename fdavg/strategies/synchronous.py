@@ -59,7 +59,7 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
     
     while epoch_count <= num_epochs:
 
-        if total_fda_steps % 100 == 0:
+        if total_fda_steps % 25 == 0:
             gc.collect()
             
         # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)

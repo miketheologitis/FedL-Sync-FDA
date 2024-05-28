@@ -120,7 +120,7 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
         # Continue training until estimated variance crosses the threshold
         while est_var <= theta:
 
-            if total_fda_steps % 100 == 0:
+            if total_fda_steps % 25 == 0:
                 gc.collect()
 
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)

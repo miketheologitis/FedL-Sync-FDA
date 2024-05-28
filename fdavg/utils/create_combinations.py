@@ -71,19 +71,19 @@ def create_combinations(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--comb_file_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json", required=True)
-    parser.add_argument('--ds_name', nargs='+', type=str, help="The dataset name.", default=["MNIST"])
-    parser.add_argument('--bias', nargs='+', type=float, help="The bias parameter.", default=[])
-    parser.add_argument('--b', nargs='+', type=int, help="The batch size(s).")
-    parser.add_argument('--e', type=int, help="Number of epochs.", required=True)
-    parser.add_argument('--fda', nargs='+', type=str, help="The FDA name(s).", required=True)
-    parser.add_argument('--nn', nargs='+', type=str, help="The CNN name(s) ('LeNet-5' , 'AdvancedCNN')", required=True)
-    parser.add_argument('--th', nargs='+', type=float, help="Theta threshold(s).", required=True)
-    parser.add_argument('--num_clients', nargs='+', type=int, help="Number of clients.",
+    parser.add_argument('--comb_file_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json. Ex. 0", required=True)
+    parser.add_argument('--ds_name', nargs='+', type=str, help="The dataset name. Ex. MNIST CIFAR10", default=["MNIST"])
+    parser.add_argument('--bias', nargs='+', type=float, help="The bias parameter. If not given, defaults to no bias. Options: '-1', '-2', '0.X'. Ex. 0.4 -1", default=[])
+    parser.add_argument('--b', nargs='+', type=int, help="The batch size(s). Ex. 32 256")
+    parser.add_argument('--e', type=int, help="Number of epochs. Ex. 100", required=True)
+    parser.add_argument('--fda', nargs='+', type=str, help="The training strategies' names. Options: 'linear', 'sketch', 'FedAdam', 'FedAvgM', 'synchronous'. Ex. synchronous linear", required=True)
+    parser.add_argument('--nn', nargs='+', type=str, help="The CNN name(s). Specific NNs go with specific datasets (be careful). Options: 'LeNet-5', 'AdvancedCNN', 'DenseNet121', 'DenseNet169', 'DenseNet201', 'ConvNeXtBase', 'ConvNeXtLarge', 'ConvNeXtXLarge'", required=True)
+    parser.add_argument('--th', nargs='+', type=float, help="Theta threshold(s). Ex. 100 150", required=True)
+    parser.add_argument('--num_clients', nargs='+', type=int, help="Number of clients. Ex. 5 10 15",
                         default=[60, 55, 5, 10, 50, 45, 40, 35, 15, 20, 30, 25])
     parser.add_argument('--aggr_scheme', nargs='+', type=str,
-                        help="Aggregation schemes (e.g., 'avg', 'wavg_drifts')", default=['avg'])
-    parser.add_argument('--per_layer', action='store_true', help="Per-layer FDA training.")
+                        help="Aggregation schemes. If not given, defaults to averaging. Options: 'avg', 'wavg_drifts'. Ex. 'avg'.", default=['avg'])
+    parser.add_argument('--per_layer', action='store_true', help="Per-layer FDA training. If not given, defaults to False.")
     parser.add_argument('--append_to', action='store_true',
                         help="If given, then we append to the comb file.")
     parser.add_argument('--test', action='store_true', help="If given, then we bench test.")

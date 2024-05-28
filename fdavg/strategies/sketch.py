@@ -339,16 +339,16 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         # Continue training until estimated variance crosses the threshold
         while est_var <= theta:
 
-            if total_fda_steps % 100 == 0:
+            if total_fda_steps % 25 == 0:
                 gc.collect()
 
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
-            euc_norm_squared_clients, sketch_clients = clients_train_sketch2(  # TODO: Change 2
+            euc_norm_squared_clients, sketch_clients = clients_train_sketch(
                 w_t0, client_cnns, federated_dataset, ams_sketch
             )
 
             # Sketch estimation of variance
-            est_var = f_sketch2(euc_norm_squared_clients, sketch_clients, epsilon).numpy()  # TODO: Change 2
+            est_var = f_sketch(euc_norm_squared_clients, sketch_clients, epsilon).numpy()
 
             tmp_fda_steps += 1
             total_fda_steps += 1
