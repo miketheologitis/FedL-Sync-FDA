@@ -4,14 +4,14 @@ Clone.
 ```bash
 git clone https://github.com/miketheologitis/FedL-Sync-FDA
 ```
-Materialize LFS files.
+Materialize LFS files (deep pre-trained models ~2GB).
 ```bash
 git lfs fetch --all
 ```
 ```bash
 git lfs pull
 ```
-# Combination Script
+# WorkFlow
 1. Using the `create_combinations.py` script, create all the experiments you want to run.
 2. Either in `slurm` or in a local machine with GPUs, simulate the experiments you created
 
