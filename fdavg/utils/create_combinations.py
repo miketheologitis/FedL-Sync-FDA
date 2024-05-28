@@ -72,7 +72,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--comb_file_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json. Ex. 0", required=True)
-    parser.add_argument('--ds_name', nargs='+', type=str, help="The dataset name. Ex. MNIST CIFAR10", default=["MNIST"])
+    parser.add_argument('--ds_name', nargs='+', type=str, help="The dataset name. Options: 'MNIST', 'CIFAR10', 'CIFAR100'. Ex. MNIST", default=["MNIST"])
     parser.add_argument('--bias', nargs='+', type=float, help="The bias parameter. If not given, defaults to no bias. Options: '-1', '-2', '0.X'. Ex. 0.4 -1", default=[])
     parser.add_argument('--b', nargs='+', type=int, help="The batch size(s). Ex. 32 256")
     parser.add_argument('--e', type=int, help="Number of epochs. Ex. 100", required=True)
