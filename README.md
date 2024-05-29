@@ -13,7 +13,7 @@ git lfs pull
 ```
 # WorkFlow
 1. Using the `create_combinations.py` script, create all the experiments you want to run.
-2. Either in `slurm` or in a local machine with GPUs, simulate the experiments you created
+2. Simulate the experiments you created utilizing GPUs, in **SLURM**, in a local machine, or in a server cluster provided they are visible to `nvidia-smi`.
 
 ## 1. Combination Script
 
