@@ -94,8 +94,9 @@ def single_simulation(ds_name, load_federated_data_fn, n_train, fda_name, num_cl
             sketch_width, sketch_depth = 250, 5
 
             if nn_name in ['EfficientNetV2L', 'ConvNeXtBase', 'ConvNeXtLarge', 'ConvNeXtXLarge']:
-                #ams_sketch = AmsSketch(save_on_cpu=True, use_other_gpu='/device:GPU:1', chunk_size=100_000_000)  # TODO: Uncomment and remove bellow
-                ams_sketch = None
+                # ams_sketch = AmsSketch(save_on_cpu=True, use_other_gpu='/device:GPU:1', chunk_size=100_000_000)
+                ams_sketch = AmsSketch(width=sketch_width, depth=sketch_depth, save_on_cpu=True, chunk_size=5_000_000)
+                # ams_sketch = None
             else:
                 ams_sketch = AmsSketch(width=sketch_width, depth=sketch_depth)
 
