@@ -1,5 +1,20 @@
 # Requirements
-Be careful: `TensorFlow >= v2.11`
+**TensorFlow** version: **v2.15**
+```bash
+conda create -n tf-2.15 python==3.9
+```
+```bash
+conda activate tf-2.15
+```
+
+If you are planning on using GPU:
+```bash
+pip install --extra-index-url https://pypi.nvidia.com tensorrt-bindings==8.6.1 tensorrt-libs==8.6.1
+```
+```bash
+pip install -U tensorflow[and-cuda]==2.15.0 pandas pyarrow
+```
+If you are planning on **not** using GPU:
 ```bash
 pip install tensorflow pandas pyarrow
 ```
@@ -10,6 +25,9 @@ Clone.
 git clone https://github.com/miketheologitis/FedL-Sync-FDA
 ```
 Materialize LFS files (deep pre-trained models ~2GB).
+```bash
+cd FedL-Sync-FDA/
+```
 ```bash
 git lfs fetch --all
 ```
@@ -89,94 +107,94 @@ We will create 5 combination files, one for each Neural Network - Dataset, encom
 ### LeNet-5
 
 **IID:**
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda linear sketch --nn LeNet-5 --ds_name MNIST --b 32 --e 300 --th 0.5 1 1.5 2 3 5 7 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 0
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda synchronous --nn LeNet-5 --ds_name MNIST --b 32 --e 300 --th 0 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 0 --append_to
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda synchronous FedAdam --nn LeNet-5 --ds_name MNIST --b 32 --e 1000 --th 0 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 0 --append_to
 ```
 **Non-IID:**
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda linear sketch --nn LeNet-5 --ds_name MNIST --b 32 --e 300 --th 0.5 1 1.5 2 3 5 7 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --bias 0.6 -1 --comb_file_id 0 --append_to
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda synchronous --nn LeNet-5 --ds_name MNIST --b 32 --e 300 --th 0 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --bias 0.6 -1 --comb_file_id 0 --append_to
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda synchronous FedAdam --nn LeNet-5 --ds_name MNIST --b 32 --e 1000 --th 0 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --bias 0.6 -1 --comb_file_id 0 --append_to
 ```
 
 ### VGG16*
 
 **IID:**
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda linear sketch --nn AdvancedCNN --ds_name MNIST --b 32 --e 300 --th 20 25 30 50 75 90 100 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 1
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda synchronous --nn AdvancedCNN --ds_name MNIST --b 32 --e 300 --th 0 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 1 --append_to
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda synchronous FedAdam --nn AdvancedCNN --ds_name MNIST --b 32 --e 1000 --th 0 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 1 --append_to
 ```
 
 **Non-IID:**
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda linear sketch --nn AdvancedCNN --ds_name MNIST --b 32 --e 300 --th 20 25 30 50 75 90 100 --bias -1 -2 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 1 --append_to
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda synchronous --nn AdvancedCNN --ds_name MNIST --b 32 --e 300 --th 0 --bias -1 -2 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 1 --append_to
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda synchronous FedAdam --nn AdvancedCNN --ds_name MNIST --b 32 --e 1000 --th 0 --bias -1 -2 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 1 --append_to
 ```
 
 ### DenseNet121
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda linear sketch --nn DenseNet121 --ds_name CIFAR-10 --b 32 --e 300 --th 200 250 275 300 325 350 400 --num_clients 5 10 15 20 25 30 --comb_file_id 2
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda synchronous --nn DenseNet121 --ds_name CIFAR-10 --b 32 --e 300 --th 0 --num_clients 5 10 15 20 25 30 --comb_file_id 2 --append_to
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda FedAvgM --nn DenseNet121 --ds_name CIFAR-10 --b 32 --e 1000 --th 0 --num_clients 5 10 15 20 25 30 --comb_file_id 2 --append_to
 ```
 
 ### DenseNet201
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda linear sketch --nn DenseNet201 --ds_name CIFAR-10 --b 32 --e 300 --th 200 250 275 300 325 350 400 --num_clients 5 10 15 20 25 30 --comb_file_id 3
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda synchronous --nn DenseNet201 --ds_name CIFAR-10 --b 32 --e 300 --th 0 --num_clients 5 10 15 20 25 30 --comb_file_id 3 --append_to
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda FedAvgM --nn DenseNet201 --ds_name CIFAR-10 --b 32 --e 1000 --th 0 --num_clients 5 10 15 20 25 30 --comb_file_id 3 --append_to
 ```
 
 ### ConvNeXtLarge
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda linear sketch --nn ConvNeXtLarge --ds_name CIFAR-100 --b 32 --e 30 --th 25 50 100 150 --num_clients 3 5 --comb_file_id 4
 ```
-```python
+```bash
 python -m fdavg.utils.create_combinations --fda synchronous --nn ConvNeXtLarge --ds_name CIFAR-100 --b 32 --e 30 --th 0 --num_clients 3 5 --comb_file_id 4 --append_to
 ```
 
 ## 2. Simulations
 To streamline things, we will run experiments locally.
-```python
+```bash
 python -m local_simulator --n_sims 612 --comb_file_id 0 --n_gpus 2
 ```
-```python
+```bash
 python -m local_simulator --n_sims 612 --comb_file_id 1 --n_gpus 2
 ```
-```python
+```bash
 python -m local_simulator --n_sims 96 --comb_file_id 2 --n_gpus 2
 ```
-```python
+```bash
 python -m local_simulator --n_sims 96 --comb_file_id 3 --n_gpus 2
 ```
-```python
+```bash
 python -m local_simulator --n_sims 18 --comb_file_id 4 --n_gpus 2
 ```
