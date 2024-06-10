@@ -90,6 +90,32 @@ python -m slurm_submitter --help
 ```
 You will see the `.out` and `.err` files in `/metrics/tmp/slurm_out/`.
 
+## 3. Results
+
+After each simulation ends, a `.parquet` or `.csv` file will be created in `/FedL-Sync-FDA/metrics/tmp/epoch_metrics`. Then,
+we must move it to `/FedL-Sync-FDA/metrics/epoch_metrics` where all the metrics are kept.
+
+If the files are `.parquet`:
+```bash
+cp /metrics/tmp/epoch_metrics/* /metrics/epoch_metrics
+```
+```bash
+rm /metrics/tmp/epoch_metrics/*
+```
+
+If the files are `.csv`:
+```bash
+cd /metrics/
+```
+```bash
+python from_csv_to_parquet.py
+```
+```bash
+rm /metrics/tmp/epoch_metrics/*
+```
+Then, run the notebook `/FedL-Sync-FDA/notebooks/data_analysis/epoch_metrics_analysis.ipynb` to see the results (plots) in
+`/FedL-Sync-FDA/metrics/plots`.
+
 
 # Paper Experiments
 
