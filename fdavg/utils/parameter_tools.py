@@ -127,7 +127,7 @@ def derive_params(nn_name, ds_name, batch_size, num_clients, num_epochs, fda_nam
                 optimizer_fn=client_optimizer_fn
             )
 
-    if ds_name == 'CIFAR100':
+    if ds_name == 'CIFAR-100':
 
         # Here because ARIS has 2.7
         from fdavg.models.convnext import get_compiled_and_built_convnext
