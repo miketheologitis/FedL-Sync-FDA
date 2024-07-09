@@ -164,13 +164,15 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
                 w_t0, w_tminus1, client_cnns, federated_dataset
             )
 
+            print([p.numpy() for p in euc_norm_squared_clients])
+
             # Linear estimation of variance
             est_var = f_linear(euc_norm_squared_clients, ksi_delta_clients).numpy()
             
             tmp_fda_steps += 1
             total_fda_steps += 1
 
-            print(f"Step {tmp_fda_steps}/{fda_steps_in_one_epoch} ,  est_var: {est_var:.2f}")
+            #print(f"Step {tmp_fda_steps}/{fda_steps_in_one_epoch} ,  est_var: {est_var:.2f}")
             
             # If Epoch has passed in this fda step
             if tmp_fda_steps >= fda_steps_in_one_epoch:
