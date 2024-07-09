@@ -347,6 +347,8 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
                 w_t0, client_cnns, federated_dataset, ams_sketch
             )
 
+            print([p.numpy() for p in euc_norm_squared_clients])
+
             # Sketch estimation of variance
             est_var = f_sketch(euc_norm_squared_clients, sketch_clients, epsilon).numpy()
 
