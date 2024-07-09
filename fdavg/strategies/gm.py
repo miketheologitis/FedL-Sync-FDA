@@ -125,6 +125,8 @@ def gm_federated_simulation(test_dataset, federated_dataset, server_cnn, client_
             # train clients, each on some number of batches which depends on `.take` creation of dataset (Default=1)
             euc_norm_squared_clients = clients_train_gm(w_t0, client_cnns, federated_dataset)
 
+            print([p.numpy() for p in euc_norm_squared_clients])
+
             # gm estimation of variance
             est_var = f_gm(euc_norm_squared_clients).numpy()
 
