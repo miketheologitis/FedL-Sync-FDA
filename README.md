@@ -16,7 +16,7 @@ pip install -U tensorflow[and-cuda]==2.15.0 pandas pyarrow
 ```
 If you are planning on **not** using GPU:
 ```bash
-pip install tensorflow pandas pyarrow
+pip install tensorflow==2.15.0 pandas pyarrow
 ```
 
 # Clone repository
