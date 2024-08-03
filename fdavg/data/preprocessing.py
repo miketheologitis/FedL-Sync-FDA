@@ -176,3 +176,46 @@ def create_one_label_biased_federated_data(X_train, y_train, num_clients, biased
         )
 
     return one_label_biased_federated_dataset
+
+
+def create_multi_label_biased_federated_data(X_train, y_train, num_clients, biased_labels_list):
+    """
+    Create non-iid federated data with specific labels (biased_labels_list) completely non-uniformly distributed
+    (potentially whole samples of said labels will go on a few clients only). Almost equal cardinality of each client's dataset.
+    Rest of the dataset is iid (without the specified labels examples).
+
+    Args:
+        X_train (numpy.ndarray): The training data features.
+        y_train (numpy.ndarray): The training data labels.
+        num_clients (int): The number of clients among which the data should be distributed.
+        biased_labels_list (list): The list of labels that should be non-uniformly distributed.
+
+    Returns:
+        list of tf.data.Dataset: A list of TensorFlow Dataset objects. Each dataset in the list corresponds to
+        the data shard for a client. The order of the datasets in the list corresponds to the order of the clients.
+    """
+
+    # Separate the data based on the biased labels
+    mask = np.isin(y_train, biased_labels_list)
+    X_train_biased = X_train[mask]
+    y_train_biased = y_train[mask]
+
+    X_train_rest = X_train[~mask]
+    y_train_rest = y_train[~mask]
+
+    # Concatenate the biased and rest datasets
+    X_train_multi_label_biased = np.concatenate((X_train_biased, X_train_rest))
+    y_train_multi_label_biased = np.concatenate((y_train_biased, y_train_rest))
+
+    # Split the data into parts for each client
+    X_train_multi_label_biased_lst = np.array_split(X_train_multi_label_biased, num_clients)
+    y_train_multi_label_biased_lst = np.array_split(y_train_multi_label_biased, num_clients)
+
+    # Create TensorFlow datasets for each client
+    multi_label_biased_federated_dataset = []
+    for X_train_client, y_train_client in zip(X_train_multi_label_biased_lst, y_train_multi_label_biased_lst):
+        dataset = tf.data.Dataset.from_tensor_slices((X_train_client, y_train_client))
+        multi_label_biased_federated_dataset.append(dataset)
+
+    return multi_label_biased_federated_dataset
+
