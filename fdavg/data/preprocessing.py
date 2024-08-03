@@ -195,8 +195,6 @@ def create_multi_label_biased_federated_data(X_train, y_train, num_clients, bias
         the data shard for a client. The order of the datasets in the list corresponds to the order of the clients.
     """
 
-    print("\n\n\n\n\n\n HELLO \n\n\n\n\n")
-
     # Separate the data based on the biased labels
     mask = np.isin(y_train, biased_labels_list)
     X_train_biased = X_train[mask]
