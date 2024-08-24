@@ -9,6 +9,7 @@ import gc
 
 from fdavg.utils.communication_cost import comm_cost_str
 from fdavg.models.miscellaneous import count_weights
+from fdavg.utils.pretty_printers import print_epoch_metrics
 
 class AmsSketch:
     """
@@ -374,7 +375,7 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
                 train_acc = tf.reduce_mean([cnn.metrics[1].result() for cnn in client_cnns]).numpy()
                 epoch_metrics = EpochMetrics(epoch_count, total_rounds, total_fda_steps, acc, train_acc)
                 epoch_metrics_list.append(epoch_metrics)
-                print(epoch_metrics)  # remove
+                print_epoch_metrics(epoch_metrics)
                 # -------------------------------
 
                 # Reset training accuracy
