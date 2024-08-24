@@ -3,6 +3,8 @@ from fdavg.models.miscellaneous import average_trainable_client_weights, synchro
 import tensorflow as tf
 import gc
 
+from fdavg.utils.communication_cost import comm_cost_str
+from fdavg.models.miscellaneous import count_weights
 
 def clients_train_synchronous(client_cnns, federated_dataset):
     """
@@ -49,6 +51,9 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
     total_rounds = 1  # Round counter
     total_fda_steps = 0  # Total FDA steps taken
 
+    nn_num_weights = count_weights(server_cnn)
+    num_clients = len(client_cnns)
+
     synchronize_clients(server_cnn, client_cnns)  # Set clients to server model
 
     # Initialize list for storing epoch metrics
@@ -68,7 +73,8 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
         tmp_fda_steps += 1
         total_fda_steps += 1
 
-        print(f"Step {tmp_fda_steps}/{fda_steps_in_one_epoch}")
+        comm_cost = comm_cost_str(total_fda_steps, total_rounds, num_clients, nn_num_weights, 'synchronous')
+        print(f"Step {total_fda_steps} ,  Communication Cost: {comm_cost}")
             
         # If Epoch has passed in this fda step
         if tmp_fda_steps >= fda_steps_in_one_epoch:
@@ -94,6 +100,7 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
             epoch_count += 1
         
         # Round finished
+        print(f"Synchronizing...!")
 
         # server average
         server_cnn.set_trainable_variables(average_trainable_client_weights(client_cnns))
@@ -101,6 +108,7 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
         synchronize_clients(server_cnn, client_cnns)
 
         total_rounds += 1
-    
+
     return epoch_metrics_list
+
                 

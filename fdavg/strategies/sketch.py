@@ -7,6 +7,8 @@ from fdavg.models.miscellaneous import (average_trainable_client_weights, weight
 
 import gc
 
+from fdavg.utils.communication_cost import comm_cost_str
+from fdavg.models.miscellaneous import count_weights
 
 class AmsSketch:
     """
@@ -321,6 +323,9 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
     total_fda_steps = 0  # Total FDA steps taken
     est_var = 0  # Estimated variance
 
+    nn_num_weights = count_weights(server_cnn)
+    num_clients = len(client_cnns)
+
     synchronize_clients(server_cnn, client_cnns)
     
     # Initialize models and synchronize client and server models
@@ -347,15 +352,14 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
                 w_t0, client_cnns, federated_dataset, ams_sketch
             )
 
-            print([p.numpy() for p in euc_norm_squared_clients])
-
             # Sketch estimation of variance
             est_var = f_sketch(euc_norm_squared_clients, sketch_clients, epsilon).numpy()
 
             tmp_fda_steps += 1
             total_fda_steps += 1
 
-            #print(f"Step {tmp_fda_steps}/{fda_steps_in_one_epoch} ,  est_var: {est_var:.2f}")
+            comm_cost = comm_cost_str(total_fda_steps, total_rounds, num_clients, nn_num_weights, 'sketch')
+            print(f"Step {total_fda_steps} ,  Communication Cost: {comm_cost}")
             
             # If Epoch has passed in this fda step
             if tmp_fda_steps >= fda_steps_in_one_epoch:
@@ -383,6 +387,7 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
                     break
         
         # Round finished
+        print(f"Synchronizing...!")
 
         # aggregation
         if aggr_scheme == 'avg':

@@ -7,6 +7,8 @@ from fdavg.models.miscellaneous import (average_trainable_client_weights, weight
 
 import gc
 
+from fdavg.utils.communication_cost import comm_cost_str
+from fdavg.models.miscellaneous import count_weights
 
 def client_train_naive(w_t0, client_cnn, client_dataset):
     """
@@ -102,6 +104,9 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
     total_fda_steps = 0  # Total number of FDA steps taken
     est_var = 0  # Estimated variance
 
+    nn_num_weights = count_weights(server_cnn)
+    num_clients = len(client_cnns)
+
     synchronize_clients(server_cnn, client_cnns)
     
     # Initialize models and weights
@@ -132,7 +137,8 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
             tmp_fda_steps += 1
             total_fda_steps += 1
 
-            print(f"Step {tmp_fda_steps}/{fda_steps_in_one_epoch} ,  est_var: {est_var:.2f}")
+            comm_cost = comm_cost_str(total_fda_steps, total_rounds, num_clients, nn_num_weights, 'naive')
+            print(f"Step {total_fda_steps} ,  Communication Cost: {comm_cost}")
             
             # If Epoch has passed in this fda step
             if tmp_fda_steps >= fda_steps_in_one_epoch:
@@ -160,6 +166,7 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
                     break
         
         # Round finished
+        print(f"Synchronizing...!")
 
         # aggregation
         if aggr_scheme == 'avg':
@@ -179,7 +186,7 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
         est_var = 0
 
         total_rounds += 1
-        
+
     return epoch_metrics_list
 
 

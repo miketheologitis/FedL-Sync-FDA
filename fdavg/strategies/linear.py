@@ -5,6 +5,8 @@ from fdavg.models.miscellaneous import (average_trainable_client_weights, weight
                                         current_accuracy, synchronize_clients)
 import gc
 
+from fdavg.utils.communication_cost import comm_cost_str
+from fdavg.models.miscellaneous import count_weights
 
 def ksi_unit(w_t0, w_tminus1):
     """
@@ -138,6 +140,9 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
     total_fda_steps = 0  # Total number of FDA steps taken
     est_var = 0  # Estimated variance
 
+    nn_num_weights = count_weights(server_cnn)
+    num_clients = len(client_cnns)
+
     synchronize_clients(server_cnn, client_cnns)  # Set clients to server model
 
     w_t0 = server_cnn.trainable_vars_as_vector()
@@ -164,13 +169,14 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
                 w_t0, w_tminus1, client_cnns, federated_dataset
             )
 
-            print([p.numpy() for p in euc_norm_squared_clients])
-
             # Linear estimation of variance
             est_var = f_linear(euc_norm_squared_clients, ksi_delta_clients).numpy()
             
             tmp_fda_steps += 1
             total_fda_steps += 1
+
+            comm_cost = comm_cost_str(total_fda_steps, total_rounds, num_clients, nn_num_weights, 'linear')
+            print(f"Step {total_fda_steps} ,  Communication Cost: {comm_cost}")
 
             #print(f"Step {tmp_fda_steps}/{fda_steps_in_one_epoch} ,  est_var: {est_var:.2f}")
             
@@ -200,6 +206,7 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
                     break
         
         # Round finished
+        print(f"Synchronizing...!")
 
         # aggregation
         if aggr_scheme == 'avg':
@@ -223,6 +230,7 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
         total_rounds += 1
         
     return epoch_metrics_list
+
 
 
                 

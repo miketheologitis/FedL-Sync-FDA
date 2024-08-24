@@ -63,7 +63,7 @@ if __name__ == '__main__':
         # Open the FIFO for reading and block until the child process writes to it
         with open(fifo_path, 'r') as fifo:
             message = fifo.read()
-            print(f'Received hyper-parameters from Kafka! FedL workflow with ID has started with ID: {sim_id}')
+            print(f'Received hyper-parameters from Kafka! FedL workflow has started with ID: {sim_id}')
 
         # Cleanup
         os.remove(fifo_path)
