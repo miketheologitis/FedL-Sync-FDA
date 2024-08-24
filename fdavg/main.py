@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser.add_argument('--gpu_mem', type=int, default=-1,
                         help="The maximum GPU memory. If not given we dynamically allocate.")
     parser.add_argument('--slurm', action='store_true', help="Use if we are in SLURM HPC env.")
-    parser.add_argument('--kafka', action='store_false',
+    parser.add_argument('--kafka', action='store_true',
                         help="Use if we are reading hyper-parameters from Kafka.")
     args = parser.parse_args()
 

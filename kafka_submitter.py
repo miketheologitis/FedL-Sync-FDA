@@ -55,7 +55,6 @@ if __name__ == '__main__':
 
         with open(f'metrics/tmp/local_out/server_sim{sim_id}.out', 'w') as stdout_file:
             with open(f'metrics/tmp/local_out/server_sim{sim_id}.err', 'w') as stderr_file:
-                print(f"Running: {' '.join(cmd)}")
                 process = subprocess.Popen(
                     cmd, stdout=stdout_file, stderr=stderr_file, env=dict(os.environ, FIFO_PATH=fifo_path)
                 )
@@ -64,7 +63,7 @@ if __name__ == '__main__':
         # Open the FIFO for reading and block until the child process writes to it
         with open(fifo_path, 'r') as fifo:
             message = fifo.read()
-            print(f'Received hyper-parameters from Kafka! FedL workflow has started with ID: {sim_id}')
+            print(f'Received hyper-parameters from Kafka! FedL workflow with ID has started with ID: {sim_id}')
 
         # Cleanup
         os.remove(fifo_path)

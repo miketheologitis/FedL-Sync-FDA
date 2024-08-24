@@ -47,6 +47,7 @@ def kafka_get_test_hyper_parameters(topic='FedL', bootstrap_servers='localhost:9
         fifo_path = os.environ['FIFO_PATH']  # Get the FIFO path from the environment variable
         with open(fifo_path, 'w') as fifo:
             fifo.write('Received Kafka message')  # Send the signal to the parent
+            print(f"WE DID WRITE THE FIFO {fifo_path}")
 
         return combinations[0]
 
