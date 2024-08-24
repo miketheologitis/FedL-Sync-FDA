@@ -359,7 +359,7 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
             total_fda_steps += 1
 
             comm_cost = comm_cost_str(total_fda_steps, total_rounds, num_clients, nn_num_weights, 'sketch')
-            print(f"Step {total_fda_steps} ,  Communication Cost: {comm_cost}")
+            print(f"Step {total_fda_steps} , Communication Cost: {comm_cost}")
             
             # If Epoch has passed in this fda step
             if tmp_fda_steps >= fda_steps_in_one_epoch:
