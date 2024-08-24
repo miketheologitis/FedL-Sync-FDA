@@ -36,7 +36,7 @@ git lfs pull
 ```
 # WorkFlow
 1. Using the `create_combinations.py` script, create all the experiments you want to run.
-2. Simulate the experiments you created utilizing GPUs, in **SLURM**, in a local machine, or in a server cluster provided they are visible to `nvidia-smi`.
+2. Simulate the experiments you created utilizing GPUs, in **SLURM**, in a local machine, or in a server cluster provided they are visible to `nvidia-smi`. For the `Kafka` WorkFlow go to the end of this README.
 
 ## 1. Combination Script
 
@@ -223,4 +223,34 @@ python -m local_simulator --n_sims 96 --comb_file_id 3 --n_gpus 2
 ```
 ```bash
 python -m local_simulator --n_sims 18 --comb_file_id 4 --n_gpus 2
+```
+
+# Kafka WorkFlow
+
+```bash
+cd FedL-Sync-FDA
+```
+
+```bash
+python -m fdavg.utils.create_combinations --fda sketch --nn AdvancedCNN --ds_name MNIST --b 32 --e 300 --th 300 --num_clients 20 --comb_file_id 0
+```
+
+```bash
+python -m kafka_submitter --n_gpus 2 --kafka_topic FedL --kafka_server localhost:9092
+```
+
+```bash
+cd /FedL-Sync-FDA/metrics/tmp/combinations
+```
+
+```bash
+kafka-console-producer.sh --bootstrap-server localhost:9092 --topic FedL < 0.json
+```
+
+```bash
+cd /FedL-Sync-FDA/metrics/tmp/local_out
+```
+
+```bash
+tail -f server_sim1.out
 ```

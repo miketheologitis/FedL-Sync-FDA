@@ -42,7 +42,7 @@ def print_finish_testing_info(start_time, end_time, ds_name, bias, fda_name, num
 
 def print_epoch_metrics(epoch_metrics):
     print()
-    print(f"------------ Epoch {epoch_metrics.epoch} Finished : ------------")
+    print(f"---------- Epoch {epoch_metrics.epoch} Finished : -----------")
     print(f"Total Synchronizations : {epoch_metrics.total_rounds}")
     print(f"Test Accuracy : {epoch_metrics.accuracy:.4f}")
     print(f"Train Accuracy : {epoch_metrics.train_accuracy:.4f}")
