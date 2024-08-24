@@ -197,7 +197,7 @@ def create_multi_label_biased_federated_data(X_train, y_train, num_clients, bias
 
     # Separate the data based on the biased labels
     mask = np.isin(y_train, biased_labels_list).ravel()
-    print(f"mask.shape: {mask.shape}  len(X_train): {X_train.shape}")
+
     X_train_biased = X_train[mask]
     y_train_biased = y_train[mask]
 
