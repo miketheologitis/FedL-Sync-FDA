@@ -11,8 +11,8 @@ def format_bytes(size):
         size /= power
         n += 1
 
-    # Format the size with 2 decimal places
-    return f"{size:.2f} {units[n]}"
+    # Format the size with 5 decimal places
+    return f"{size:.5f} {units[n]}"
 
 def comm_cost_str(steps, rounds, num_clients, num_nn_weights, method, sketch_width=250, sketch_depth=5):
 
