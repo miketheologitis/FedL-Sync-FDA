@@ -46,5 +46,5 @@ def print_epoch_metrics(epoch_metrics):
     print(f"Total Synchronizations : {epoch_metrics.total_rounds}")
     print(f"Test Accuracy : {epoch_metrics.accuracy:.4f}")
     print(f"Train Accuracy : {epoch_metrics.train_accuracy:.4f}")
-    print("-----------------------------------------")
+    print("------------------------------------------")
     print()
