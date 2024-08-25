@@ -1,6 +1,7 @@
 
 def print_current_test_info(ds_name, bias, fda_name, num_clients, batch_size, num_epochs,
                             num_steps_until_rtc_check, nn_name, bench_test, theta, aggr_scheme, per_layer, **kwargs):
+    nn_name = nn_name if nn_name != 'AdvancedCNN' else 'VGG16*'
     print()
     print(f"------------ Current Test : ------------")
     print(f"Dataset name : {ds_name}")
@@ -21,6 +22,7 @@ def print_current_test_info(ds_name, bias, fda_name, num_clients, batch_size, nu
     
 def print_finish_testing_info(start_time, end_time, ds_name, bias, fda_name, num_clients, batch_size, num_epochs,
                               num_steps_until_rtc_check, nn_name, bench_test, theta, aggr_scheme, per_layer, **kwargs):
+    nn_name = nn_name if nn_name != 'AdvancedCNN' else 'VGG16*'
     print()
     print(f"------------ Finished Testing : ------------")
     print(f"Dataset name : {ds_name}")
