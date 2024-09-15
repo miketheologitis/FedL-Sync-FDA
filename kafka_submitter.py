@@ -53,8 +53,8 @@ if __name__ == '__main__':
             f'--gpu_mem={args.gpu_mem}', '--kafka'
         ]
 
-        with open(f'metrics/tmp/local_out/server_sim{sim_id}.out', 'w') as stdout_file:
-            with open(f'metrics/tmp/local_out/server_sim{sim_id}.err', 'w') as stderr_file:
+        with open(f'metrics/tmp/local_out/server{sim_id}.out', 'w') as stdout_file:
+            with open(f'metrics/tmp/local_out/server{sim_id}.err', 'w') as stderr_file:
                 process = subprocess.Popen(
                     cmd, stdout=stdout_file, stderr=stderr_file, env=dict(os.environ, FIFO_PATH=fifo_path)
                 )
