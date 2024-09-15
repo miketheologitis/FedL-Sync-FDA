@@ -7,7 +7,7 @@ local_out_path = os.path.normpath(os.path.join(script_dir, f'{tmp_dir}/local_out
 
 def client_step_out_create(num_clients):
     for client_i in range(num_clients):
-        with open(f"{local_out_path}/client{client_i}.out", "a"):
+        with open(f"{local_out_path}/client{client_i}.out", "w"):
             pass
 
 def client_step_out(num_clients, step, sync):
