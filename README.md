@@ -232,7 +232,7 @@ cd FedL-Sync-FDA
 ```
 
 ```bash
-python -m fdavg.utils.create_combinations --fda sketch --nn AdvancedCNN --ds_name MNIST --b 32 --e 300 --th 300 --num_clients 20 --comb_file_id 0
+python -m fdavg.utils.create_combinations --fda sketch --nn AdvancedCNN --ds_name MNIST --b 32 --e 300 --th 100 --num_clients 20 --comb_file_id 0
 ```
 
 ```bash

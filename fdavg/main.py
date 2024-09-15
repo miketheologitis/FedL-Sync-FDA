@@ -23,7 +23,7 @@ if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
     import tensorflow as tf
     if tf.config.list_physical_devices('GPU'):
-        print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+        # print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
         if args.gpu_mem == -1:
             for gpu in tf.config.experimental.list_physical_devices('GPU'):
@@ -48,7 +48,9 @@ if __name__ == '__main__':
         hyperparameters = get_test_hyper_parameters(f'{args.comb_file_id}', args.sim_id)
     else:
         from fdavg.utils.read_combinations import kafka_get_test_hyper_parameters
+        print("Waiting hyper-parameters from Kafka...")
         hyperparameters = kafka_get_test_hyper_parameters()
+        print("Received hyper-parameters from Kafka!")
 
     from fdavg.utils.clients_out import client_step_out_create
 
