@@ -13,5 +13,5 @@ def client_step_out_create(num_clients):
 def client_step_out(num_clients, step, sync):
     for client_i in range(num_clients):
         with open(f"{local_out_path}/client{client_i}.out", "a") as file:
-            sync_str = "Synchronization STARTED!" if sync else "Synchronization AVOIDED!"
+            sync_str = "Synchronization STARTED!" if sync else "Synchronization avoided!"
             file.write(f"Step {step:5}: {sync_str}\n")
