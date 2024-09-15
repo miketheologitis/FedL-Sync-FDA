@@ -50,6 +50,10 @@ if __name__ == '__main__':
         from fdavg.utils.read_combinations import kafka_get_test_hyper_parameters
         hyperparameters = kafka_get_test_hyper_parameters()
 
+    from fdavg.utils.clients_out import client_step_out_create
+
+    client_step_out_create(hyperparameters['num_clients'])  # REMOVE
+
     # 1. Derive parameters
     derived_params = derive_params(**hyperparameters)
 

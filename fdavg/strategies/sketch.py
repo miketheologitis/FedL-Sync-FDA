@@ -10,6 +10,8 @@ import gc
 from fdavg.utils.communication_cost import comm_cost_str
 from fdavg.models.miscellaneous import count_weights
 from fdavg.utils.pretty_printers import print_epoch_metrics
+from fdavg.utils.clients_out import client_step_out
+
 
 class AmsSketch:
     """
@@ -359,6 +361,7 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
             tmp_fda_steps += 1
             total_fda_steps += 1
 
+            client_step_out(num_clients, total_fda_steps, False)  # REMOVE
             comm_cost = comm_cost_str(total_fda_steps, total_rounds, num_clients, nn_num_weights, 'sketch')
             print(f"Step {total_fda_steps} , Communication Cost: {comm_cost}")
             
@@ -388,6 +391,7 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
                     break
         
         # Round finished
+        client_step_out(num_clients, total_fda_steps, True)  # REMOVE
         print(f"Synchronizing...!")
 
         # aggregation
