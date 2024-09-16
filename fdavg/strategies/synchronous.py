@@ -3,7 +3,7 @@ from fdavg.models.miscellaneous import average_trainable_client_weights, synchro
 import tensorflow as tf
 import gc
 
-from fdavg.utils.communication_cost import comm_cost_str
+from fdavg.utils.communication_cost import step_comm_cost_str  # REMOVE
 from fdavg.models.miscellaneous import count_weights
 from fdavg.utils.pretty_printers import print_epoch_metrics
 
@@ -74,8 +74,10 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
         tmp_fda_steps += 1
         total_fda_steps += 1
 
-        comm_cost = comm_cost_str(total_fda_steps, total_rounds, num_clients, nn_num_weights, 'synchronous')
-        print(f"Step {total_fda_steps} , Communication Cost: {comm_cost}")
+        sync_needed = True  # REMOVE
+        if sync_needed: print(f"Synchronizing...!")  # REMOVE
+        comm_cost = step_comm_cost_str(num_clients, nn_num_weights, sync_needed, 'linear')  # REMOVE
+        print(f"Step {total_fda_steps:4} , Communication Cost: {comm_cost}")
             
         # If Epoch has passed in this fda step
         if tmp_fda_steps >= fda_steps_in_one_epoch:
@@ -101,7 +103,6 @@ def synchronous_federated_simulation(test_dataset, federated_dataset, server_cnn
             epoch_count += 1
         
         # Round finished
-        print(f"Synchronizing...!")
 
         # server average
         server_cnn.set_trainable_variables(average_trainable_client_weights(client_cnns))
