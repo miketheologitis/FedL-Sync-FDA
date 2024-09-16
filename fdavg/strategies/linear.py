@@ -5,7 +5,7 @@ from fdavg.models.miscellaneous import (average_trainable_client_weights, weight
                                         current_accuracy, synchronize_clients)
 import gc
 
-from fdavg.utils.communication_cost import comm_cost_str
+from fdavg.utils.communication_cost import step_comm_cost_str  # REMOVE
 from fdavg.models.miscellaneous import count_weights
 from fdavg.utils.pretty_printers import print_epoch_metrics
 from fdavg.utils.clients_out import client_step_out
@@ -177,9 +177,11 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
             tmp_fda_steps += 1
             total_fda_steps += 1
 
-            client_step_out(num_clients, total_fda_steps, False)  # REMOVE
-            comm_cost = comm_cost_str(total_fda_steps, total_rounds, num_clients, nn_num_weights, 'linear')
-            print(f"Step {total_fda_steps:5} , Communication Cost: {comm_cost}")
+            sync_needed = est_var > theta  # REMOVE
+            if sync_needed: print(f"Synchronizing...!")  # REMOVE
+            client_step_out(num_clients, total_fda_steps, sync_needed)  # REMOVE
+            comm_cost = step_comm_cost_str(num_clients, nn_num_weights, sync_needed, 'linear')  # REMOVE
+            print(f"Step {total_fda_steps:4} , Communication Cost: {comm_cost}")  # REMOVE
 
             #print(f"Step {tmp_fda_steps}/{fda_steps_in_one_epoch} ,  est_var: {est_var:.2f}")
             
@@ -209,8 +211,6 @@ def linear_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
                     break
         
         # Round finished
-        client_step_out(num_clients, total_fda_steps, True)  # REMOVE
-        print(f"Synchronizing...!")
 
         # aggregation
         if aggr_scheme == 'avg':
