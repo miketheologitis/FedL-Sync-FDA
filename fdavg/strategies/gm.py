@@ -5,10 +5,10 @@ from fdavg.models.miscellaneous import (average_trainable_client_weights, synchr
                                         current_accuracy, weighted_average_client_weights)
 import gc
 
-from fdavg.utils.communication_cost import comm_cost_str
+from fdavg.utils.communication_cost import step_comm_cost_str  # REMOVE
 from fdavg.models.miscellaneous import count_weights
 from fdavg.utils.pretty_printers import print_epoch_metrics
-
+from fdavg.utils.clients_out import client_step_out  # REMOVE
 
 def client_train_gm(w_t0, client_cnn, client_dataset):
     """
@@ -138,8 +138,11 @@ def gm_federated_simulation(test_dataset, federated_dataset, server_cnn, client_
             tmp_fda_steps += 1
             total_fda_steps += 1
 
-            comm_cost = comm_cost_str(total_fda_steps, total_rounds, num_clients, nn_num_weights, 'gm')
-            print(f"Step {total_fda_steps} , Communication Cost: {comm_cost}")
+            sync_needed = est_var > theta  # REMOVE
+            if sync_needed: print(f"Synchronizing...!")  # REMOVE
+            client_step_out(num_clients, total_fda_steps, sync_needed)  # REMOVE
+            comm_cost = step_comm_cost_str(num_clients, nn_num_weights, sync_needed, 'linear')  # REMOVE
+            print(f"Step {total_fda_steps:4} , Communication Cost: {comm_cost}")  # REMOVE
 
             # If Epoch has passed in this fda step
             if tmp_fda_steps >= fda_steps_in_one_epoch:
@@ -167,7 +170,6 @@ def gm_federated_simulation(test_dataset, federated_dataset, server_cnn, client_
                     break
 
         # Round finished
-        print(f"Synchronizing...!")
 
         # server average
         if aggr_scheme == 'avg':

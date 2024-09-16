@@ -8,7 +8,7 @@ import gc
 from fdavg.utils.communication_cost import step_comm_cost_str  # REMOVE
 from fdavg.models.miscellaneous import count_weights
 from fdavg.utils.pretty_printers import print_epoch_metrics
-from fdavg.utils.clients_out import client_step_out
+from fdavg.utils.clients_out import client_step_out  # REMOVE
 
 def ksi_unit(w_t0, w_tminus1):
     """
