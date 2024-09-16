@@ -12,7 +12,7 @@ def format_bytes(size):
         n += 1
 
     # Format the size with 5 decimal places
-    return f"{size:.5f} {units[n]}"
+    return f"{size:.3f} {units[n]}"
 
 def step_comm_cost_str(num_clients, num_nn_weights, sync_needed, method, sketch_width=250, sketch_depth=5):
 

@@ -365,7 +365,7 @@ def sketch_federated_simulation(test_dataset, federated_dataset, server_cnn, cli
             if sync_needed: print(f"Synchronizing...!")  # REMOVE
             client_step_out(num_clients, total_fda_steps, sync_needed)  # REMOVE
             comm_cost = step_comm_cost_str(num_clients, nn_num_weights, sync_needed, 'linear')  # REMOVE
-            print(f"Step {total_fda_steps:4} , Communication Cost: {comm_cost}")
+            print(f"Step: {total_fda_steps:4} , Step Communication Cost: {comm_cost}")  # REMOVE
             
             # If Epoch has passed in this fda step
             if tmp_fda_steps >= fda_steps_in_one_epoch:
