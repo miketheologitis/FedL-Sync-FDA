@@ -30,6 +30,8 @@ def step_comm_cost_str(num_clients, num_nn_weights, sync_needed, method, sketch_
     elif method == 'synchronous':
         monitor_bytes = 0
 
+    monitor_bytes = monitor_bytes * num_clients
+
     if sync_needed:
         total_bytes_transmitted = sync_bytes + monitor_bytes
     else:

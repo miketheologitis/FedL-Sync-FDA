@@ -37,7 +37,7 @@ def print_finish_testing_info(start_time, end_time, ds_name, bias, fda_name, num
     print(f"Theta : {theta}")
     print(f"Aggr. Scheme : {aggr_scheme}")
     print(f"Per-Layer training : {per_layer}")
-    print(f"Total simulation time: {end_time-start_time} sec")
+    print(f"Wall-time: {end_time-start_time} sec")
     print("-----------------------------------------")
     print()
 
