@@ -42,6 +42,15 @@ If you are planning on **not** using GPU:
 pip install tensorflow==2.15.0 pandas pyarrow
 ```
 
+## Clone repo
+Clone and materialize LFS files (deep pre-trained models ~2GB).
+```bash
+git clone https://github.com/miketheologitis/FedL-Sync-FDA
+cd FedL-Sync-FDA/
+git lfs fetch --all
+git lfs pull
+```
+
 ## Create Experiments
 We provide the workflow to run all of our experiments. Note that they required 200K GPU hours so hopefully there are many available GPUs.
 
@@ -54,15 +63,6 @@ We will create one json file, `0.json`, encompassing all 1434 unique experiments
 
 ```bash
 bash paper_experiments.sh
-```
-
-## Clone repo
-Clone and materialize LFS files (deep pre-trained models ~2GB).
-```bash
-git clone https://github.com/miketheologitis/FedL-Sync-FDA
-cd FedL-Sync-FDA/
-git lfs fetch --all
-git lfs pull
 ```
 
 ## Run Experiments
