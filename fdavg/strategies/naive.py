@@ -7,6 +7,10 @@ from fdavg.models.miscellaneous import (average_trainable_client_weights, weight
 
 import gc
 
+from fdavg.utils.communication_cost import step_comm_cost_str  # REMOVE
+from fdavg.models.miscellaneous import count_weights
+from fdavg.utils.pretty_printers import print_epoch_metrics
+from fdavg.utils.clients_out import client_step_out  # REMOVE
 
 def client_train_naive(w_t0, client_cnn, client_dataset):
     """
@@ -102,6 +106,9 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
     total_fda_steps = 0  # Total number of FDA steps taken
     est_var = 0  # Estimated variance
 
+    nn_num_weights = count_weights(server_cnn)
+    num_clients = len(client_cnns)
+
     synchronize_clients(server_cnn, client_cnns)
     
     # Initialize models and weights
@@ -132,7 +139,11 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
             tmp_fda_steps += 1
             total_fda_steps += 1
 
-            print(f"Step {tmp_fda_steps}/{fda_steps_in_one_epoch} ,  est_var: {est_var:.2f}")
+            sync_needed = est_var > theta  # REMOVE
+            if sync_needed: print(f"Synchronizing...!")  # REMOVE
+            client_step_out(num_clients, total_fda_steps, sync_needed)  # REMOVE
+            comm_cost = step_comm_cost_str(num_clients, nn_num_weights, sync_needed, 'linear')  # REMOVE
+            print(f"Step: {total_fda_steps:4} , Step Communication Cost: {comm_cost}")  # REMOVE
             
             # If Epoch has passed in this fda step
             if tmp_fda_steps >= fda_steps_in_one_epoch:
@@ -179,7 +190,7 @@ def naive_federated_simulation(test_dataset, federated_dataset, server_cnn, clie
         est_var = 0
 
         total_rounds += 1
-        
+
     return epoch_metrics_list
 
 
@@ -344,7 +355,7 @@ def naive_federated_simulation_per_layer(test_dataset, federated_dataset, server
                 train_acc = tf.reduce_mean([cnn.metrics[1].result() for cnn in client_cnns]).numpy()
                 epoch_metrics = EpochMetrics(epoch_count, copy.copy(total_rounds), total_fda_steps, acc, train_acc)
                 epoch_metrics_list.append(epoch_metrics)
-                print(epoch_metrics)  # remove
+                print_epoch_metrics(epoch_metrics)
                 # -------------------------------
 
                 # Reset training accuracy

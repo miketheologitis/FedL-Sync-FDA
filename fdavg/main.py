@@ -10,18 +10,20 @@ epoch_metrics_path = os.path.normpath(os.path.join(script_dir, f'{tmp_dir}/epoch
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--comb_file_id', type=int, help="The combinations prefix, i.e., <PREFIX>.json")
+    parser.add_argument('--comb_file_id', type=int, default=-1, help="The combinations prefix, i.e., <PREFIX>.json")
     parser.add_argument('--sim_id', type=int, help="The Sim ID (0, 1, 2, ...)")
     parser.add_argument('--gpu_id', type=str, help="The GPU ID that the simulation will use.")
     parser.add_argument('--gpu_mem', type=int, default=-1,
                         help="The maximum GPU memory. If not given we dynamically allocate.")
     parser.add_argument('--slurm', action='store_true', help="Use if we are in SLURM HPC env.")
+    parser.add_argument('--kafka', action='store_true',
+                        help="Use if we are reading hyper-parameters from Kafka.")
     args = parser.parse_args()
 
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
     import tensorflow as tf
     if tf.config.list_physical_devices('GPU'):
-        print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+        # print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
         if args.gpu_mem == -1:
             for gpu in tf.config.experimental.list_physical_devices('GPU'):
@@ -42,7 +44,17 @@ if __name__ == '__main__':
     from fdavg.utils.pretty_printers import print_finish_testing_info, print_current_test_info
     from fdavg.utils.parameter_tools import derive_params
 
-    hyperparameters = get_test_hyper_parameters(f'{args.comb_file_id}', args.sim_id)
+    if not args.kafka:
+        hyperparameters = get_test_hyper_parameters(f'{args.comb_file_id}', args.sim_id)
+    else:
+        from fdavg.utils.read_combinations import kafka_get_test_hyper_parameters
+        print("Waiting hyper-parameters from Kafka...")
+        hyperparameters = kafka_get_test_hyper_parameters()
+        print("Received hyper-parameters from Kafka!")
+
+    from fdavg.utils.clients_out import client_step_out_create
+
+    client_step_out_create(hyperparameters['num_clients'])  # REMOVE
 
     # 1. Derive parameters
     derived_params = derive_params(**hyperparameters)

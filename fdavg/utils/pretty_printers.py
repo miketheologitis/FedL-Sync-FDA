@@ -1,6 +1,7 @@
 
 def print_current_test_info(ds_name, bias, fda_name, num_clients, batch_size, num_epochs,
                             num_steps_until_rtc_check, nn_name, bench_test, theta, aggr_scheme, per_layer, **kwargs):
+    nn_name = nn_name if nn_name != 'AdvancedCNN' else 'VGG16*'
     print()
     print(f"------------ Current Test : ------------")
     print(f"Dataset name : {ds_name}")
@@ -21,6 +22,7 @@ def print_current_test_info(ds_name, bias, fda_name, num_clients, batch_size, nu
     
 def print_finish_testing_info(start_time, end_time, ds_name, bias, fda_name, num_clients, batch_size, num_epochs,
                               num_steps_until_rtc_check, nn_name, bench_test, theta, aggr_scheme, per_layer, **kwargs):
+    nn_name = nn_name if nn_name != 'AdvancedCNN' else 'VGG16*'
     print()
     print(f"------------ Finished Testing : ------------")
     print(f"Dataset name : {ds_name}")
@@ -35,6 +37,16 @@ def print_finish_testing_info(start_time, end_time, ds_name, bias, fda_name, num
     print(f"Theta : {theta}")
     print(f"Aggr. Scheme : {aggr_scheme}")
     print(f"Per-Layer training : {per_layer}")
-    print(f"Total simulation time: {end_time-start_time} sec")
+    print(f"Wall-time: {end_time-start_time} sec")
     print("-----------------------------------------")
+    print()
+
+
+def print_epoch_metrics(epoch_metrics):
+    print()
+    print(f"---------- Epoch {epoch_metrics.epoch} Finished : -----------")
+    print(f"Total Synchronizations : {epoch_metrics.total_rounds}")
+    print(f"Test Accuracy : {epoch_metrics.accuracy:.4f}")
+    print(f"Train Accuracy : {epoch_metrics.train_accuracy:.4f}")
+    print("------------------------------------------")
     print()
