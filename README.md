@@ -1,46 +1,84 @@
-# Requirements
+# Abstract
+
+The ever-growing volume and decentralized nature of data, coupled with the need to harness it and extract knowledge, have led to the extensive use of distributed deep learning (DDL) techniques for training. These techniques rely on local training performed at distributed nodes using locally collected data, followed by a periodic synchronization process that combines these models to create a unified global model. However, the frequent synchronization of deep learning models, encompassing millions to many billions of parameters, creates a communication bottleneck, severely hindering scalability. Worse yet, DDL algorithms typically waste valuable bandwidth and render themselves less practical in bandwidth-constrained federated settings by relying on overly simplistic, periodic, and rigid synchronization schedules. These inefficiencies make the training process increasingly impractical as they demand excessive time for data communication. To address these shortcomings, we propose Federated Dynamic Averaging (FDA), a communication-efficient DDL strategy that dynamically triggers synchronization based on the value of the model variance. In essence, the costly synchronization step is triggered only if the local models---initialized from a common global model after each synchronization---have significantly diverged. This decision is facilitated by the transmission of a small local state from each distributed node. Through extensive experiments across a wide range of learning tasks we demonstrate that FDA reduces communication cost by orders of magnitude, compared to both traditional and cutting-edge communication-efficient algorithms. Additionally, we show that FDA maintains robust performance across diverse data heterogeneity settings.
+
+# Cite
+```python
+@inproceedings{theologitis2025fda,
+  author       = {Michail Theologitis and
+                  Georgios Frangias and
+                  Georgios Anestis and
+                  Vasilis Samoladas and
+                  Antonios Deligiannakis},
+  title        = {Communication-Efficient Distributed Deep Learning via Federated Dynamic
+                  Averaging},
+  booktitle    = {Proceedings 28th International Conference on Extending Database Technology,
+                  {EDBT} 2025, Barcelona, Spain, March 25-28, 2025},
+  pages        = {411--424},
+  publisher    = {OpenProceedings.org},
+  year         = {2025},
+  url          = {https://doi.org/10.48786/edbt.2025.33},
+  doi          = {10.48786/EDBT.2025.33}
+}
+```
+
+# Paper Experiments
+
+## Create Enviroment
 **TensorFlow** version: **v2.15**
 ```bash
 conda create -n tf-2.15 python==3.9
-```
-```bash
 conda activate tf-2.15
 ```
 
 If you are planning on using GPU:
 ```bash
 pip install --extra-index-url https://pypi.nvidia.com tensorrt-bindings==8.6.1 tensorrt-libs==8.6.1
-```
-```bash
 pip install -U tensorflow[and-cuda]==2.15.0 pandas pyarrow
 ```
+
 If you are planning on **not** using GPU:
 ```bash
 pip install tensorflow==2.15.0 pandas pyarrow
 ```
 
-# Clone repository
-Clone.
+## Clone repo
+Clone and materialize LFS files (deep pre-trained models ~2GB).
 ```bash
 git clone https://github.com/miketheologitis/FedL-Sync-FDA
-```
-Materialize LFS files (deep pre-trained models ~2GB).
-```bash
 cd FedL-Sync-FDA/
-```
-```bash
 git lfs fetch --all
-```
-```bash
 git lfs pull
 ```
-# WorkFlow
+
+## Create Experiments
+We provide the workflow to run all of our experiments. Note that they required 200K GPU hours so hopefully there are many available GPUs.
+
+We will create one json file, `0.json`, encompassing all 1434 unique experiments of the paper.
+1. **LeNet-5 - MNIST**: `612` unique simulations.
+2. **VGG16\* - MNIST**: `612` unique simulations.
+3. **DenseNet121 - CIFAR-10**: `96` unique simulations.
+4. **DenseNet201 - CIFAR-10**: `96` unique simulations.
+5. **ConvNeXtLarge - CIFAR-100** (fine-tuning): `18` unique simulations.
+
+```bash
+bash paper_experiments.sh
+```
+
+## Run Experiments
+```bash
+python -m local_simulator --n_sims 1434 --comb_file_id 0 --n_gpus 2
+```
+
+
+
+
+# Example WorkFlow
 1. Using the `create_combinations.py` script, create all the experiments you want to run.
 2. Simulate the experiments you created utilizing GPUs, in **SLURM**, in a local machine, or in a server cluster provided they are visible to `nvidia-smi`. For the `Kafka` WorkFlow go to the end of this README.
 
 ## 1. Combination Script
 
-### Example
 Go to project directory `/FedL-Sync-FDA` and create a combinations file:
 ```bash
 python -m fdavg.utils.create_combinations --fda linear sketch --nn DenseNet121 --ds_name CIFAR10 --b 32 --e 100 --th 350 400 --num_clients 5 10 15 20 --comb_file_id 0
@@ -115,142 +153,3 @@ rm /metrics/tmp/epoch_metrics/*
 ```
 Then, run the notebook `/FedL-Sync-FDA/notebooks/data_analysis/epoch_metrics_analysis.ipynb` to see the results (plots) in
 `/FedL-Sync-FDA/metrics/plots`.
-
-
-# Paper Experiments
-
-We provide the workflow to run all of our experiments. Note that they required 200K GPU hours so hopefully there
-are many available GPUs.
-
-## 1. Create individual simulation combinations
-We will create 5 combination files, one for each Neural Network - Dataset, encompassing all experiments of the paper.
-1. **LeNet-5 - MNIST**: `0.json` with total of `612` unique simulations.
-2. **VGG16\* - MNIST**: `1.json` with total of `612` unique simulations.
-3. **DenseNet121 - CIFAR-10**: `2.json` with total of `96` unique simulations.
-4. **DenseNet201 - CIFAR-10**: `3.json` with total of `96` unique simulations.
-5. **ConvNeXtLarge - CIFAR-100** (fine-tuning): `4.json` with total of `18` unique simulations.
-
-### LeNet-5
-
-**IID:**
-```bash
-python -m fdavg.utils.create_combinations --fda linear sketch --nn LeNet-5 --ds_name MNIST --b 32 --e 300 --th 0.5 1 1.5 2 3 5 7 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 0
-```
-```bash
-python -m fdavg.utils.create_combinations --fda synchronous --nn LeNet-5 --ds_name MNIST --b 32 --e 300 --th 0 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 0 --append_to
-```
-```bash
-python -m fdavg.utils.create_combinations --fda synchronous FedAdam --nn LeNet-5 --ds_name MNIST --b 32 --e 1000 --th 0 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 0 --append_to
-```
-**Non-IID:**
-```bash
-python -m fdavg.utils.create_combinations --fda linear sketch --nn LeNet-5 --ds_name MNIST --b 32 --e 300 --th 0.5 1 1.5 2 3 5 7 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --bias 0.6 -1 --comb_file_id 0 --append_to
-```
-```bash
-python -m fdavg.utils.create_combinations --fda synchronous --nn LeNet-5 --ds_name MNIST --b 32 --e 300 --th 0 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --bias 0.6 -1 --comb_file_id 0 --append_to
-```
-```bash
-python -m fdavg.utils.create_combinations --fda synchronous FedAdam --nn LeNet-5 --ds_name MNIST --b 32 --e 1000 --th 0 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --bias 0.6 -1 --comb_file_id 0 --append_to
-```
-
-### VGG16*
-
-**IID:**
-```bash
-python -m fdavg.utils.create_combinations --fda linear sketch --nn AdvancedCNN --ds_name MNIST --b 32 --e 300 --th 20 25 30 50 75 90 100 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 1
-```
-```bash
-python -m fdavg.utils.create_combinations --fda synchronous --nn AdvancedCNN --ds_name MNIST --b 32 --e 300 --th 0 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 1 --append_to
-```
-```bash
-python -m fdavg.utils.create_combinations --fda synchronous FedAdam --nn AdvancedCNN --ds_name MNIST --b 32 --e 1000 --th 0 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 1 --append_to
-```
-
-**Non-IID:**
-```bash
-python -m fdavg.utils.create_combinations --fda linear sketch --nn AdvancedCNN --ds_name MNIST --b 32 --e 300 --th 20 25 30 50 75 90 100 --bias -1 -2 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 1 --append_to
-```
-```bash
-python -m fdavg.utils.create_combinations --fda synchronous --nn AdvancedCNN --ds_name MNIST --b 32 --e 300 --th 0 --bias -1 -2 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 1 --append_to
-```
-```bash
-python -m fdavg.utils.create_combinations --fda synchronous FedAdam --nn AdvancedCNN --ds_name MNIST --b 32 --e 1000 --th 0 --bias -1 -2 --num_clients 5 10 15 20 25 30 35 40 45 50 55 60 --comb_file_id 1 --append_to
-```
-
-### DenseNet121
-```bash
-python -m fdavg.utils.create_combinations --fda linear sketch --nn DenseNet121 --ds_name CIFAR-10 --b 32 --e 300 --th 200 250 275 300 325 350 400 --num_clients 5 10 15 20 25 30 --comb_file_id 2
-```
-```bash
-python -m fdavg.utils.create_combinations --fda synchronous --nn DenseNet121 --ds_name CIFAR-10 --b 32 --e 300 --th 0 --num_clients 5 10 15 20 25 30 --comb_file_id 2 --append_to
-```
-```bash
-python -m fdavg.utils.create_combinations --fda FedAvgM --nn DenseNet121 --ds_name CIFAR-10 --b 32 --e 1000 --th 0 --num_clients 5 10 15 20 25 30 --comb_file_id 2 --append_to
-```
-
-### DenseNet201
-```bash
-python -m fdavg.utils.create_combinations --fda linear sketch --nn DenseNet201 --ds_name CIFAR-10 --b 32 --e 300 --th 200 250 275 300 325 350 400 --num_clients 5 10 15 20 25 30 --comb_file_id 3
-```
-```bash
-python -m fdavg.utils.create_combinations --fda synchronous --nn DenseNet201 --ds_name CIFAR-10 --b 32 --e 300 --th 0 --num_clients 5 10 15 20 25 30 --comb_file_id 3 --append_to
-```
-```bash
-python -m fdavg.utils.create_combinations --fda FedAvgM --nn DenseNet201 --ds_name CIFAR-10 --b 32 --e 1000 --th 0 --num_clients 5 10 15 20 25 30 --comb_file_id 3 --append_to
-```
-
-### ConvNeXtLarge
-```bash
-python -m fdavg.utils.create_combinations --fda linear sketch --nn ConvNeXtLarge --ds_name CIFAR-100 --b 32 --e 30 --th 25 50 100 150 --num_clients 3 5 --comb_file_id 4
-```
-```bash
-python -m fdavg.utils.create_combinations --fda synchronous --nn ConvNeXtLarge --ds_name CIFAR-100 --b 32 --e 30 --th 0 --num_clients 3 5 --comb_file_id 4 --append_to
-```
-
-## 2. Simulations
-To streamline things, we will run experiments locally.
-```bash
-python -m local_simulator --n_sims 612 --comb_file_id 0 --n_gpus 2
-```
-```bash
-python -m local_simulator --n_sims 612 --comb_file_id 1 --n_gpus 2
-```
-```bash
-python -m local_simulator --n_sims 96 --comb_file_id 2 --n_gpus 2
-```
-```bash
-python -m local_simulator --n_sims 96 --comb_file_id 3 --n_gpus 2
-```
-```bash
-python -m local_simulator --n_sims 18 --comb_file_id 4 --n_gpus 2
-```
-
-# Kafka WorkFlow
-
-```bash
-cd FedL-Sync-FDA
-```
-
-```bash
-python -m fdavg.utils.create_combinations --fda sketch --nn AdvancedCNN --ds_name MNIST --b 32 --e 300 --th 100 --num_clients 20 --comb_file_id 0
-```
-
-```bash
-python -m kafka_submitter --n_gpus 2 --kafka_topic FedL --kafka_server localhost:9092
-```
-
-```bash
-cd /FedL-Sync-FDA/metrics/tmp/combinations
-```
-
-```bash
-kafka-console-producer.sh --bootstrap-server localhost:9092 --topic FedL < 0.json
-```
-
-```bash
-cd /FedL-Sync-FDA/metrics/tmp/local_out
-```
-
-```bash
-tail -f server_sim1.out
-```
